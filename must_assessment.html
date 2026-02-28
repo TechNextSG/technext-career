@@ -1,0 +1,962 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>MUST Candidate Profile Assessment</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --navy: #1a2e4a; --navy-light: #2d4a6b; --gold: #c9a84c; --gold-light: #e8c96c;
+      --blue: #2d5f8a; --bg: #f0f4f8; --white: #ffffff; --text: #1e2d3d;
+      --muted: #6b7a8d; --success: #1e7e5e; --warn: #c77a1a; --danger: #c0392b;
+      --border: #dce3ea; --shadow: 0 4px 20px rgba(26,46,74,0.12); --radius: 12px;
+    }
+
+    body { font-family: 'Segoe UI', system-ui, -apple-system, sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; line-height: 1.6; }
+
+    .screen { display: none; }
+    .screen.active { display: block; }
+
+    .topbar {
+      background: var(--navy); color: var(--white); padding: 12px 32px;
+      display: flex; align-items: center; justify-content: space-between;
+      position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+      box-shadow: 0 2px 12px rgba(0,0,0,0.25);
+    }
+    .topbar-brand { display: flex; align-items: center; gap: 10px; }
+    .logo-mark {
+      width: 36px; height: 36px; background: var(--gold); border-radius: 8px;
+      display: flex; align-items: center; justify-content: center;
+      font-weight: 900; font-size: 16px; color: var(--navy); letter-spacing: -1px;
+    }
+    .topbar-brand span { font-size: 14px; font-weight: 600; opacity: 0.9; }
+    .topbar-meta { display: flex; align-items: center; gap: 20px; }
+    #timer-display {
+      font-size: 13px; font-family: 'Courier New', monospace;
+      background: rgba(255,255,255,0.1); padding: 4px 12px; border-radius: 20px; color: var(--gold-light);
+    }
+    #timer-display.warn { color: #ffb347; background: rgba(255,179,71,0.15); }
+    #overall-progress-bar { width: 140px; height: 6px; background: rgba(255,255,255,0.15); border-radius: 99px; overflow: hidden; }
+    #overall-progress-fill { height: 100%; background: var(--gold); border-radius: 99px; transition: width 0.4s ease; width: 0%; }
+    #progress-label { font-size: 11px; opacity: 0.7; }
+
+    .page-wrap { max-width: 780px; margin: 0 auto; padding: 88px 20px 60px; }
+
+    .card { background: var(--white); border-radius: var(--radius); box-shadow: var(--shadow); padding: 40px; margin-bottom: 24px; }
+
+    /* INTRO */
+    .must-pillars { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; margin: 32px 0; }
+    .pillar { background: var(--bg); border-radius: 10px; padding: 20px 16px; text-align: center; border: 2px solid transparent; transition: border-color 0.2s, transform 0.2s; }
+    .pillar:hover { border-color: var(--gold); transform: translateY(-2px); }
+    .pillar .letter { font-size: 32px; font-weight: 900; color: var(--navy); line-height: 1; margin-bottom: 6px; }
+    .pillar .letter span { color: var(--gold); }
+    .pillar .name { font-size: 13px; font-weight: 700; color: var(--navy); text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 6px; }
+    .pillar .desc { font-size: 12px; color: var(--muted); line-height: 1.4; }
+    .info-row { display: flex; gap: 24px; justify-content: center; font-size: 13px; color: var(--muted); margin-bottom: 32px; flex-wrap: wrap; }
+    .info-row .item { display: flex; align-items: center; gap: 6px; }
+    .info-row .dot { width: 8px; height: 8px; border-radius: 50%; background: var(--gold); display: inline-block; }
+
+    /* FORM */
+    .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+    .form-grid.full { grid-template-columns: 1fr; }
+    .field { display: flex; flex-direction: column; gap: 6px; }
+    .field label { font-size: 13px; font-weight: 600; color: var(--navy); text-transform: uppercase; letter-spacing: 0.5px; }
+    .field label .req { color: var(--gold); }
+    .field input, .field select { padding: 11px 14px; border: 2px solid var(--border); border-radius: 8px; font-size: 15px; color: var(--text); background: var(--white); transition: border-color 0.2s; outline: none; font-family: inherit; }
+    .field input:focus, .field select:focus { border-color: var(--navy); }
+    .field.error input, .field.error select { border-color: var(--danger); }
+
+    /* BUTTONS */
+    .btn { display: inline-flex; align-items: center; justify-content: center; gap: 8px; padding: 13px 28px; border-radius: 8px; border: none; font-size: 15px; font-weight: 700; cursor: pointer; transition: all 0.2s; font-family: inherit; }
+    .btn-primary { background: var(--navy); color: var(--white); }
+    .btn-primary:hover { background: var(--navy-light); transform: translateY(-1px); box-shadow: 0 4px 14px rgba(26,46,74,0.3); }
+    .btn-gold { background: var(--gold); color: var(--navy); }
+    .btn-gold:hover { background: var(--gold-light); transform: translateY(-1px); }
+    .btn-outline { background: transparent; color: var(--navy); border: 2px solid var(--border); }
+    .btn-outline:hover { border-color: var(--navy); background: var(--bg); }
+    .btn:disabled { opacity: 0.45; cursor: not-allowed; transform: none !important; }
+    .btn-lg { padding: 16px 40px; font-size: 17px; }
+    .btn-block { width: 100%; }
+
+    /* SECTION HEADER */
+    .section-header { display: flex; align-items: center; gap: 16px; margin-bottom: 8px; }
+    .section-letter { width: 56px; height: 56px; border-radius: 12px; background: var(--navy); display: flex; align-items: center; justify-content: center; font-size: 28px; font-weight: 900; color: var(--gold); flex-shrink: 0; }
+    .section-info h2 { font-size: 20px; font-weight: 800; color: var(--navy); margin-bottom: 2px; }
+    .section-info p { font-size: 14px; color: var(--muted); }
+    .section-divider { height: 3px; background: linear-gradient(90deg, var(--navy), var(--gold), transparent); border-radius: 99px; margin: 16px 0 28px; }
+
+    /* QUESTION CARDS */
+    .question-block { background: var(--bg); border-radius: 10px; padding: 22px 24px; margin-bottom: 16px; border-left: 4px solid transparent; transition: border-color 0.2s; }
+    .question-block.answered { border-left-color: var(--gold); }
+    .question-block.unanswered-error { border-left-color: var(--danger); background: rgba(192,57,43,0.04); }
+    .q-number { font-size: 11px; font-weight: 700; color: var(--muted); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 8px; }
+    .q-type-tag { display: inline-block; font-size: 10px; font-weight: 700; letter-spacing: 1px; text-transform: uppercase; padding: 2px 7px; border-radius: 4px; margin-right: 6px; }
+    .tag-scenario { background: var(--navy); color: var(--gold); }
+    .tag-choice   { background: #2d5f8a; color: #fff; }
+    .q-text { font-size: 15px; font-weight: 500; color: var(--text); margin-bottom: 16px; line-height: 1.55; }
+    .q-scenario-body { background: white; border-left: 3px solid var(--navy); padding: 12px 16px; border-radius: 0 8px 8px 0; margin-bottom: 16px; font-size: 14px; color: var(--text); line-height: 1.55; font-style: italic; }
+
+    /* LIKERT */
+    .likert-scale { display: flex; gap: 8px; align-items: flex-end; }
+    .likert-option { flex: 1; display: flex; flex-direction: column; align-items: center; gap: 5px; }
+    .likert-btn { width: 100%; aspect-ratio: 1; max-width: 52px; border-radius: 50%; border: 2px solid var(--border); background: var(--white); cursor: pointer; transition: all 0.15s; display: flex; align-items: center; justify-content: center; font-size: 13px; font-weight: 700; color: var(--muted); }
+    .likert-btn:hover { border-color: var(--gold); color: var(--navy); transform: scale(1.1); }
+    .likert-btn.selected { background: var(--navy); border-color: var(--navy); color: var(--white); transform: scale(1.15); box-shadow: 0 4px 12px rgba(26,46,74,0.35); }
+    .likert-ends { display: flex; justify-content: space-between; margin-top: 8px; font-size: 11px; color: var(--muted); font-style: italic; }
+
+    /* SCENARIO MCQ */
+    .mcq-options { display: flex; flex-direction: column; gap: 10px; }
+    .mcq-option { display: flex; align-items: flex-start; gap: 12px; padding: 12px 16px; background: var(--white); border: 2px solid var(--border); border-radius: 8px; cursor: pointer; transition: all 0.15s; }
+    .mcq-option:hover { border-color: var(--gold); }
+    .mcq-option.selected { border-color: var(--navy); background: rgba(26,46,74,0.04); }
+    .mcq-option input[type=radio] { display: none; }
+    .mcq-marker { width: 24px; height: 24px; min-width: 24px; border-radius: 50%; border: 2px solid var(--border); display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 700; color: var(--muted); transition: all 0.15s; }
+    .mcq-option.selected .mcq-marker { background: var(--navy); border-color: var(--navy); color: var(--white); }
+    .mcq-text { font-size: 14px; color: var(--text); line-height: 1.5; padding-top: 1px; }
+
+    /* FORCED CHOICE */
+    .fc-instruction { font-size: 11px; font-weight: 700; color: var(--muted); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 10px; }
+    .fc-wrap { display: flex; flex-direction: column; gap: 8px; }
+    .fc-btn { display: flex; align-items: flex-start; gap: 12px; padding: 14px 16px; background: var(--white); border: 2px solid var(--border); border-radius: 8px; cursor: pointer; transition: all 0.15s; text-align: left; width: 100%; font-family: inherit; }
+    .fc-btn:hover { border-color: var(--gold); }
+    .fc-btn.selected { border-color: var(--navy); background: rgba(26,46,74,0.05); }
+    .fc-marker { width: 26px; height: 26px; min-width: 26px; border-radius: 50%; border: 2px solid var(--border); display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 800; color: var(--muted); transition: all 0.15s; flex-shrink: 0; margin-top: 1px; }
+    .fc-btn.selected .fc-marker { background: var(--navy); border-color: var(--navy); color: var(--gold); }
+    .fc-text { font-size: 14px; color: var(--text); line-height: 1.5; }
+    .fc-or { text-align: center; font-size: 11px; font-weight: 700; color: var(--muted); text-transform: uppercase; letter-spacing: 1px; padding: 2px 0; position: relative; }
+    .fc-or::before, .fc-or::after { content:''; position:absolute; top:50%; width:44%; height:1px; background:var(--border); }
+    .fc-or::before { left:0; } .fc-or::after { right:0; }
+
+    /* NAV */
+    .nav-row { display: flex; justify-content: space-between; align-items: center; margin-top: 32px; padding-top: 20px; border-top: 1px solid var(--border); }
+    .section-dots { display: flex; gap: 8px; }
+    .s-dot { width: 10px; height: 10px; border-radius: 50%; background: var(--border); transition: background 0.2s; }
+    .s-dot.done { background: var(--gold); }
+    .s-dot.active { background: var(--navy); transform: scale(1.3); }
+
+    /* RESULTS */
+    .status-badge { display: inline-block; padding: 10px 24px; border-radius: 99px; font-size: 14px; font-weight: 800; letter-spacing: 1px; text-transform: uppercase; margin-bottom: 16px; }
+    .status-badge.strong    { background: #d4edda; color: #155724; }
+    .status-badge.promising { background: #cce5ff; color: #004085; }
+    .status-badge.borderline{ background: #fff3cd; color: #856404; }
+    .status-badge.low       { background: #f8d7da; color: #721c24; }
+
+    .overall-score-ring { width: 140px; height: 140px; margin: 0 auto 24px; position: relative; }
+    .score-ring-svg { transform: rotate(-90deg); }
+    .score-ring-bg   { fill: none; stroke: var(--border); stroke-width: 12; }
+    .score-ring-fill { fill: none; stroke: var(--navy); stroke-width: 12; stroke-linecap: round; stroke-dasharray: 345; stroke-dashoffset: 345; transition: stroke-dashoffset 1.2s ease; }
+    .score-ring-label { position: absolute; top: 50%; left: 50%; transform: translate(-50%,-50%); text-align: center; }
+    .score-ring-label .pct { font-size: 28px; font-weight: 900; color: var(--navy); line-height: 1; }
+    .score-ring-label .of  { font-size: 11px; color: var(--muted); }
+
+    .score-row { display: flex; align-items: center; gap: 14px; margin-bottom: 12px; }
+    .score-letter-badge { width: 40px; height: 40px; min-width: 40px; background: var(--navy); color: var(--gold); border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 20px; font-weight: 900; }
+    .score-info { flex: 1; }
+    .score-info .s-name { font-size: 13px; font-weight: 700; color: var(--navy); text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 5px; }
+    .score-bar-wrap { height: 10px; background: var(--bg); border-radius: 99px; overflow: hidden; }
+    .score-bar { height: 100%; border-radius: 99px; transition: width 1s ease; width: 0%; }
+    .score-bar.m { background: linear-gradient(90deg, #1a2e4a, #2d5f8a); }
+    .score-bar.u { background: linear-gradient(90deg, #2d5f8a, #3b82b5); }
+    .score-bar.s { background: linear-gradient(90deg, #c9a84c, #e8c96c); }
+    .score-bar.t { background: linear-gradient(90deg, #1e7e5e, #27ae60); }
+    .score-pct { font-size: 14px; font-weight: 800; color: var(--navy); min-width: 44px; text-align: right; }
+
+    .insight-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 24px; }
+    .insight-card { background: var(--bg); border-radius: 8px; padding: 14px 16px; }
+    .insight-card .ic-label { font-size: 11px; font-weight: 700; color: var(--muted); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 6px; }
+    .insight-card .ic-value { font-size: 14px; font-weight: 600; color: var(--text); }
+    .insight-card.highlight { background: rgba(26,46,74,0.04); border: 1px solid rgba(26,46,74,0.12); }
+
+    .behavioral-section { margin-bottom: 24px; }
+    .behavioral-section h3 { font-size: 15px; font-weight: 800; color: var(--navy); margin-bottom: 12px; display: flex; align-items: center; gap: 8px; }
+    .behavioral-section h3 .dot { width: 8px; height: 8px; border-radius: 50%; }
+    .flag-list { list-style: none; display: flex; flex-direction: column; gap: 8px; }
+    .flag-list li { display: flex; align-items: flex-start; gap: 10px; font-size: 13px; color: var(--text); background: var(--bg); padding: 10px 14px; border-radius: 8px; }
+    .flag-icon { width: 18px; height: 18px; min-width: 18px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 10px; margin-top: 1px; }
+    .flag-icon.pos { background: #d4edda; color: #155724; }
+    .flag-icon.neg { background: #f8d7da; color: #721c24; }
+    .flag-icon.neu { background: #fff3cd; color: #856404; }
+
+    .iq-list { list-style: none; counter-reset: iq; }
+    .iq-list li { counter-increment: iq; display: flex; align-items: flex-start; gap: 10px; font-size: 13px; color: var(--text); padding: 10px 0; border-bottom: 1px solid var(--border); }
+    .iq-list li::before { content: counter(iq); min-width: 22px; height: 22px; background: var(--navy); color: var(--gold); border-radius: 50%; font-size: 11px; font-weight: 700; display: flex; align-items: center; justify-content: center; flex-shrink: 0; margin-top: 1px; }
+
+    .disclaimer { background: var(--bg); border-radius: 8px; padding: 14px 16px; font-size: 12px; color: var(--muted); line-height: 1.6; border-left: 3px solid var(--gold); margin-bottom: 24px; }
+    .print-row { display: flex; gap: 12px; justify-content: flex-end; }
+
+    .divider-gold { height: 1px; background: linear-gradient(90deg, var(--gold), transparent); margin: 24px 0; }
+    .mt-16 { margin-top: 16px; }
+
+    @media print {
+      .topbar, .nav-row, .print-row { display: none !important; }
+      .screen { display: block !important; }
+      #screen-intro, #screen-info, #screen-m, #screen-u, #screen-s, #screen-g { display: none !important; }
+      #screen-results { display: block !important; }
+      body { background: white; }
+      .page-wrap { padding: 20px; }
+      .card { box-shadow: none; border: 1px solid #ddd; }
+    }
+
+    @media (max-width: 600px) {
+      .card { padding: 24px 18px; }
+      .must-pillars { grid-template-columns: 1fr; }
+      .form-grid { grid-template-columns: 1fr; }
+      .insight-grid { grid-template-columns: 1fr; }
+      .likert-scale { gap: 4px; }
+      .likert-btn { max-width: 44px; }
+      .score-row { flex-wrap: wrap; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- TOP BAR -->
+<div class="topbar" id="main-topbar" style="display:none">
+  <div class="topbar-brand">
+    <div class="logo-mark">M</div>
+    <span>MUST Candidate Assessment</span>
+  </div>
+  <div class="topbar-meta">
+    <div id="timer-display">00:00</div>
+    <div style="display:flex;flex-direction:column;align-items:flex-end;gap:4px">
+      <div id="overall-progress-bar"><div id="overall-progress-fill"></div></div>
+      <div id="progress-label" style="font-size:11px;color:rgba(255,255,255,0.5)">0 of 32 answered</div>
+    </div>
+  </div>
+</div>
+
+<!-- ===================== INTRO ===================== -->
+<div id="screen-intro" class="screen active">
+  <div class="page-wrap" style="padding-top:40px">
+    <div class="card" style="padding:0;overflow:hidden">
+      <div style="background:var(--navy);padding:40px 40px 32px">
+        <div style="display:flex;align-items:center;gap:12px;margin-bottom:24px">
+          <div class="logo-mark" style="width:48px;height:48px;font-size:20px">M</div>
+          <div style="color:rgba(255,255,255,0.7);font-size:13px;font-weight:600;letter-spacing:1px">MUST ENGINEERING</div>
+        </div>
+        <h1 style="font-size:28px;font-weight:900;color:white;margin-bottom:10px;line-height:1.2">
+          Candidate Profile<br><span style="color:var(--gold)">Assessment</span>
+        </h1>
+        <p style="color:rgba(255,255,255,0.65);font-size:15px;max-width:480px;line-height:1.6">
+          A behavioural and values profiling tool to assess candidate alignment with MUST's core culture and working principles.
+        </p>
+      </div>
+      <div style="padding:32px 40px">
+        <div class="must-pillars">
+          <div class="pillar">
+            <div class="letter"><span>M</span></div>
+            <div class="name">Mission</div>
+            <div class="desc">Driven to complete. Takes ownership and pushes through obstacles without being told.</div>
+          </div>
+          <div class="pillar">
+            <div class="letter"><span>U</span></div>
+            <div class="name">Underdog</div>
+            <div class="desc">Hungry to prove real worth. Treats every opportunity as earned, not owed.</div>
+          </div>
+          <div class="pillar">
+            <div class="letter"><span>S</span></div>
+            <div class="name">Sacrifice</div>
+            <div class="desc">Puts the company's bigger picture above personal comfort. Trades ego for pride.</div>
+          </div>
+          <div class="pillar" style="grid-column: span 3; max-width:240px; margin:0 auto;">
+            <div class="letter"><span>T</span></div>
+            <div class="name">Technical</div>
+            <div class="desc">Rigorous, disciplined, and continuously growing. Strong technical drive propels real contribution.</div>
+          </div>
+        </div>
+        <div style="background:var(--bg);border-radius:8px;padding:16px 20px;margin-bottom:20px">
+          <div style="font-size:13px;font-weight:700;color:var(--navy);margin-bottom:8px;text-transform:uppercase;letter-spacing:0.5px">About this assessment</div>
+          <div style="font-size:13px;color:var(--muted);line-height:1.7">
+            This profile uses a mix of question formats — including <strong>paired preference choices</strong>, <strong>real-world scenarios</strong>, and <strong>agreement scales</strong>. There are no trick questions. Answer based on what is genuinely most true for you, not what you think is the "right" answer.
+          </div>
+        </div>
+        <div class="info-row">
+          <div class="item"><span class="dot"></span>32 questions</div>
+          <div class="item"><span class="dot"></span>~20 minutes</div>
+          <div class="item"><span class="dot"></span>4 sections</div>
+          <div class="item"><span class="dot"></span>Confidential</div>
+        </div>
+        <button class="btn btn-primary btn-lg btn-block" onclick="goToInfo()">Begin Assessment &rarr;</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ===================== CANDIDATE INFO ===================== -->
+<div id="screen-info" class="screen">
+  <div class="page-wrap">
+    <div class="card">
+      <div style="margin-bottom:24px">
+        <div style="font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:1.5px;margin-bottom:6px">Step 1 of 5</div>
+        <h2 style="font-size:22px;font-weight:800;color:var(--navy)">Your Information</h2>
+        <p style="font-size:14px;color:var(--muted);margin-top:4px">Kept confidential and used only to identify your submission.</p>
+      </div>
+      <div class="form-grid">
+        <div class="field" id="f-fullname">
+          <label>Full Name <span class="req">*</span></label>
+          <input type="text" id="inp-fullname" placeholder="e.g. Ahmad bin Razali" />
+        </div>
+        <div class="field" id="f-position">
+          <label>Position Applied For <span class="req">*</span></label>
+          <input type="text" id="inp-position" placeholder="e.g. Service Engineer" />
+        </div>
+        <div class="field" id="f-date">
+          <label>Assessment Date <span class="req">*</span></label>
+          <input type="date" id="inp-date" />
+        </div>
+        <div class="field">
+          <label>Years of Experience</label>
+          <select id="inp-experience">
+            <option value="">Select range</option>
+            <option>0 – 1 year (Fresh / Junior)</option>
+            <option>2 – 3 years</option>
+            <option>4 – 6 years</option>
+            <option>7 – 10 years</option>
+            <option>10+ years</option>
+          </select>
+        </div>
+      </div>
+      <div class="form-grid full mt-16">
+        <div class="field">
+          <label>Interviewer / HR Officer</label>
+          <input type="text" id="inp-interviewer" placeholder="Name of the person administering this assessment" />
+        </div>
+      </div>
+      <div class="nav-row" style="border-top:none;padding-top:24px">
+        <button class="btn btn-outline" onclick="goTo('screen-intro')">&#8592; Back</button>
+        <button class="btn btn-primary" onclick="startAssessment()">Start Assessment &rarr;</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- SECTION SCREENS -->
+<div id="screen-m" class="screen"><div class="page-wrap"><div id="section-m-content"></div></div></div>
+<div id="screen-u" class="screen"><div class="page-wrap"><div id="section-u-content"></div></div></div>
+<div id="screen-s" class="screen"><div class="page-wrap"><div id="section-s-content"></div></div></div>
+<div id="screen-t" class="screen"><div class="page-wrap"><div id="section-t-content"></div></div></div>
+
+<!-- RESULTS -->
+<div id="screen-results" class="screen">
+  <div class="page-wrap"><div class="card" id="results-card"></div></div>
+</div>
+
+<script>
+// ================================================================
+// QUESTION DATA
+// Types: 'likert' (1–5, scored direct), 'reverse' (1–5, scored 6-x),
+//        'forced' (2 options, each has a score), 'scenario' (4 options, weighted)
+// Per section max: 2×forced(max3) + 2×likert(max5) + 2×reverse(max5) + 2×scenario(max4) = 34
+// ================================================================
+
+const LIKERT_LABELS = ['Strongly\nDisagree','Disagree','Neutral','Agree','Strongly\nAgree'];
+const SECTION_META = {
+  M:{ letter:'M', name:'Mission Driven',     color:'#1a2e4a', bar:'m', desc:'Measures your drive to complete, take ownership, and persist through difficulty without supervision.' },
+  U:{ letter:'U', name:'Underdog Hunger',    color:'#2d5f8a', bar:'u', desc:'Measures how you respond to being overlooked, and whether you treat opportunities as earned rather than owed.' },
+  S:{ letter:'S', name:'Sacrifice & Ego',    color:'#c9a84c', bar:'s', desc:"Measures your willingness to put the company's bigger picture above personal comfort and recognition." },
+  T:{ letter:'T', name:'Technical Mindset',  color:'#1e7e5e', bar:'t', desc:'Measures your discipline, rigour, and commitment to continuous growth as a field service engineer in a precision engineering environment.' }
+};
+
+const QUESTIONS = {
+M:[
+  { id:'m1', type:'forced', max:3,
+    text:'Which of these statements is more like you?',
+    options:[
+      { label:'A', text:'I feel genuinely unsettled leaving a task unfinished — even if the working day is over and others have moved on.', score:3 },
+      { label:'B', text:"Knowing when to step back and return to a task with fresh eyes is part of working effectively — I don't push through for its own sake.", score:1 }
+    ]},
+  { id:'m2', type:'reverse', max:5,
+    text:'After several hours working on a problem without clear progress, I begin to question whether continuing is the best use of my time.' },
+  { id:'m3', type:'likert', max:5,
+    text:'I take full personal ownership of a task\'s outcome, even when the result depends on people or factors outside my direct control.' },
+  { id:'m4', type:'scenario', max:4,
+    scenario:'A critical PECVD chamber has been down for 4 hours. You have methodically tested the most likely causes — all clear. A colleague now suggests a different fault source. Your manager is pressing for a timeline.',
+    text:'What do you do?',
+    options:[
+      { label:'A', text:'Escalate directly to the equipment manufacturer\'s hotline — fresh external input will resolve this faster.', score:1 },
+      { label:'B', text:'Continue your own systematic diagnosis. You haven\'t exhausted your approach, and switching without evidence could lose more time.', score:4 },
+      { label:'C', text:'Immediately defer to your colleague\'s theory — time is critical and they may have spotted something you\'ve missed.', score:2 },
+      { label:'D', text:'Spend 15 minutes quickly stress-testing both your theory and your colleague\'s in parallel before deciding which to pursue.', score:3 }
+    ]},
+  { id:'m5', type:'likert', max:5,
+    text:'I give the same level of care and effort to routine, repetitive tasks as I do to complex or high-stakes ones.' },
+  { id:'m6', type:'reverse', max:5,
+    text:'Once I have resolved the most difficult or technically interesting part of a task, I find it harder to stay fully invested in completing the remainder.' },
+  { id:'m7', type:'forced', max:3,
+    text:'Which of these is more accurate for you when things get difficult at work?',
+    options:[
+      { label:'A', text:'I tend to push harder and become more determined when under genuine pressure — difficulty sharpens my focus.', score:3 },
+      { label:'B', text:'I tend to slow down and become more methodical when the stakes are high — moving carefully prevents compounding the problem.', score:1 }
+    ]},
+  { id:'m8', type:'scenario', max:4,
+    scenario:'You are three weeks into a complex tool installation at a client fab — 80% complete. A higher-profile job has just come in. Your manager informally mentions they may reassign you and have someone else finish your current job.',
+    text:'How do you respond?',
+    options:[
+      { label:'A', text:'Accept whichever the manager decides without voicing a preference — it\'s their call.', score:2 },
+      { label:'B', text:'Ask your manager what serves the client and company best, and commit fully to that outcome.', score:3 },
+      { label:'C', text:'Ask to complete the current installation first — you started it and want to see it through properly.', score:4 },
+      { label:'D', text:'Express readiness for the new, more advanced assignment — it\'s a better opportunity for your development.', score:1 }
+    ]}
+],
+
+U:[
+  { id:'u1', type:'forced', max:3,
+    text:'Which of these statements is more like you?',
+    options:[
+      { label:'A', text:'Being doubted or underestimated gives me an edge — I tend to perform better when I have something to prove.', score:3 },
+      { label:'B', text:'I perform at my best when I feel genuinely trusted and supported by the people I work with.', score:1 }
+    ]},
+  { id:'u2', type:'likert', max:5,
+    text:'I bring the same level of preparation and professional seriousness to assignments that others consider low-priority or routine.' },
+  { id:'u3', type:'scenario', max:4,
+    scenario:"You have worked hard for 6 months on a demanding client account. A junior colleague — 18 months in — is selected to lead a new, prestigious client engagement instead of you. No explanation is given.",
+    text:'What is your reaction?',
+    options:[
+      { label:'A', text:'Offer your full support to your colleague — their growth and the team\'s success is what matters most.', score:1 },
+      { label:'B', text:'Accept it without reaction — trust that management has their reasons and focus on your current responsibilities.', score:2 },
+      { label:'C', text:'Speak to your manager professionally to understand the decision and make clear your interest in similar opportunities.', score:3 },
+      { label:'D', text:'Use it as direct motivation — commit to working harder and making it impossible to be overlooked next time.', score:4 }
+    ]},
+  { id:'u4', type:'reverse', max:5,
+    text:'I need to feel that my contributions are being noticed and appreciated by my team or manager in order to stay fully motivated.' },
+  { id:'u5', type:'likert', max:5,
+    text:'Past experiences of being overlooked or underestimated have made me more determined and driven — not discouraged.' },
+  { id:'u6', type:'scenario', max:4,
+    scenario:"You are assigned to perform a routine service check on a legacy machine at a small, low-revenue client site. A colleague is simultaneously sent to a flagship account with cutting-edge equipment.",
+    text:'How do you approach your assignment?',
+    options:[
+      { label:'A', text:'Complete it efficiently and use any spare time to self-study or prepare for more technically advanced upcoming work.', score:3 },
+      { label:'B', text:'Bring exactly the same thoroughness and preparation as any other job — your standards don\'t change with the audience.', score:4 },
+      { label:'C', text:'Complete it professionally but acknowledge to yourself that you\'re less energised than you would be at a more challenging site.', score:2 },
+      { label:'D', text:'Complete the job and mention to your manager afterward that more technically challenging placements would help your development.', score:1 }
+    ]},
+  { id:'u7', type:'forced', max:3,
+    text:'Which of these is more like you when you start a new job or role?',
+    options:[
+      { label:'A', text:'I look for an early opportunity to demonstrate what I\'m capable of — I want to show what I bring to the table.', score:3 },
+      { label:'B', text:'I focus on understanding the environment and building trust before I try to make my mark.', score:1 }
+    ]},
+  { id:'u8', type:'reverse', max:5,
+    text:'If I consistently work hard and deliver good results, I expect to be recognised and rewarded in proportion to my contribution.' }
+],
+
+S:[
+  { id:'s1', type:'forced', max:3,
+    text:'Which of these statements is more like you in a team context?',
+    options:[
+      { label:'A', text:'When the team is struggling or behind, I instinctively step in and take on more — even when it goes beyond my defined responsibilities.', score:3 },
+      { label:'B', text:'I believe clear role ownership and discipline is what creates reliable, accountable teams — overreach, even with good intent, creates gaps elsewhere.', score:1 }
+    ]},
+  { id:'s2', type:'likert', max:5,
+    text:'I find more genuine satisfaction in a team achieving a shared goal than in being personally credited for my own contribution to it.' },
+  { id:'s3', type:'scenario', max:4,
+    scenario:"You confidently diagnose a machine fault and instruct the client to replace component X. After replacement, the fault persists. The actual issue turns out to be component Y — which your colleague had flagged earlier and you had dismissed.",
+    text:'How do you handle it with the client?',
+    options:[
+      { label:'A', text:'Focus entirely on resolving the fault as fast as possible — full transparency on what happened can be addressed in a proper debrief after.', score:2 },
+      { label:'B', text:"Tell the client directly: 'I made an error in my initial diagnosis. Here is what actually happened and what we've now resolved.'", score:4 },
+      { label:'C', text:"Acknowledge your colleague's contribution clearly in front of the client and ensure they receive the credit for identifying the root cause.", score:3 },
+      { label:'D', text:"Explain it to the client as: 'These faults can present intermittently — we've now comprehensively addressed the root cause.'", score:1 }
+    ]},
+  { id:'s4', type:'reverse', max:5,
+    text:"I find it difficult to fully move on from a decision my team has made when I genuinely believe my original approach was the right one." },
+  { id:'s5', type:'likert', max:5,
+    text:'I am willing to take on roles or tasks that are less visible or prestigious, as long as they genuinely contribute to the team\'s success.' },
+  { id:'s6', type:'scenario', max:4,
+    scenario:"Your team needs a volunteer for a weekend emergency call-out to a remote client site, 4 hours away. It is not mandatory. You have personal plans. After 24 hours, nobody else has stepped up.",
+    text:'What do you do?',
+    options:[
+      { label:'A', text:"Decline — you've already given up significant personal time for work this period and need to protect your personal commitments.", score:1 },
+      { label:'B', text:'Ask your manager whether there is genuinely no other alternative before making a decision.', score:2 },
+      { label:'C', text:'Volunteer, but inform your manager clearly that you are giving up personal plans — it is worth acknowledging.', score:3 },
+      { label:'D', text:'Volunteer without raising the personal inconvenience — the team needs someone and you can do it.', score:4 }
+    ]},
+  { id:'s7', type:'forced', max:3,
+    text:'Which of these reflects your preference more accurately?',
+    options:[
+      { label:'A', text:"I'm more comfortable in a lower-profile but critical support role than in a visible role that is less essential to the actual outcome.", score:3 },
+      { label:'B', text:'I believe high-visibility roles matter — they create leverage, amplify contribution, and allow you to develop others through your example.', score:1 }
+    ]},
+  { id:'s8', type:'reverse', max:5,
+    text:'I keep an informal mental record of contributions I made that went unrecognised — and it affects my willingness to go the extra mile in future.' }
+],
+
+T:[
+  // Forced-choice 1: Process discipline vs pragmatic investigation
+  { id:'t1', type:'forced', max:3,
+    text:'Which of these is more like you when assigned to service a tool you have never worked on before?',
+    options:[
+      { label:'A', text:'I work through all available service documentation and understand the system thoroughly before making any physical intervention on the tool.', score:3 },
+      { label:'B', text:'I start with a careful visual and operational assessment of the tool while simultaneously cross-referencing the manual as I go.', score:1 }
+    ]},
+  // Reverse Likert: SOP / checklist attitude
+  { id:'t2', type:'reverse', max:5,
+    text:'In practice, detailed service checklists and preventive maintenance procedures are more of a formality — experienced engineers already know what the tool actually needs.' },
+  // Likert: Understanding "why" not just "how"
+  { id:'t3', type:'likert', max:5,
+    text:"I make a consistent effort to understand why a procedure works — not just how to execute it — so I can adapt effectively when the tool's behaviour deviates from expected." },
+  // Scenario 1: SOP deviation during PM — CVD furnace
+  { id:'t4', type:'scenario', max:4,
+    scenario:"During a scheduled PM on a CVD furnace at a client fab, you deviate slightly from the documented SOP because you believe the change will improve the process outcome. The tool subsequently fails its qualification run.",
+    text:'How do you handle it?',
+    options:[
+      { label:'A', text:'Immediately disclose the deviation in writing to both the client and your manager — provide a full account of what changed and why.', score:4 },
+      { label:'B', text:'Restore the configuration to the standard SOP and requalify — document the deviation honestly in your internal service report.', score:3 },
+      { label:'C', text:'Investigate thoroughly whether your deviation could be the actual cause before disclosing anything — avoid alarming the client unnecessarily.', score:2 },
+      { label:'D', text:'Requalify using the standard SOP. If the tool passes, the deviation was not a factor — document it only if the tool fails again.', score:1 }
+    ]},
+  // Likert: Proactive technical learning
+  { id:'t5', type:'likert', max:5,
+    text:"I actively follow technical service bulletins, firmware updates, and revised procedures from equipment manufacturers — even when it is not formally required as part of my role." },
+  // Reverse Likert: Documentation after resolution
+  { id:'t6', type:'reverse', max:5,
+    text:"Once a fault is resolved and the tool is back in production, I consider the job essentially complete — detailed root cause documentation can be completed when there is more time." },
+  // Forced-choice 2: Deep knowledge vs network/speed
+  { id:'t7', type:'forced', max:3,
+    text:'Which of these reflects your professional goal as a field service engineer more accurately?',
+    options:[
+      { label:'A', text:'My goal is to develop deep enough technical mastery of the tools I support that I can diagnose most faults from first principles, independently.', score:3 },
+      { label:'B', text:'My goal is to build a reliable network of colleagues and manufacturer contacts so that between us, any fault can be resolved quickly and efficiently.', score:1 }
+    ]},
+  // Scenario 2: Unfamiliar fault under client pressure — etch tool downtime
+  { id:'t8', type:'scenario', max:4,
+    scenario:"You arrive at a critical etch tool downtime at a client fab. On inspection, you realise this is a fault mode you have personally never encountered before. The client is already agitated. Your company had committed to a 3–4 hour resolution estimate.",
+    text:'How do you proceed?',
+    options:[
+      { label:'A', text:"Tell the client immediately: 'This is a fault I haven't personally seen before — I'll diagnose it systematically and bring in support if needed.'", score:3 },
+      { label:'B', text:'Begin your systematic diagnosis and simultaneously get internal technical support on the line — handle it competently without informing the client of your specific unfamiliarity with this fault.', score:4 },
+      { label:'C', text:'Request to escalate to a more experienced engineer right away — being transparent about your limits protects both the client and the company.', score:2 },
+      { label:'D', text:'Call the equipment manufacturer hotline immediately — this is precisely the situation that resource exists for.', score:1 }
+    ]}
+]
+};
+
+// ================================================================
+// STATE
+// ================================================================
+const answers = {};
+let timerInterval = null, startTime = null;
+const SECTION_ORDER = ['M','U','S','T'];
+const SECTION_SCREENS = { M:'screen-m', U:'screen-u', S:'screen-s', T:'screen-t' };
+const SECTION_MAX = 34; // 2×3 + 2×5 + 2×5 + 2×4
+
+// ================================================================
+// NAVIGATION
+// ================================================================
+function goTo(id) {
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  window.scrollTo(0, 0);
+}
+function goToInfo() {
+  document.getElementById('inp-date').valueAsDate = new Date();
+  goTo('screen-info');
+}
+function navSection(sec) { goTo(SECTION_SCREENS[sec]); }
+
+function navSectionForward(cur, next) {
+  const qs = QUESTIONS[cur];
+  let allOk = true;
+  qs.forEach(q => {
+    if (answers[q.id] === undefined) {
+      document.getElementById('qblock-'+q.id).classList.add('unanswered-error');
+      allOk = false;
+    }
+  });
+  if (!allOk) {
+    const first = qs.find(q => answers[q.id] === undefined);
+    document.getElementById('qblock-'+first.id).scrollIntoView({ behavior:'smooth', block:'center' });
+    return;
+  }
+  if (next) {
+    SECTION_ORDER.forEach((s, i) => {
+      const dot = document.getElementById('dot-'+s);
+      if (!dot) return;
+      if (SECTION_ORDER.indexOf(s) < SECTION_ORDER.indexOf(next)) { dot.classList.add('done'); dot.classList.remove('active'); }
+      else if (s === next) { dot.classList.add('active'); dot.classList.remove('done'); }
+    });
+    goTo(SECTION_SCREENS[next]);
+  } else {
+    clearInterval(timerInterval);
+    showResults();
+    goTo('screen-results');
+  }
+}
+
+// ================================================================
+// START
+// ================================================================
+function startAssessment() {
+  let ok = true;
+  ['inp-fullname','inp-position','inp-date'].forEach(id => {
+    const el = document.getElementById(id);
+    const f  = el.closest('.field');
+    if (!el.value.trim()) { f.classList.add('error'); ok = false; }
+    else f.classList.remove('error');
+  });
+  if (!ok) return;
+  document.getElementById('main-topbar').style.display = 'flex';
+  buildSections();
+  startTimer();
+  goTo('screen-m');
+}
+
+// ================================================================
+// TIMER
+// ================================================================
+function startTimer() {
+  startTime = Date.now();
+  timerInterval = setInterval(() => {
+    const e = Math.floor((Date.now() - startTime) / 1000);
+    const el = document.getElementById('timer-display');
+    el.textContent = String(Math.floor(e/60)).padStart(2,'0') + ':' + String(e%60).padStart(2,'0');
+    if (e > 1200) el.classList.add('warn');
+  }, 1000);
+}
+
+// ================================================================
+// BUILD SECTIONS
+// ================================================================
+function buildSections() {
+  SECTION_ORDER.forEach((sec, idx) => {
+    const meta = SECTION_META[sec];
+    const qs   = QUESTIONS[sec];
+    const container = document.getElementById('section-'+sec.toLowerCase()+'-content');
+    let html = `
+      <div class="card">
+        <div class="section-header">
+          <div class="section-letter">${meta.letter}</div>
+          <div class="section-info">
+            <h2>Section ${idx+1}: ${meta.name}</h2>
+            <p>${meta.desc}</p>
+          </div>
+        </div>
+        <div class="section-divider"></div>`;
+    qs.forEach((q, qi) => { html += buildQuestionHTML(q, qi+1, sec, qs.length); });
+    html += `
+        <div class="nav-row">
+          <div>${idx > 0 ? `<button class="btn btn-outline" onclick="navSection('${SECTION_ORDER[idx-1]}')">&#8592; Previous</button>` : ''}</div>
+          <div class="section-dots">${SECTION_ORDER.map((s,i)=>`<div class="s-dot ${i<idx?'done':i===idx?'active':''}" id="dot-${s}"></div>`).join('')}</div>
+          <button class="btn btn-primary" onclick="navSectionForward('${sec}','${SECTION_ORDER[idx+1]||''}')">
+            ${idx < SECTION_ORDER.length-1 ? 'Next Section &rarr;' : 'View My Results &rarr;'}
+          </button>
+        </div>
+      </div>`;
+    container.innerHTML = html;
+  });
+}
+
+function buildQuestionHTML(q, num, sec, total) {
+  let inner = '';
+
+  if (q.type === 'likert' || q.type === 'reverse') {
+    const reverseNote = q.type === 'reverse' ? '' : ''; // no visible indicator
+    inner = `
+      <div class="likert-scale">
+        ${[1,2,3,4,5].map(v=>`
+          <div class="likert-option">
+            <button class="likert-btn" id="lb-${q.id}-${v}" onclick="setLikert('${q.id}',${v},'${sec}','${q.type}')">${v}</button>
+          </div>`).join('')}
+      </div>
+      <div class="likert-ends"><span>Strongly Disagree</span><span>Strongly Agree</span></div>`;
+
+  } else if (q.type === 'forced') {
+    const [optA, optB] = q.options;
+    inner = `
+      <div class="fc-instruction">Choose the one that is more like you</div>
+      <div class="fc-wrap">
+        <button class="fc-btn" id="fc-${q.id}-A" onclick="setForced('${q.id}','A',${optA.score})">
+          <span class="fc-marker">A</span>
+          <span class="fc-text">${optA.text}</span>
+        </button>
+        <div class="fc-or">or</div>
+        <button class="fc-btn" id="fc-${q.id}-B" onclick="setForced('${q.id}','B',${optB.score})">
+          <span class="fc-marker">B</span>
+          <span class="fc-text">${optB.text}</span>
+        </button>
+      </div>`;
+
+  } else { // scenario
+    inner = `
+      ${q.scenario ? `<div class="q-scenario-body">${q.scenario}</div>` : ''}
+      <div class="mcq-options">
+        ${q.options.map(o=>`
+          <label class="mcq-option" id="mcq-${q.id}-${o.label}" onclick="setMCQ('${q.id}','${o.label}',${o.score},'${sec}')">
+            <input type="radio" name="${q.id}" value="${o.label}"/>
+            <div class="mcq-marker">${o.label}</div>
+            <div class="mcq-text">${o.text}</div>
+          </label>`).join('')}
+      </div>`;
+  }
+
+  const typeTag = q.type === 'scenario' ? `<span class="q-type-tag tag-scenario">Scenario</span>` :
+                  q.type === 'forced'   ? `<span class="q-type-tag tag-choice">Preference</span>` : '';
+
+  return `
+    <div class="question-block" id="qblock-${q.id}">
+      <div class="q-number">Question ${num} of ${total} &nbsp;·&nbsp; ${SECTION_META[sec].name}</div>
+      <div class="q-text">${typeTag}${q.text}</div>
+      ${inner}
+    </div>`;
+}
+
+// ================================================================
+// ANSWER HANDLERS
+// ================================================================
+function setLikert(qid, val, sec, type) {
+  answers[qid] = { raw: val, type };
+  [1,2,3,4,5].forEach(v => document.getElementById(`lb-${qid}-${v}`).classList.toggle('selected', v===val));
+  markAnswered(qid);
+}
+
+function setForced(qid, label, score) {
+  answers[qid] = { raw: score, type:'forced', label };
+  ['A','B'].forEach(l => document.getElementById(`fc-${qid}-${l}`).classList.toggle('selected', l===label));
+  markAnswered(qid);
+}
+
+function setMCQ(qid, label, score, sec) {
+  answers[qid] = { raw: score, type:'scenario', label };
+  const q = findQ(qid);
+  if (q) q.options.forEach(o => document.getElementById(`mcq-${qid}-${o.label}`).classList.toggle('selected', o.label===label));
+  markAnswered(qid);
+}
+
+function markAnswered(qid) {
+  const b = document.getElementById('qblock-'+qid);
+  b.classList.add('answered'); b.classList.remove('unanswered-error');
+  updateProgress();
+}
+
+function findQ(id) {
+  for (const s of SECTION_ORDER) for (const q of QUESTIONS[s]) if (q.id===id) return q;
+  return null;
+}
+
+function updateProgress() {
+  const total = SECTION_ORDER.reduce((a,s)=>a+QUESTIONS[s].length, 0);
+  const done  = Object.keys(answers).length;
+  document.getElementById('overall-progress-fill').style.width = (done/total*100)+'%';
+  document.getElementById('progress-label').textContent = `${done} of ${total} answered`;
+}
+
+// ================================================================
+// SCORING
+// ================================================================
+function getScore(qid) {
+  const a = answers[qid];
+  if (!a) return 0;
+  if (a.type === 'reverse') return 6 - a.raw;   // reverse scored
+  return a.raw;                                   // likert / forced / scenario
+}
+
+function computeScores() {
+  const scores = {};
+  SECTION_ORDER.forEach(sec => {
+    const qs  = QUESTIONS[sec];
+    const raw = qs.reduce((a,q) => a + getScore(q.id), 0);
+    scores[sec] = { raw, max: SECTION_MAX, pct: Math.round((raw/SECTION_MAX)*100) };
+  });
+  const totalRaw = Object.values(scores).reduce((a,s)=>a+s.raw,0);
+  const totalMax = SECTION_ORDER.length * SECTION_MAX;
+  scores.OVERALL = { raw:totalRaw, max:totalMax, pct: Math.round((totalRaw/totalMax)*100) };
+  return scores;
+}
+
+function consistencyCheck() {
+  // Count how many reverse items candidate scored in the "non-obvious" direction
+  // Non-obvious = disagreeing with the negatively-framed statement (SA/A → raw 4/5 → score 2/1 — honest self-acknowledgment)
+  // Suspicious = disagreeing with ALL reverse items (raw 1/2 → reversed to 5/4 → looks clean but could be coached)
+  const reverseIds = ['m2','m6','u4','u8','s4','s8','t2','t6'];
+  let highReverseCount = 0; // answered 1 or 2 (SD/D) on reverse items (honest about limitation)
+  let lowReverseCount  = 0; // answered 4 or 5 (A/SA) on reverse items (claiming no limitation)
+  reverseIds.forEach(id => {
+    const a = answers[id];
+    if (!a) return;
+    if (a.raw <= 2) highReverseCount++;  // Disagree = admitting some of this applies
+    if (a.raw >= 4) lowReverseCount++;   // Agree = claiming the limitation applies (scores low)
+  });
+  // Candidates who disagree with ALL reverse items (all claiming no limitations) may be gaming
+  const allClean = lowReverseCount === 0 && highReverseCount === 8;
+  return { highReverseCount, lowReverseCount, allClean };
+}
+
+function getRecommendation(pct) {
+  if (pct >= 80) return { label:'Strong MUST Fit', cls:'strong',
+    summary:"This candidate demonstrates strong behavioural alignment with MUST's core values. Positive indicators across mission ownership, underdog hunger, sacrifice mindset, and ground-level work ethic. Recommend proceeding to structured interview." };
+  if (pct >= 65) return { label:'Promising — Interview Recommended', cls:'promising',
+    summary:"This candidate shows solid alignment in several MUST dimensions with some areas requiring deeper validation. A targeted behavioural interview is recommended to probe weaker sections before a final decision." };
+  if (pct >= 50) return { label:'Borderline — Further Assessment Needed', cls:'borderline',
+    summary:"This candidate shows partial alignment with MUST values. There are notable gaps in one or more key dimensions. A structured follow-up interview and additional reference checks are strongly recommended before proceeding." };
+  return { label:'Not Recommended at This Time', cls:'low',
+    summary:"This candidate does not demonstrate sufficient alignment with MUST's behavioural values at this stage. Consider re-evaluation at a later stage if circumstances or role requirements change." };
+}
+
+function getBehaviouralFlags(scores) {
+  const flags = [];
+  const {M, U, S} = scores;
+  const {allClean, lowReverseCount} = consistencyCheck();
+
+  if (allClean)
+    flags.push({ type:'neu', text:'Response pattern note: Candidate answered all 8 reverse-scored items in the non-limiting direction. Results may reflect genuine values OR awareness of psychometric structure — verify through interview.' });
+
+  if (M.pct >= 78) flags.push({ type:'pos', text:'Strong completion drive — likely to take ownership and persist through ambiguous, high-pressure situations without close supervision.' });
+  else if (M.pct < 55) flags.push({ type:'neg', text:'Mission persistence is below threshold — candidate may disengage when tasks are prolonged, ambiguous, or lack direct recognition.' });
+
+  if (U.pct >= 78) flags.push({ type:'pos', text:'High underdog hunger — treats every opportunity as earned, not owed. Likely to be internally motivated and resilient when sidelined.' });
+  else if (U.pct < 55) flags.push({ type:'neg', text:'Low underdog drive — candidate may expect recognition proportional to effort and disengage when opportunities do not come easily.' });
+
+  if (S.pct >= 78) flags.push({ type:'pos', text:'Demonstrates willingness to absorb personal cost for team and company outcomes — ego appears well-managed and redirected toward collective pride.' });
+  else if (S.pct < 55) flags.push({ type:'neg', text:'Sacrifice mindset is underdeveloped — candidate may prioritise personal recognition and find it difficult to take accountability when things go wrong.' });
+
+  if (scores.T.pct >= 78) flags.push({ type:'pos', text:'Strong technical mindset — demonstrates process discipline, proactive learning, and commitment to root-cause rigour. Likely to grow rapidly in a precision engineering environment.' });
+  else if (scores.T.pct < 55) flags.push({ type:'neg', text:'Technical attitude requires attention — candidate may treat procedures as optional, defer too quickly to others, or deprioritise documentation. Probe directly in interview.' });
+
+  // Specific scenario answers
+  const m4 = answers['m4']; if (m4 && m4.label==='A') flags.push({ type:'neg', text:'Scenario (M-4): Chose to escalate to the manufacturer immediately when stuck — tendency to deflect rather than persist with own diagnosis. Probe ownership under downtime pressure.' });
+  const s3 = answers['s3']; if (s3 && s3.label==='D') flags.push({ type:'neg', text:'Scenario (S-3): When wrong, chose face-saving language over direct admission to client — ego management may be a gap. Probe accountability in interview.' });
+  const t4 = answers['t4']; if (t4 && (t4.label==='C'||t4.label==='D')) flags.push({ type:'neg', text:'Scenario (T-4): After an SOP deviation caused a qual failure, candidate avoided or delayed disclosure. Process integrity and honesty under pressure should be probed.' });
+  const t8 = answers['t8']; if (t8 && t8.label==='D') flags.push({ type:'neg', text:'Scenario (T-8): On encountering an unfamiliar fault, immediately escalated to the manufacturer rather than attempting systematic diagnosis. Probe technical self-sufficiency.' });
+
+  if (flags.length === 0) flags.push({ type:'neu', text:'No critical behavioural flags detected. Proceed with standard structured interview.' });
+  return flags;
+}
+
+function getInterviewQuestions(scores) {
+  const qs = [];
+  if (scores.M.pct < 75) qs.push("Tell me about a time you were working on something difficult and progress completely stalled. What did you do — and how long did you stay with it before changing approach?");
+  if (scores.U.pct < 75) qs.push("Describe a time you were passed over for an opportunity you worked hard for. Walk me through how you responded over the following weeks.");
+  if (scores.S.pct < 75) qs.push("Tell me about a time you were publicly wrong about something technical. How did you handle it in front of the client or your team?");
+  if (scores.T.pct < 75) qs.push("Tell me about a time you encountered a technical fault you had never seen before. Walk me through your exact diagnostic process and what you did when your first hypothesis was wrong.");
+  qs.push("In semiconductor field service, tools going down can cost a client over a million dollars per hour. Walk me through exactly how you personally manage an unresolved downtime situation beyond the 6-hour mark.");
+  qs.push("Describe a time you deviated from a documented procedure because you believed your approach was better. What happened, and what did you do when the outcome was not what you expected?");
+  return qs;
+}
+
+// ================================================================
+// RESULTS PAGE
+// ================================================================
+function showResults() {
+  const scores = computeScores();
+  const rec    = getRecommendation(scores.OVERALL.pct);
+  const flags  = getBehaviouralFlags(scores);
+  const iqs    = getInterviewQuestions(scores);
+  const name   = document.getElementById('inp-fullname').value.trim();
+  const pos    = document.getElementById('inp-position').value.trim();
+  const dt     = document.getElementById('inp-date').value;
+  const hr     = document.getElementById('inp-interviewer').value.trim();
+  const elapsed = startTime ? Math.floor((Date.now()-startTime)/1000) : 0;
+  const em = String(Math.floor(elapsed/60)).padStart(2,'0');
+  const es = String(elapsed%60).padStart(2,'0');
+  const circ = 345;
+  const offset = circ - (scores.OVERALL.pct/100)*circ;
+
+  const secPcts = SECTION_ORDER.map(s=>({key:s,pct:scores[s].pct,name:SECTION_META[s].name}));
+  secPcts.sort((a,b)=>b.pct-a.pct);
+  const atRisk = SECTION_ORDER.filter(s=>scores[s].pct<60);
+
+  document.getElementById('results-card').innerHTML = `
+    <div style="text-align:center;padding:32px 0 16px">
+      <div class="status-badge ${rec.cls}">${rec.label}</div>
+      <div class="overall-score-ring">
+        <svg class="score-ring-svg" width="140" height="140" viewBox="0 0 120 120">
+          <circle class="score-ring-bg" cx="60" cy="60" r="54"/>
+          <circle class="score-ring-fill" id="ring-fill" cx="60" cy="60" r="54" style="stroke-dashoffset:${circ}"/>
+        </svg>
+        <div class="score-ring-label">
+          <div class="pct" id="ring-pct">0%</div>
+          <div class="of">Overall</div>
+        </div>
+      </div>
+      <h2 style="font-size:22px;font-weight:800;color:var(--navy);margin-bottom:4px">${name}</h2>
+      <div style="font-size:14px;color:var(--muted)">${pos}${hr?' &nbsp;·&nbsp; Assessed by: '+hr:''}</div>
+      <div style="font-size:13px;color:var(--muted);margin-top:4px">${dt} &nbsp;·&nbsp; Completion time: ${em}m ${es}s</div>
+    </div>
+
+    <div class="divider-gold"></div>
+
+    <div style="margin-bottom:28px">
+      ${SECTION_ORDER.map(sec=>`
+        <div class="score-row">
+          <div class="score-letter-badge">${SECTION_META[sec].letter}</div>
+          <div class="score-info">
+            <div class="s-name">${SECTION_META[sec].name}</div>
+            <div class="score-bar-wrap"><div class="score-bar ${SECTION_META[sec].bar}" id="bar-${sec}" data-pct="${scores[sec].pct}"></div></div>
+          </div>
+          <div class="score-pct" id="spct-${sec}">0%</div>
+        </div>`).join('')}
+    </div>
+
+    <div class="insight-grid">
+      <div class="insight-card highlight">
+        <div class="ic-label">Strongest Area</div>
+        <div class="ic-value">${secPcts[0].name} (${secPcts[0].pct}%)</div>
+      </div>
+      <div class="insight-card">
+        <div class="ic-label">Area to Probe</div>
+        <div class="ic-value">${secPcts[secPcts.length-1].name} (${secPcts[secPcts.length-1].pct}%)</div>
+      </div>
+      <div class="insight-card">
+        <div class="ic-label">Raw Score</div>
+        <div class="ic-value">${scores.OVERALL.raw} / ${scores.OVERALL.max}</div>
+      </div>
+      <div class="insight-card">
+        <div class="ic-label">Sections Below 60%</div>
+        <div class="ic-value">${atRisk.length===0?'None':atRisk.map(s=>SECTION_META[s].name).join(', ')}</div>
+      </div>
+    </div>
+
+    <div class="behavioral-section">
+      <h3><span class="dot" style="background:var(--navy)"></span>HR Behavioural Observations</h3>
+      <ul class="flag-list">
+        ${flags.map(f=>`<li><span class="flag-icon ${f.type}">${f.type==='pos'?'✓':f.type==='neg'?'!':'?'}</span><span>${f.text}</span></li>`).join('')}
+      </ul>
+    </div>
+
+    <div class="behavioral-section">
+      <div style="background:var(--bg);border-radius:8px;padding:16px 20px">
+        <div style="font-weight:700;color:var(--navy);margin-bottom:8px">Recommendation Summary</div>
+        <div style="font-size:14px;color:var(--text);line-height:1.6">${rec.summary}</div>
+      </div>
+    </div>
+
+    <div class="behavioral-section">
+      <h3><span class="dot" style="background:var(--gold)"></span>Recommended Interview Questions</h3>
+      <ul class="iq-list">${iqs.map(q=>`<li>${q}</li>`).join('')}</ul>
+    </div>
+
+    <div class="disclaimer">
+      <strong>Note to HR:</strong> This assessment is a behavioural screening tool only and should be used as one data point alongside structured interviews, reference checks, and practical evaluations. Forced-choice and reverse-scored items are included to reduce response bias; however, no psychometric tool eliminates it entirely. Results are confidential and must be accessed only by authorised personnel.
+    </div>
+
+    <div class="print-row">
+      <button class="btn btn-outline" onclick="window.print()">&#128424; Print / Save PDF</button>
+      <button class="btn btn-primary" onclick="location.reload()">New Assessment &rarr;</button>
+    </div>`;
+
+  setTimeout(() => {
+    document.getElementById('ring-fill').style.strokeDashoffset = offset;
+    animateNum('ring-pct', 0, scores.OVERALL.pct, '%', 1200);
+    SECTION_ORDER.forEach((sec, i) => setTimeout(() => {
+      document.getElementById('bar-'+sec).style.width = scores[sec].pct+'%';
+      animateNum('spct-'+sec, 0, scores[sec].pct, '%', 800);
+    }, i * 220));
+  }, 150);
+}
+
+function animateNum(id, from, to, suf, dur) {
+  const el = document.getElementById(id);
+  if (!el) return;
+  const start = performance.now();
+  (function step(now) {
+    const p = Math.min((now-start)/dur, 1);
+    const ease = 1 - Math.pow(1-p, 3);
+    el.textContent = Math.round(from + (to-from)*ease) + suf;
+    if (p < 1) requestAnimationFrame(step);
+  })(performance.now());
+}
+</script>
+</body>
+</html>
