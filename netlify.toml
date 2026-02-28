@@ -1,0 +1,15 @@
+[build]
+  publish = "."
+
+[functions]
+  directory = "netlify/functions"
+
+[[redirects]]
+  from = "/"
+  to = "/must_jobs.html"
+  status = 301
+
+[[redirects]]
+  from = "/v1"
+  to = "/must_assessment.html"
+  status = 301
