@@ -356,7 +356,7 @@ const SECTION_META = {
   M:{ letter:'M', name:'Mission Driven',     color:'#1a2e4a', bar:'m', desc:'Measures your drive to complete, take ownership, and persist through difficulty without supervision.' },
   U:{ letter:'U', name:'Underdog Hunger',    color:'#2d5f8a', bar:'u', desc:'Measures how you respond to being overlooked, and whether you treat opportunities as earned rather than owed.' },
   S:{ letter:'S', name:'Sacrifice & Ego',    color:'#c9a84c', bar:'s', desc:"Measures your willingness to put the company's bigger picture above personal comfort and recognition." },
-  T:{ letter:'T', name:'Technical Mindset',  color:'#1e7e5e', bar:'t', desc:'Measures your discipline, rigour, and commitment to continuous growth as a field service engineer in a precision engineering environment.' }
+  T:{ letter:'T', name:'Technical Mindset',  color:'#1e7e5e', bar:'t', desc:'Measures your discipline, rigour, and commitment to continuous growth as a field service engineer.' }
 };
 
 const QUESTIONS = {
@@ -372,7 +372,7 @@ M:[
   { id:'m3', type:'likert', max:5,
     text:'I take full personal ownership of a task\'s outcome, even when the result depends on people or factors outside my direct control.' },
   { id:'m4', type:'scenario', max:4,
-    scenario:'A critical PECVD chamber has been down for 4 hours. You have methodically tested the most likely causes — all clear. A colleague now suggests a different fault source. Your manager is pressing for a timeline.',
+    scenario:'A critical piece of production equipment has been down for 4 hours. You have methodically tested the most likely causes — all clear. A colleague now suggests a different fault source. Your manager is pressing for a timeline.',
     text:'What do you do?',
     options:[
       { label:'A', text:'Escalate directly to the equipment manufacturer\'s hotline — fresh external input will resolve this faster.', score:1 },
@@ -391,7 +391,7 @@ M:[
       { label:'B', text:'I tend to slow down and become more methodical when the stakes are high — moving carefully prevents compounding the problem.', score:1 }
     ]},
   { id:'m8', type:'scenario', max:4,
-    scenario:'You are three weeks into a complex tool installation at a client fab — 80% complete. A higher-profile job has just come in. Your manager informally mentions they may reassign you and have someone else finish your current job.',
+    scenario:'You are three weeks into a complex equipment installation at a client site — 80% complete. A higher-profile job has just come in. Your manager informally mentions they may reassign you and have someone else finish your current job.',
     text:'How do you respond?',
     options:[
       { label:'A', text:'Accept whichever the manager decides without voicing a preference — it\'s their call.', score:2 },
@@ -486,43 +486,43 @@ S:[
 T:[
   // Forced-choice 1: Process discipline vs pragmatic investigation
   { id:'t1', type:'forced', max:3,
-    text:'Which of these is more like you when assigned to service a tool you have never worked on before?',
+    text:'Which of these is more like you when assigned to service equipment you have never worked on before?',
     options:[
       { label:'A', text:'I work through all available service documentation and understand the system thoroughly before making any physical intervention on the tool.', score:3 },
-      { label:'B', text:'I start with a careful visual and operational assessment of the tool while simultaneously cross-referencing the manual as I go.', score:1 }
+      { label:'B', text:'I start with a careful visual and operational assessment of the equipment while simultaneously cross-referencing the manual as I go.', score:1 }
     ]},
-  // Reverse Likert: SOP / checklist attitude
+  // Reverse Likert: checklist attitude
   { id:'t2', type:'reverse', max:5,
-    text:'In practice, detailed service checklists and preventive maintenance procedures are more of a formality — experienced engineers already know what the tool actually needs.' },
+    text:'In practice, detailed service checklists and preventive maintenance procedures are more of a formality — experienced engineers already know what the equipment actually needs.' },
   // Likert: Understanding "why" not just "how"
   { id:'t3', type:'likert', max:5,
-    text:"I make a consistent effort to understand why a procedure works — not just how to execute it — so I can adapt effectively when the tool's behaviour deviates from expected." },
-  // Scenario 1: SOP deviation during PM — CVD furnace
+    text:"I make a consistent effort to understand why a procedure works — not just how to execute it — so I can adapt effectively when the equipment's behaviour deviates from what is expected." },
+  // Scenario 1: Procedure deviation during PM
   { id:'t4', type:'scenario', max:4,
-    scenario:"During a scheduled PM on a CVD furnace at a client fab, you deviate slightly from the documented SOP because you believe the change will improve the process outcome. The tool subsequently fails its qualification run.",
+    scenario:"During a scheduled preventive maintenance on a client's critical equipment, you deviate slightly from the documented procedure because you believe the change will improve the process outcome. The equipment subsequently fails its qualification test.",
     text:'How do you handle it?',
     options:[
       { label:'A', text:'Immediately disclose the deviation in writing to both the client and your manager — provide a full account of what changed and why.', score:4 },
-      { label:'B', text:'Restore the configuration to the standard SOP and requalify — document the deviation honestly in your internal service report.', score:3 },
+      { label:'B', text:'Restore the configuration to the standard procedure and re-run the qualification — document the deviation honestly in your internal service report.', score:3 },
       { label:'C', text:'Investigate thoroughly whether your deviation could be the actual cause before disclosing anything — avoid alarming the client unnecessarily.', score:2 },
-      { label:'D', text:'Requalify using the standard SOP. If the tool passes, the deviation was not a factor — document it only if the tool fails again.', score:1 }
+      { label:'D', text:'Re-run the qualification using the standard procedure. If the equipment passes, the deviation was not a factor — document it only if the equipment fails again.', score:1 }
     ]},
   // Likert: Proactive technical learning
   { id:'t5', type:'likert', max:5,
-    text:"I actively follow technical service bulletins, firmware updates, and revised procedures from equipment manufacturers — even when it is not formally required as part of my role." },
+    text:"I actively follow technical service bulletins, software updates, and revised procedures from equipment manufacturers — even when it is not formally required as part of my role." },
   // Reverse Likert: Documentation after resolution
   { id:'t6', type:'reverse', max:5,
-    text:"Once a fault is resolved and the tool is back in production, I consider the job essentially complete — detailed root cause documentation can be completed when there is more time." },
+    text:"Once a fault is resolved and the equipment is back in production, I consider the job essentially complete — detailed root cause documentation can be completed when there is more time." },
   // Forced-choice 2: Deep knowledge vs network/speed
   { id:'t7', type:'forced', max:3,
     text:'Which of these reflects your professional goal as a field service engineer more accurately?',
     options:[
-      { label:'A', text:'My goal is to develop deep enough technical mastery of the tools I support that I can diagnose most faults from first principles, independently.', score:3 },
+      { label:'A', text:'My goal is to develop deep enough technical mastery of the equipment I support that I can diagnose most faults from first principles, independently.', score:3 },
       { label:'B', text:'My goal is to build a reliable network of colleagues and manufacturer contacts so that between us, any fault can be resolved quickly and efficiently.', score:1 }
     ]},
-  // Scenario 2: Unfamiliar fault under client pressure — etch tool downtime
+  // Scenario 2: Unfamiliar fault under client pressure — equipment downtime
   { id:'t8', type:'scenario', max:4,
-    scenario:"You arrive at a critical etch tool downtime at a client fab. On inspection, you realise this is a fault mode you have personally never encountered before. The client is already agitated. Your company had committed to a 3–4 hour resolution estimate.",
+    scenario:"You arrive at a critical equipment breakdown at a client site. On inspection, you realise this is a fault mode you have personally never encountered before. The client is already agitated. Your company had committed to a 3–4 hour resolution estimate.",
     text:'How do you proceed?',
     options:[
       { label:'A', text:"Tell the client immediately: 'This is a fault I haven't personally seen before — I'll diagnose it systematically and bring in support if needed.'", score:3 },
@@ -817,13 +817,13 @@ function getBehaviouralFlags(scores) {
   if (S.pct >= 78) flags.push({ type:'pos', text:'Demonstrates willingness to absorb personal cost for team and company outcomes — ego appears well-managed and redirected toward collective pride.' });
   else if (S.pct < 55) flags.push({ type:'neg', text:'Sacrifice mindset is underdeveloped — candidate may prioritise personal recognition and find it difficult to take accountability when things go wrong.' });
 
-  if (scores.T.pct >= 78) flags.push({ type:'pos', text:'Strong technical mindset — demonstrates process discipline, proactive learning, and commitment to root-cause rigour. Likely to grow rapidly in a precision engineering environment.' });
+  if (scores.T.pct >= 78) flags.push({ type:'pos', text:'Strong technical mindset — demonstrates process discipline, proactive learning, and commitment to root-cause rigour. Likely to grow rapidly in a technical field service role.' });
   else if (scores.T.pct < 55) flags.push({ type:'neg', text:'Technical attitude requires attention — candidate may treat procedures as optional, defer too quickly to others, or deprioritise documentation. Probe directly in interview.' });
 
   // Specific scenario answers
   const m4 = answers['m4']; if (m4 && m4.label==='A') flags.push({ type:'neg', text:'Scenario (M-4): Chose to escalate to the manufacturer immediately when stuck — tendency to deflect rather than persist with own diagnosis. Probe ownership under downtime pressure.' });
   const s3 = answers['s3']; if (s3 && s3.label==='D') flags.push({ type:'neg', text:'Scenario (S-3): When wrong, chose face-saving language over direct admission to client — ego management may be a gap. Probe accountability in interview.' });
-  const t4 = answers['t4']; if (t4 && (t4.label==='C'||t4.label==='D')) flags.push({ type:'neg', text:'Scenario (T-4): After an SOP deviation caused a qual failure, candidate avoided or delayed disclosure. Process integrity and honesty under pressure should be probed.' });
+  const t4 = answers['t4']; if (t4 && (t4.label==='C'||t4.label==='D')) flags.push({ type:'neg', text:'Scenario (T-4): After a procedure deviation caused a qualification failure, candidate avoided or delayed disclosure. Process integrity and honesty under pressure should be probed.' });
   const t8 = answers['t8']; if (t8 && t8.label==='D') flags.push({ type:'neg', text:'Scenario (T-8): On encountering an unfamiliar fault, immediately escalated to the manufacturer rather than attempting systematic diagnosis. Probe technical self-sufficiency.' });
 
   if (flags.length === 0) flags.push({ type:'neu', text:'No critical behavioural flags detected. Proceed with standard structured interview.' });
@@ -836,7 +836,7 @@ function getInterviewQuestions(scores) {
   if (scores.U.pct < 75) qs.push("Describe a time you were passed over for an opportunity you worked hard for. Walk me through how you responded over the following weeks.");
   if (scores.S.pct < 75) qs.push("Tell me about a time you were publicly wrong about something technical. How did you handle it in front of the client or your team?");
   if (scores.T.pct < 75) qs.push("Tell me about a time you encountered a technical fault you had never seen before. Walk me through your exact diagnostic process and what you did when your first hypothesis was wrong.");
-  qs.push("In semiconductor field service, tools going down can cost a client over a million dollars per hour. Walk me through exactly how you personally manage an unresolved downtime situation beyond the 6-hour mark.");
+  qs.push("When critical equipment goes down, client losses can mount quickly. Walk me through exactly how you personally manage an unresolved downtime situation beyond the 6-hour mark.");
   qs.push("Describe a time you deviated from a documented procedure because you believed your approach was better. What happened, and what did you do when the outcome was not what you expected?");
   return qs;
 }

@@ -10,7 +10,9 @@ const crypto = require('crypto');
 
 const TOKEN     = process.argv[2];
 const SITE_NAME = 'must-engineering-assessment';
-const HTML_PATH = path.join(__dirname, 'must_assessment.html');
+const HTML_V1   = path.join(__dirname, 'must_assessment.html');
+const HTML_V2   = path.join(__dirname, 'must_jobs.html');
+const TOML_PATH = path.join(__dirname, 'netlify.toml');
 const FN_PATH   = path.join(__dirname, 'netlify', 'functions', 'submit-results.js');
 
 if (!TOKEN) {
@@ -120,14 +122,20 @@ function apiRequest(method, endpoint, body, headers = {}) {
 
 // ─── Main deploy ──────────────────────────────────────────────────────────────
 async function deploy() {
-  const html    = fs.readFileSync(HTML_PATH);
-  const htmlSha = crypto.createHash('sha1').update(html).digest('hex');
+  const htmlV1    = fs.readFileSync(HTML_V1);
+  const htmlV1Sha = crypto.createHash('sha1').update(htmlV1).digest('hex');
+
+  const htmlV2    = fs.readFileSync(HTML_V2);
+  const htmlV2Sha = crypto.createHash('sha1').update(htmlV2).digest('hex');
+
+  const toml      = fs.readFileSync(TOML_PATH);
+  const tomlSha   = crypto.createHash('sha1').update(toml).digest('hex');
 
   const fnSrc   = fs.readFileSync(FN_PATH);
   const fnZip   = makeZip('submit-results.js', fnSrc);
   const fnSha   = crypto.createHash('sha1').update(fnZip).digest('hex');
 
-  console.log('\n🚀  MUST Assessment — Deploying to Netlify...\n');
+  console.log('\n🚀  MUST Jobs — Deploying to Netlify...\n');
 
   // 1. Look up or create site
   console.log('   [1/5] Looking up site...');
@@ -159,8 +167,10 @@ async function deploy() {
   console.log('   [3/5] Creating deploy...');
   const deployRes = await apiRequest('POST', `/sites/${siteId}/deploys`, JSON.stringify({
     files: {
-      '/index.html':           htmlSha,
-      '/must_assessment.html': htmlSha
+      '/index.html':           htmlV2Sha,
+      '/must_jobs.html':       htmlV2Sha,
+      '/must_assessment.html': htmlV1Sha,
+      '/netlify.toml':         tomlSha
     },
     functions: {
       'submit-results': fnSha
@@ -173,13 +183,21 @@ async function deploy() {
   const required        = deployRes.body.required        || [];
   const requiredFns     = deployRes.body.required_functions || [];
 
-  // 3. Upload HTML if needed
+  // 3. Upload files if needed
   if (required.length > 0) {
-    console.log('   [4/5] Uploading HTML...');
-    await apiRequest('PUT', `/deploys/${deployId}/files/index.html`,           html, { 'Content-Type': 'text/html' });
-    await apiRequest('PUT', `/deploys/${deployId}/files/must_assessment.html`, html, { 'Content-Type': 'text/html' });
+    console.log('   [4/5] Uploading files...');
+    if (required.includes(htmlV2Sha)) {
+      await apiRequest('PUT', `/deploys/${deployId}/files/index.html`,      htmlV2, { 'Content-Type': 'text/html' });
+      await apiRequest('PUT', `/deploys/${deployId}/files/must_jobs.html`,  htmlV2, { 'Content-Type': 'text/html' });
+    }
+    if (required.includes(htmlV1Sha)) {
+      await apiRequest('PUT', `/deploys/${deployId}/files/must_assessment.html`, htmlV1, { 'Content-Type': 'text/html' });
+    }
+    if (required.includes(tomlSha)) {
+      await apiRequest('PUT', `/deploys/${deployId}/files/netlify.toml`, toml, { 'Content-Type': 'application/octet-stream' });
+    }
   } else {
-    console.log('   [4/5] HTML already up to date.');
+    console.log('   [4/5] Files already up to date.');
   }
 
   // 4. Upload function ZIP if needed
