@@ -307,6 +307,10 @@
           <input type="date" id="inp-date" />
         </div>
         <div class="field">
+          <label>Email Address</label>
+          <input type="email" id="inp-email" placeholder="e.g. ahmad@email.com" />
+        </div>
+        <div class="field">
           <label>Years of Experience</label>
           <select id="inp-experience">
             <option value="">Select range</option>
@@ -537,7 +541,7 @@ T:[
 // STATE
 // ================================================================
 const answers = {};
-let timerInterval = null, startTime = null;
+let timerInterval = null, startTime = null, assessmentStartISO = null, assessmentEndISO = null;
 const SECTION_ORDER = ['M','U','S','T'];
 const SECTION_SCREENS = { M:'screen-m', U:'screen-u', S:'screen-s', T:'screen-t' };
 const SECTION_MAX = 34; // 2×3 + 2×5 + 2×5 + 2×4
@@ -614,6 +618,7 @@ function startAssessment() {
 // ================================================================
 function startTimer() {
   startTime = Date.now();
+  assessmentStartISO = new Date().toISOString();
   timerInterval = setInterval(() => {
     const e = Math.floor((Date.now() - startTime) / 1000);
     const el = document.getElementById('timer-display');
@@ -845,6 +850,7 @@ function getInterviewQuestions(scores) {
 // RESULTS PAGE
 // ================================================================
 function showResults() {
+  assessmentEndISO = new Date().toISOString();
   const scores = computeScores();
   const rec    = getRecommendation(scores.OVERALL.pct);
   const flags  = getBehaviouralFlags(scores);
@@ -959,6 +965,9 @@ function showResults() {
 
   // Submit to Odoo if assessment was opened with ?id=APPLICANT_ID
   if (ODOO_APPLICANT_ID) setTimeout(() => submitToOdoo(scores, rec), 800);
+
+  // Always submit to Supabase via Netlify function
+  setTimeout(() => submitToSupabase(scores, rec, flags), 600);
 }
 
 // ── Odoo submission ────────────────────────────────────────────────────────────
@@ -1014,6 +1023,37 @@ async function submitToOdoo(scores, rec) {
       text.textContent = 'Could not submit automatically — please notify HR with your printed results.';
     }
     console.warn('[MUST] Odoo submission failed:', err.message);
+  }
+}
+
+// ── Supabase submission ────────────────────────────────────────────────────────
+async function submitToSupabase(scores, rec, flags) {
+  try {
+    const elapsed = startTime ? Math.floor((Date.now() - startTime) / 1000) : 0;
+    const checks  = consistencyCheck();
+    const payload = {
+      test_type:           'profiler',
+      candidate_name:      document.getElementById('inp-fullname').value.trim(),
+      candidate_email:     (document.getElementById('inp-email')?.value || '').trim(),
+      candidate_position:  document.getElementById('inp-position').value.trim(),
+      start_time:          assessmentStartISO || new Date().toISOString(),
+      end_time:            assessmentEndISO   || new Date().toISOString(),
+      time_taken_seconds:  elapsed,
+      score_raw:           scores.OVERALL.raw,
+      score_max:           scores.OVERALL.max,
+      score_pct:           scores.OVERALL.pct,
+      result_label:        rec.label,
+      section_scores:      { M: scores.M.pct, U: scores.U.pct, S: scores.S.pct, T: scores.T.pct },
+      answers:             answers,
+      flags:               { consistency_flagged: !checks.allClean, low_reverse: checks.lowReverseCount, items: flags.map(f => f.text) }
+    };
+    await fetch('/.netlify/functions/submit-test', {
+      method:  'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body:    JSON.stringify(payload)
+    });
+  } catch (err) {
+    console.warn('[MUST] Supabase submission failed:', err.message);
   }
 }
 

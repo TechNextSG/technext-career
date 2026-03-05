@@ -13,3 +13,28 @@
   from = "/v1"
   to = "/must_assessment.html"
   status = 301
+
+[[redirects]]
+  from = "/profiler"
+  to = "/must_assessment.html"
+  status = 301
+
+[[redirects]]
+  from = "/iq"
+  to = "/iq_test.html"
+  status = 301
+
+[[redirects]]
+  from = "/cyber"
+  to = "/cyber_test.html"
+  status = 301
+
+[[redirects]]
+  from = "/ai"
+  to = "/ai_test.html"
+  status = 301
+
+[[redirects]]
+  from = "/admin"
+  to = "/admin.html"
+  status = 301

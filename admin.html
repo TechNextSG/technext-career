@@ -1,0 +1,510 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Admin Dashboard — MUST Jobs</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;background:#f0f2f5;color:#1a2e4a;min-height:100vh}
+.screen{display:none;min-height:100vh}
+.screen.active{display:flex;flex-direction:column}
+
+/* LOGIN */
+.login-wrap{flex:1;display:flex;align-items:center;justify-content:center;padding:40px 20px;background:#1a2e4a}
+.login-card{background:#fff;border-radius:16px;padding:48px 40px;max-width:400px;width:100%;box-shadow:0 8px 48px rgba(0,0,0,.25)}
+.login-logo{text-align:center;margin-bottom:32px}
+.login-logo .logo-text{font-size:36px;font-weight:900;color:#1a2e4a;letter-spacing:2px}
+.login-logo .logo-sub{font-size:12px;color:#c9a84c;font-weight:700;letter-spacing:3px;text-transform:uppercase}
+.login-card h2{font-size:22px;color:#1a2e4a;font-weight:800;margin-bottom:6px}
+.login-card p{color:#6b7280;font-size:14px;margin-bottom:28px}
+.field{margin-bottom:20px}
+.field label{display:block;font-size:13px;font-weight:600;color:#374151;margin-bottom:6px}
+.field input{width:100%;padding:12px 14px;border:1.5px solid #e5e7eb;border-radius:8px;font-size:15px;outline:none;transition:border-color .2s}
+.field input:focus{border-color:#1a2e4a}
+.btn{display:inline-flex;align-items:center;gap:6px;padding:12px 24px;border-radius:8px;font-size:14px;font-weight:700;cursor:pointer;border:none;transition:all .2s;text-decoration:none}
+.btn-primary{background:#1a2e4a;color:#fff}
+.btn-primary:hover{background:#0f1e33}
+.btn-gold{background:#c9a84c;color:#1a2e4a}
+.btn-gold:hover{background:#b8943d}
+.btn-outline{background:#fff;border:1.5px solid #d1d5db;color:#374151}
+.btn-outline:hover{background:#f9fafb}
+.btn-danger{background:#fef2f2;border:1.5px solid #fecaca;color:#dc2626}
+.btn-danger:hover{background:#fee2e2}
+.btn-sm{padding:8px 16px;font-size:13px}
+.login-error{color:#dc2626;font-size:13px;margin-bottom:16px;display:none}
+
+/* TOPBAR */
+.topbar{background:#1a2e4a;padding:0 24px;display:flex;align-items:center;gap:16px;height:60px;flex-shrink:0}
+.topbar-logo{color:#c9a84c;font-size:20px;font-weight:900;letter-spacing:1px}
+.topbar-title{color:#fff;font-size:14px;opacity:.7}
+.topbar-right{margin-left:auto;display:flex;align-items:center;gap:12px}
+.topbar-user{color:#c9a84c;font-size:13px;font-weight:600}
+
+/* DASHBOARD BODY */
+.dash-body{flex:1;padding:24px;max-width:1400px;margin:0 auto;width:100%}
+
+/* STATS */
+.stats-row{display:grid;grid-template-columns:repeat(5,1fr);gap:16px;margin-bottom:24px}
+.stat-card{background:#fff;border-radius:12px;padding:20px;box-shadow:0 2px 8px rgba(0,0,0,.06);border-left:4px solid transparent}
+.stat-card.all{border-color:#1a2e4a}
+.stat-card.profiler{border-color:#1a2e4a}
+.stat-card.iq{border-color:#2563eb}
+.stat-card.cyber{border-color:#16a34a}
+.stat-card.ai{border-color:#7c3aed}
+.stat-num{font-size:28px;font-weight:900;color:#1a2e4a}
+.stat-lbl{font-size:12px;color:#6b7280;margin-top:4px;font-weight:500}
+
+/* FILTERS */
+.filters{background:#fff;border-radius:12px;padding:16px 20px;margin-bottom:20px;display:flex;align-items:center;gap:12px;flex-wrap:wrap;box-shadow:0 2px 8px rgba(0,0,0,.06)}
+.filters select,.filters input[type=date]{padding:8px 12px;border:1.5px solid #e5e7eb;border-radius:8px;font-size:13px;color:#1a2e4a;outline:none;background:#fff}
+.filters select:focus,.filters input[type=date]:focus{border-color:#1a2e4a}
+.filter-label{font-size:13px;color:#6b7280;font-weight:600}
+.filter-sep{color:#d1d5db;margin:0 4px}
+
+/* TABLE */
+.table-wrap{background:#fff;border-radius:12px;box-shadow:0 2px 8px rgba(0,0,0,.06);overflow:hidden;margin-bottom:24px}
+.table-header{padding:16px 20px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid #f3f4f6}
+.table-header h2{font-size:16px;font-weight:700;color:#1a2e4a}
+.table-actions{display:flex;gap:8px}
+table{width:100%;border-collapse:collapse}
+thead tr{background:#f8f9fb}
+th{padding:12px 16px;text-align:left;font-size:12px;font-weight:700;color:#6b7280;text-transform:uppercase;letter-spacing:.5px;white-space:nowrap}
+td{padding:12px 16px;font-size:13px;color:#374151;border-top:1px solid #f3f4f6;vertical-align:middle}
+tr:hover td{background:#fafafa}
+.badge{display:inline-flex;align-items:center;padding:3px 10px;border-radius:20px;font-size:11px;font-weight:700;letter-spacing:.3px}
+.badge-profiler{background:#e8ecf3;color:#1a2e4a}
+.badge-iq{background:#dbeafe;color:#1d4ed8}
+.badge-cyber{background:#dcfce7;color:#15803d}
+.badge-ai{background:#ede9fe;color:#6d28d9}
+.result-pill{display:inline-block;padding:2px 8px;border-radius:4px;font-size:11px;font-weight:600}
+.pill-green{background:#dcfce7;color:#15803d}
+.pill-blue{background:#dbeafe;color:#1d4ed8}
+.pill-yellow{background:#fef9c3;color:#854d0e}
+.pill-red{background:#fee2e2;color:#991b1b}
+.actions-cell{display:flex;gap:6px}
+.btn-icon{padding:6px 10px;border-radius:6px;font-size:12px;cursor:pointer;border:none;font-weight:600}
+.btn-view{background:#f0f7ff;color:#1d4ed8}
+.btn-view:hover{background:#dbeafe}
+.btn-email{background:#f0fdf4;color:#15803d}
+.btn-email:hover{background:#dcfce7}
+
+/* EMPTY */
+.empty-state{padding:60px 20px;text-align:center;color:#9ca3af}
+.empty-state .icon{font-size:48px;margin-bottom:12px}
+.empty-state p{font-size:14px}
+
+/* MODAL */
+.modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.5);display:flex;align-items:center;justify-content:center;z-index:100;padding:20px;display:none}
+.modal-overlay.open{display:flex}
+.modal{background:#fff;border-radius:16px;padding:32px;max-width:640px;width:100%;max-height:90vh;overflow-y:auto}
+.modal-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:24px}
+.modal-head h3{font-size:20px;font-weight:800;color:#1a2e4a}
+.modal-close{background:#f3f4f6;border:none;padding:8px 12px;border-radius:8px;cursor:pointer;font-size:14px}
+.modal-section{margin-bottom:20px}
+.modal-section h4{font-size:12px;font-weight:700;color:#6b7280;text-transform:uppercase;letter-spacing:.5px;margin-bottom:12px}
+.detail-row{display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px solid #f3f4f6;font-size:14px}
+.detail-row:last-child{border-bottom:none}
+.d-lbl{color:#6b7280}
+.d-val{color:#1a2e4a;font-weight:600;text-align:right;max-width:60%}
+.flag-item{padding:10px 14px;border-radius:8px;font-size:13px;margin-bottom:8px;line-height:1.5}
+.flag-pos{background:#f0fdf4;border-left:3px solid #16a34a;color:#166534}
+.flag-neg{background:#fef2f2;border-left:3px solid #dc2626;color:#991b1b}
+
+/* LOADING */
+.loading{padding:60px 20px;text-align:center;color:#6b7280;font-size:14px}
+.spinner{width:32px;height:32px;border:3px solid #e5e7eb;border-top-color:#1a2e4a;border-radius:50%;animation:spin .8s linear infinite;margin:0 auto 16px}
+@keyframes spin{to{transform:rotate(360deg)}}
+
+/* TOAST */
+.toast{position:fixed;bottom:24px;right:24px;background:#1a2e4a;color:#fff;padding:14px 20px;border-radius:10px;font-size:14px;font-weight:600;z-index:200;opacity:0;transform:translateY(8px);transition:all .3s}
+.toast.show{opacity:1;transform:translateY(0)}
+
+@media(max-width:1024px){.stats-row{grid-template-columns:repeat(3,1fr)}}
+@media(max-width:640px){.stats-row{grid-template-columns:1fr 1fr}.dash-body{padding:16px}.filters{flex-direction:column;align-items:flex-start}}
+</style>
+</head>
+<body>
+
+<!-- LOGIN -->
+<div id="screen-login" class="screen active">
+  <div class="login-wrap">
+    <div class="login-card">
+      <div class="login-logo">
+        <div class="logo-text">MUST</div>
+        <div class="logo-sub">Admin Portal</div>
+      </div>
+      <h2>Sign in to Dashboard</h2>
+      <p>Access candidate assessment data across all MUST Jobs tests.</p>
+      <div id="login-error" class="login-error">⚠ Incorrect password. Please try again.</div>
+      <div class="field"><label>Admin Password</label>
+        <input id="inp-password" type="password" placeholder="Enter admin password" onkeydown="if(event.key==='Enter')doLogin()" />
+      </div>
+      <button class="btn btn-primary" style="width:100%;justify-content:center" onclick="doLogin()">Sign In →</button>
+    </div>
+  </div>
+</div>
+
+<!-- DASHBOARD -->
+<div id="screen-dash" class="screen">
+  <div class="topbar">
+    <span class="topbar-logo">MUST</span>
+    <span class="topbar-title">Admin Dashboard</span>
+    <div class="topbar-right">
+      <span class="topbar-user" id="topbar-last-refresh"></span>
+      <button class="btn btn-outline btn-sm" onclick="loadData()">↻ Refresh</button>
+      <button class="btn btn-outline btn-sm" onclick="doLogout()">Sign Out</button>
+    </div>
+  </div>
+
+  <div class="dash-body">
+    <!-- STATS -->
+    <div class="stats-row">
+      <div class="stat-card all">
+        <div class="stat-num" id="stat-all">—</div>
+        <div class="stat-lbl">Total Candidates</div>
+      </div>
+      <div class="stat-card profiler">
+        <div class="stat-num" id="stat-profiler">—</div>
+        <div class="stat-lbl">MUST Profiler</div>
+      </div>
+      <div class="stat-card iq">
+        <div class="stat-num" id="stat-iq">—</div>
+        <div class="stat-lbl">IQ Assessment</div>
+      </div>
+      <div class="stat-card cyber">
+        <div class="stat-num" id="stat-cyber">—</div>
+        <div class="stat-lbl">Cyber Security</div>
+      </div>
+      <div class="stat-card ai">
+        <div class="stat-num" id="stat-ai">—</div>
+        <div class="stat-lbl">AI Competency</div>
+      </div>
+    </div>
+
+    <!-- FILTERS -->
+    <div class="filters">
+      <span class="filter-label">Filter:</span>
+      <select id="filter-type" onchange="applyFilters()">
+        <option value="all">All Tests</option>
+        <option value="profiler">MUST Profiler</option>
+        <option value="iq">IQ Assessment</option>
+        <option value="cyber">Cyber Security</option>
+        <option value="ai">AI Competency</option>
+      </select>
+      <span class="filter-sep">|</span>
+      <span class="filter-label">From:</span>
+      <input type="date" id="filter-from" onchange="applyFilters()" />
+      <span class="filter-label">To:</span>
+      <input type="date" id="filter-to" onchange="applyFilters()" />
+      <button class="btn btn-outline btn-sm" onclick="clearFilters()">Clear</button>
+    </div>
+
+    <!-- TABLE -->
+    <div class="table-wrap">
+      <div class="table-header">
+        <h2 id="table-title">All Candidates</h2>
+        <div class="table-actions">
+          <button class="btn btn-gold btn-sm" onclick="exportCSV()">⬇ Export CSV</button>
+        </div>
+      </div>
+      <div id="table-area">
+        <div class="loading"><div class="spinner"></div>Loading candidates…</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL -->
+<div class="modal-overlay" id="modal-overlay" onclick="if(event.target===this)closeModal()">
+  <div class="modal" id="modal-body"></div>
+</div>
+
+<!-- TOAST -->
+<div class="toast" id="toast"></div>
+
+<script>
+// ─── AUTH ────────────────────────────────────────────────────────────────────
+let adminPwd = '';
+let allData  = [];
+let filtered = [];
+
+function doLogin() {
+  const pwd = document.getElementById('inp-password').value;
+  if (!pwd) return;
+  adminPwd = pwd;
+  // Quick verify by fetching (real check is server-side)
+  fetch(`/.netlify/functions/get-results?p=${encodeURIComponent(pwd)}&limit=1`)
+    .then(r => {
+      if (r.status === 401) {
+        document.getElementById('login-error').style.display = 'block';
+        adminPwd = '';
+      } else if (r.ok) {
+        sessionStorage.setItem('admin_pwd', pwd);
+        showDash();
+      } else {
+        showToast('Server error. Check Netlify env vars.');
+        showDash(); // still show dash, data load will surface error
+      }
+    })
+    .catch(() => { showToast('Cannot reach server — check your connection.'); });
+}
+
+function doLogout() {
+  sessionStorage.removeItem('admin_pwd');
+  adminPwd = '';
+  allData = []; filtered = [];
+  showScreen('screen-login');
+  document.getElementById('inp-password').value = '';
+}
+
+function showScreen(id) {
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+}
+
+function showDash() {
+  showScreen('screen-dash');
+  loadData();
+}
+
+// ─── DATA LOAD ───────────────────────────────────────────────────────────────
+async function loadData() {
+  const area = document.getElementById('table-area');
+  area.innerHTML = '<div class="loading"><div class="spinner"></div>Loading candidates…</div>';
+  const type = document.getElementById('filter-type')?.value || 'all';
+  const from = document.getElementById('filter-from')?.value || '';
+  const to   = document.getElementById('filter-to')?.value   || '';
+
+  const params = new URLSearchParams({ p: adminPwd, limit: 500, type, from, to });
+  try {
+    const r = await fetch(`/.netlify/functions/get-results?${params}`);
+    if (r.status === 401) { doLogout(); return; }
+    if (!r.ok) {
+      const err = await r.json().catch(() => ({}));
+      area.innerHTML = `<div class="empty-state"><div class="icon">⚠️</div><p>${err.error || 'Failed to load data.'}</p><p style="margin-top:8px;font-size:12px">${err.detail || ''}</p></div>`;
+      return;
+    }
+    allData = await r.json();
+    filtered = allData;
+    renderStats();
+    renderTable();
+    document.getElementById('topbar-last-refresh').textContent = `Last updated: ${new Date().toLocaleTimeString()}`;
+  } catch(e) {
+    area.innerHTML = '<div class="empty-state"><div class="icon">🔌</div><p>Could not reach server. Check your connection.</p></div>';
+  }
+}
+
+// ─── STATS ────────────────────────────────────────────────────────────────────
+function renderStats() {
+  document.getElementById('stat-all').textContent     = allData.length;
+  document.getElementById('stat-profiler').textContent = allData.filter(r => r.test_type === 'profiler').length;
+  document.getElementById('stat-iq').textContent      = allData.filter(r => r.test_type === 'iq').length;
+  document.getElementById('stat-cyber').textContent   = allData.filter(r => r.test_type === 'cyber').length;
+  document.getElementById('stat-ai').textContent      = allData.filter(r => r.test_type === 'ai').length;
+}
+
+// ─── FILTERS ─────────────────────────────────────────────────────────────────
+function applyFilters() {
+  const type = document.getElementById('filter-type').value;
+  const from = document.getElementById('filter-from').value;
+  const to   = document.getElementById('filter-to').value;
+
+  filtered = allData.filter(r => {
+    if (type !== 'all' && r.test_type !== type) return false;
+    if (from && r.created_at < from) return false;
+    if (to   && r.created_at > to + 'T23:59:59') return false;
+    return true;
+  });
+
+  const typeLabel = { all:'All Candidates', profiler:'MUST Profiler', iq:'IQ Assessment', cyber:'Cyber Security', ai:'AI Competency' };
+  document.getElementById('table-title').textContent = `${typeLabel[type] || 'All'} — ${filtered.length} record${filtered.length !== 1 ? 's' : ''}`;
+  renderTable();
+}
+
+function clearFilters() {
+  document.getElementById('filter-type').value = 'all';
+  document.getElementById('filter-from').value = '';
+  document.getElementById('filter-to').value   = '';
+  filtered = allData;
+  document.getElementById('table-title').textContent = `All Candidates`;
+  renderTable();
+}
+
+// ─── RENDER TABLE ─────────────────────────────────────────────────────────────
+function renderTable() {
+  const area = document.getElementById('table-area');
+  if (!filtered.length) {
+    area.innerHTML = '<div class="empty-state"><div class="icon">📋</div><p>No candidates found for the selected filters.</p></div>';
+    return;
+  }
+
+  const rows = filtered.map((r, i) => `
+    <tr>
+      <td style="color:#9ca3af;font-size:12px">${i + 1}</td>
+      <td><strong>${esc(r.candidate_name)}</strong></td>
+      <td style="color:#6b7280">${esc(r.candidate_email || '—')}</td>
+      <td style="color:#6b7280;max-width:160px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${esc(r.candidate_position || '—')}</td>
+      <td><span class="badge badge-${r.test_type}">${testLabel(r.test_type)}</span></td>
+      <td style="font-size:12px;white-space:nowrap">${fmtDateShort(r.start_time)}</td>
+      <td style="font-size:12px;white-space:nowrap">${fmtDateShort(r.end_time)}</td>
+      <td style="white-space:nowrap">${fmtDuration(r.time_taken_seconds)}</td>
+      <td><strong>${r.score_pct != null ? r.score_pct + '%' : '—'}</strong></td>
+      <td>${resultPill(r.result_label)}</td>
+      <td>
+        <div class="actions-cell">
+          <button class="btn-icon btn-view" onclick="viewCandidate(${i})">View</button>
+          ${r.candidate_email ? `<button class="btn-icon btn-email" onclick="emailCandidate(${i})">Email</button>` : ''}
+        </div>
+      </td>
+    </tr>`).join('');
+
+  area.innerHTML = `
+    <div style="overflow-x:auto">
+    <table>
+      <thead><tr>
+        <th>#</th><th>Name</th><th>Email</th><th>Position</th>
+        <th>Test</th><th>Start</th><th>End</th><th>Duration</th>
+        <th>Score</th><th>Result</th><th>Actions</th>
+      </tr></thead>
+      <tbody>${rows}</tbody>
+    </table>
+    </div>`;
+}
+
+// ─── VIEW CANDIDATE ───────────────────────────────────────────────────────────
+function viewCandidate(idx) {
+  const r = filtered[idx];
+  const secScores = r.section_scores ? Object.entries(r.section_scores).map(([k,v]) =>
+    `<div class="detail-row"><span class="d-lbl">${k}</span><span class="d-val">${v}%</span></div>`).join('') : '';
+  const flagsHtml = Array.isArray(r.flags) && r.flags.length
+    ? r.flags.map(f => `<div class="flag-item flag-${f.type||'neg'}">${esc(f.text)}</div>`).join('')
+    : '<div style="color:#9ca3af;font-size:13px">No flags recorded.</div>';
+
+  document.getElementById('modal-body').innerHTML = `
+    <div class="modal-head">
+      <h3>${esc(r.candidate_name)}</h3>
+      <button class="modal-close" onclick="closeModal()">✕ Close</button>
+    </div>
+
+    <div class="modal-section">
+      <h4>Candidate Info</h4>
+      <div class="detail-row"><span class="d-lbl">Email</span><span class="d-val">${esc(r.candidate_email||'—')}</span></div>
+      <div class="detail-row"><span class="d-lbl">Position Applied</span><span class="d-val">${esc(r.candidate_position||'—')}</span></div>
+      <div class="detail-row"><span class="d-lbl">Test</span><span class="d-val">${testLabel(r.test_type)}</span></div>
+    </div>
+
+    <div class="modal-section">
+      <h4>Score &amp; Result</h4>
+      <div class="detail-row"><span class="d-lbl">Score</span><span class="d-val">${r.score_raw != null ? r.score_raw + ' / ' + r.score_max : '—'} (${r.score_pct != null ? r.score_pct + '%' : '—'})</span></div>
+      <div class="detail-row"><span class="d-lbl">Result</span><span class="d-val">${esc(r.result_label||'—')}</span></div>
+      ${secScores ? `<div style="margin-top:8px">${secScores}</div>` : ''}
+    </div>
+
+    <div class="modal-section">
+      <h4>Session Timing</h4>
+      <div class="detail-row"><span class="d-lbl">Started</span><span class="d-val">${fmtDateFull(r.start_time)}</span></div>
+      <div class="detail-row"><span class="d-lbl">Completed</span><span class="d-val">${fmtDateFull(r.end_time)}</span></div>
+      <div class="detail-row"><span class="d-lbl">Time Taken</span><span class="d-val">${fmtDuration(r.time_taken_seconds)}</span></div>
+    </div>
+
+    ${r.flags && r.flags.length ? `<div class="modal-section"><h4>Behavioural Flags</h4>${flagsHtml}</div>` : ''}
+
+    <div style="display:flex;gap:10px;flex-wrap:wrap;margin-top:8px">
+      ${r.candidate_email ? `<button class="btn btn-gold btn-sm" onclick="emailCandidate(${idx});closeModal()">📧 Email Candidate</button>` : ''}
+      <button class="btn btn-outline btn-sm" onclick="closeModal()">Close</button>
+    </div>`;
+
+  document.getElementById('modal-overlay').classList.add('open');
+}
+
+function closeModal() { document.getElementById('modal-overlay').classList.remove('open'); }
+
+// ─── EMAIL ────────────────────────────────────────────────────────────────────
+function emailCandidate(idx) {
+  const r = filtered[idx];
+  if (!r.candidate_email) return;
+  const subject = `Your MUST Jobs Assessment Results — ${testLabel(r.test_type)}`;
+  const body = `Dear ${r.candidate_name},\n\nThank you for completing the ${testLabel(r.test_type)} assessment.\n\nYour Results:\n• Score: ${r.score_pct != null ? r.score_pct + '%' : 'N/A'} (${r.score_raw}/${r.score_max})\n• Result: ${r.result_label || 'N/A'}\n• Completed: ${fmtDateFull(r.end_time)}\n• Time taken: ${fmtDuration(r.time_taken_seconds)}\n\nWe will be in touch regarding the next steps of your application.\n\nBest regards,\nMUST Engineering — HR Team`;
+  window.location.href = `mailto:${encodeURIComponent(r.candidate_email)}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+}
+
+// ─── EXPORT CSV ───────────────────────────────────────────────────────────────
+function exportCSV() {
+  if (!filtered.length) { showToast('No data to export.'); return; }
+
+  const headers = ['#','Name','Email','Position','Test','Start Time','End Time','Duration (sec)','Score Raw','Score Max','Score %','Result','Submitted At'];
+  const rows = filtered.map((r, i) => [
+    i+1,
+    csvEsc(r.candidate_name),
+    csvEsc(r.candidate_email || ''),
+    csvEsc(r.candidate_position || ''),
+    testLabel(r.test_type),
+    fmtDateFull(r.start_time),
+    fmtDateFull(r.end_time),
+    r.time_taken_seconds,
+    r.score_raw ?? '',
+    r.score_max ?? '',
+    r.score_pct ?? '',
+    csvEsc(r.result_label || ''),
+    fmtDateFull(r.created_at),
+  ].join(','));
+
+  const csv = [headers.join(','), ...rows].join('\n');
+  const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = `must-jobs-results-${new Date().toISOString().slice(0,10)}.csv`;
+  a.click();
+  URL.revokeObjectURL(url);
+  showToast(`✅ Exported ${filtered.length} records`);
+}
+
+// ─── HELPERS ──────────────────────────────────────────────────────────────────
+function testLabel(t) {
+  return { profiler:'MUST Profiler', iq:'IQ Assessment', cyber:'Cyber Security', ai:'AI Competency' }[t] || t;
+}
+
+function resultPill(label) {
+  if (!label) return '<span style="color:#9ca3af">—</span>';
+  const lc = label.toLowerCase();
+  const cls = lc.includes('strong') || lc.includes('exceptional') || lc.includes('proficient') || lc.includes('above') ? 'pill-green'
+    : lc.includes('promis') || lc.includes('average') || lc.includes('aware') || lc.includes('capable') ? 'pill-blue'
+    : lc.includes('border') || lc.includes('basic') ? 'pill-yellow'
+    : 'pill-red';
+  return `<span class="result-pill ${cls}">${esc(label)}</span>`;
+}
+
+function fmtDateShort(iso) {
+  if (!iso) return '—';
+  try { return new Date(iso).toLocaleString('en-GB',{day:'2-digit',month:'short',year:'numeric',hour:'2-digit',minute:'2-digit',hour12:true}); }
+  catch(e) { return iso; }
+}
+function fmtDateFull(iso) {
+  if (!iso) return '—';
+  try { return new Date(iso).toLocaleString('en-GB',{day:'2-digit',month:'short',year:'numeric',hour:'2-digit',minute:'2-digit',second:'2-digit',hour12:true}); }
+  catch(e) { return iso; }
+}
+function fmtDuration(sec) {
+  if (sec == null) return '—';
+  const h=Math.floor(sec/3600),m=Math.floor((sec%3600)/60),s=sec%60,p=[];
+  if(h>0) p.push(`${h}h`); if(m>0) p.push(`${m}m`); p.push(`${s}s`); return p.join(' ');
+}
+function esc(s) { return String(s || '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+function csvEsc(s) { const v = String(s || ''); return v.includes(',') || v.includes('"') || v.includes('\n') ? `"${v.replace(/"/g,'""')}"` : v; }
+
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg; t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 3000);
+}
+
+// ─── INIT ────────────────────────────────────────────────────────────────────
+window.addEventListener('load', () => {
+  const saved = sessionStorage.getItem('admin_pwd');
+  if (saved) { adminPwd = saved; showDash(); }
+});
+</script>
+</body>
+</html>
