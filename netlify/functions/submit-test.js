@@ -2,7 +2,10 @@
 const https = require('https');
 
 const SUPABASE_URL  = process.env.SUPABASE_URL  || 'https://ndaydueegykjvliblbly.supabase.co';
-const SUPABASE_ANON = process.env.SUPABASE_ANON_KEY || 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im5kYXlkdWVlZ3lranZsaWJsYmx5Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzIxMDQxMjIsImV4cCI6MjA4NzY4MDEyMn0.BwRzuNbMSj1b1B3eSYP1R9Y2a0SnkewxhtqTFIjJfzg';
+// Service role key bypasses RLS — server-side only, never sent to browser
+const SUPABASE_ANON = process.env.SUPABASE_SERVICE_ROLE_KEY
+                   || process.env.SUPABASE_ANON_KEY
+                   || 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im5kYXlkdWVlZ3lranZsaWJsYmx5Iiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc3MjEwNDEyMiwiZXhwIjoyMDg3NjgwMTIyfQ.EalKqjd3OAMLPocKvyatpvbyBxXn73uNErSs55OmZho';
 
 const CORS = {
   'Access-Control-Allow-Origin':  '*',

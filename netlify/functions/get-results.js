@@ -2,9 +2,9 @@
 const https = require('https');
 
 const SUPABASE_URL     = process.env.SUPABASE_URL  || 'https://ndaydueegykjvliblbly.supabase.co';
+// Service role key bypasses RLS — server-side only, never sent to browser
 const SUPABASE_SVC_KEY = process.env.SUPABASE_SERVICE_ROLE_KEY
-                      || process.env.SUPABASE_ANON_KEY
-                      || 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im5kYXlkdWVlZ3lranZsaWJsYmx5Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzIxMDQxMjIsImV4cCI6MjA4NzY4MDEyMn0.BwRzuNbMSj1b1B3eSYP1R9Y2a0SnkewxhtqTFIjJfzg';
+                      || 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im5kYXlkdWVlZ3lranZsaWJsYmx5Iiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc3MjEwNDEyMiwiZXhwIjoyMDg3NjgwMTIyfQ.EalKqjd3OAMLPocKvyatpvbyBxXn73uNErSs55OmZho';
 const ADMIN_PASSWORD   = process.env.ADMIN_PASSWORD || 'mustjobs2025';
 
 const CORS = {
