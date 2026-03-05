@@ -56,8 +56,14 @@ function supabaseInsert(data) {
       let raw = '';
       res.on('data', c => raw += c);
       res.on('end', () => {
-        try { const arr = JSON.parse(raw); resolve(Array.isArray(arr) ? arr[0] || {} : {}); }
-        catch(e) { resolve({}); }
+        try {
+          const parsed = JSON.parse(raw);
+          // Supabase returns an error object (not array) on failure
+          if (!Array.isArray(parsed) && parsed.code) {
+            return reject(new Error(`Supabase error ${parsed.code}: ${parsed.message}`));
+          }
+          resolve(Array.isArray(parsed) ? parsed[0] || {} : {});
+        } catch(e) { resolve({}); }
       });
     });
     req.on('error', reject);

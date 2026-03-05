@@ -233,8 +233,8 @@ function doLogin() {
   const pwd = document.getElementById('inp-password').value;
   if (!pwd) return;
   adminPwd = pwd;
-  // Quick verify by fetching (real check is server-side)
-  fetch(`/.netlify/functions/get-results?p=${encodeURIComponent(pwd)}&limit=1`)
+  // Quick verify by fetching (real check is server-side) — use header, not query param
+  fetch('/.netlify/functions/get-results?limit=1', { headers: { 'x-admin-password': pwd } })
     .then(r => {
       if (r.status === 401) {
         document.getElementById('login-error').style.display = 'block';
@@ -276,9 +276,9 @@ async function loadData() {
   const from = document.getElementById('filter-from')?.value || '';
   const to   = document.getElementById('filter-to')?.value   || '';
 
-  const params = new URLSearchParams({ p: adminPwd, limit: 500, type, from, to });
+  const params = new URLSearchParams({ limit: 500, type, from, to });
   try {
-    const r = await fetch(`/.netlify/functions/get-results?${params}`);
+    const r = await fetch(`/.netlify/functions/get-results?${params}`, { headers: { 'x-admin-password': adminPwd } });
     if (r.status === 401) { doLogout(); return; }
     if (!r.ok) {
       const err = await r.json().catch(() => ({}));
@@ -377,8 +377,16 @@ function viewCandidate(idx) {
   const r = filtered[idx];
   const secScores = r.section_scores ? Object.entries(r.section_scores).map(([k,v]) =>
     `<div class="detail-row"><span class="d-lbl">${k}</span><span class="d-val">${v}%</span></div>`).join('') : '';
-  const flagsHtml = Array.isArray(r.flags) && r.flags.length
-    ? r.flags.map(f => `<div class="flag-item flag-${f.type||'neg'}">${esc(f.text)}</div>`).join('')
+  // Normalise flags: profiler sends {consistency_flagged, items:[...strings]}, others send array of {type,text}
+  let flagsArr = [];
+  if (Array.isArray(r.flags)) {
+    flagsArr = r.flags;
+  } else if (r.flags && Array.isArray(r.flags.items)) {
+    flagsArr = r.flags.items.map(text => ({ type: 'neu', text }));
+    if (r.flags.consistency_flagged) flagsArr.unshift({ type: 'neg', text: 'Consistency check flagged: unusual response pattern on reverse-scored items.' });
+  }
+  const flagsHtml = flagsArr.length
+    ? flagsArr.map(f => `<div class="flag-item flag-${f.type||'neu'}">${esc(f.text)}</div>`).join('')
     : '<div style="color:#9ca3af;font-size:13px">No flags recorded.</div>';
 
   document.getElementById('modal-body').innerHTML = `
@@ -408,7 +416,7 @@ function viewCandidate(idx) {
       <div class="detail-row"><span class="d-lbl">Time Taken</span><span class="d-val">${fmtDuration(r.time_taken_seconds)}</span></div>
     </div>
 
-    ${r.flags && r.flags.length ? `<div class="modal-section"><h4>Behavioural Flags</h4>${flagsHtml}</div>` : ''}
+    ${flagsArr.length ? `<div class="modal-section"><h4>Behavioural Flags</h4>${flagsHtml}</div>` : ''}
 
     <div style="display:flex;gap:10px;flex-wrap:wrap;margin-top:8px">
       ${r.candidate_email ? `<button class="btn btn-gold btn-sm" onclick="emailCandidate(${idx});closeModal()">📧 Email Candidate</button>` : ''}
