@@ -106,7 +106,22 @@ nav{background:#1a2e4a;padding:16px 24px;display:flex;align-items:center;gap:12p
 .result-actions{display:flex;gap:12px;flex-wrap:wrap}
 
 @media print{nav,.result-actions,.submit-status{display:none}body{background:#fff}}
-@media(max-width:500px){.stats-grid{grid-template-columns:1fr 1fr}.landing-card{padding:32px 24px}.info-grid{grid-template-columns:1fr 1fr}}
+@media(max-width:600px){
+  .stats-grid{grid-template-columns:1fr 1fr}
+  .landing-card{padding:28px 20px}
+  .landing-card h1{font-size:26px}
+  .info-grid{grid-template-columns:1fr 1fr}
+  .form-card{padding:28px 20px}
+  .quiz-body{padding:20px 14px}
+  .q-card{padding:20px 16px}
+  .q-nav{flex-wrap:wrap;gap:10px}
+  .btn-sm{width:100%}
+  .results-body{padding:20px 14px}
+  .result-hero{padding:24px 18px}
+  .result-hero h2{font-size:22px}
+  .result-actions{flex-direction:column}
+  .result-actions .btn{width:100%;justify-content:center}
+}
 </style>
 </head>
 <body>
@@ -136,25 +151,18 @@ nav{background:#1a2e4a;padding:16px 24px;display:flex;align-items:center;gap:12p
 
 <!-- INFO -->
 <div id="screen-info" class="screen">
-  <nav><span class="nav-logo">MUST</span><span class="nav-title">Jobs</span><span class="nav-badge">Candidate Details</span></nav>
+  <nav><span class="nav-logo">MUST</span><span class="nav-title">Jobs</span><span class="nav-badge">IQ Assessment</span></nav>
   <div class="form-body">
     <div class="form-card">
-      <h2>Your Details</h2>
-      <p>This information will appear on your assessment report.</p>
-      <div class="field"><label>Full Name *</label><input id="inp-name" type="text" placeholder="e.g. Ahmad bin Hassan" /></div>
-      <div class="field"><label>Email Address *</label><input id="inp-email" type="email" placeholder="e.g. ahmad@email.com" /></div>
-      <div class="field"><label>Position Applied For *</label><input id="inp-position" type="text" placeholder="e.g. Field Service Engineer" /></div>
+      <h2>One quick thing</h2>
+      <p>Just your email — so we can save your results. That's it!</p>
       <div class="field">
-        <label>Years of Work Experience</label>
-        <select id="inp-experience">
-          <option value="fresh">Fresh Graduate (0 years)</option>
-          <option value="1-2">1–2 years</option>
-          <option value="3-5">3–5 years</option>
-          <option value="5+">5+ years</option>
-        </select>
+        <label>Email Address</label>
+        <input id="inp-email" type="email" placeholder="e.g. ahmad@email.com" autocomplete="email" inputmode="email" />
       </div>
       <div id="info-error" style="color:#ef4444;font-size:13px;margin-bottom:12px;display:none"></div>
-      <button class="btn btn-primary" style="width:100%" onclick="startQuiz()">Start Assessment →</button>
+      <button class="btn btn-primary" style="width:100%;margin-top:8px" onclick="startQuiz()">Start Assessment →</button>
+      <p style="font-size:12px;color:#9ca3af;margin-top:16px;text-align:center;line-height:1.5">Your email is only used to link your results. We will not spam you.</p>
     </div>
   </div>
 </div>
@@ -252,6 +260,13 @@ let timerInt  = null;
 let elapsed   = 0;
 let timeLimit = 30 * 60;
 let timeLimitReached = false;
+let candidateEmail = '';
+
+// Pre-fill email from localStorage (set once across all tests)
+document.addEventListener('DOMContentLoaded', () => {
+  const saved = localStorage.getItem('must_candidate_email');
+  if (saved) { const el = document.getElementById('inp-email'); if (el) el.value = saved; }
+});
 
 // ─── SCREENS ──────────────────────────────────────────────────────────────────
 function showScreen(id) {
@@ -261,13 +276,13 @@ function showScreen(id) {
 
 // ─── START QUIZ ───────────────────────────────────────────────────────────────
 function startQuiz() {
-  const name = document.getElementById('inp-name').value.trim();
   const email = document.getElementById('inp-email').value.trim();
-  const pos = document.getElementById('inp-position').value.trim();
   const err = document.getElementById('info-error');
-  if (!name || !email || !pos) { err.textContent='Please fill in all required fields.'; err.style.display='block'; return; }
+  if (!email) { err.textContent='Please enter your email address.'; err.style.display='block'; return; }
   if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) { err.textContent='Please enter a valid email address.'; err.style.display='block'; return; }
   err.style.display='none';
+  candidateEmail = email;
+  localStorage.setItem('must_candidate_email', email);
   startTime = new Date();
   elapsed = 0;
   showScreen('screen-quiz');
@@ -364,9 +379,9 @@ function submitQuiz() {
 
   const payload = {
     test_type:         'iq',
-    candidate_name:    document.getElementById('inp-name').value.trim(),
-    candidate_email:   document.getElementById('inp-email').value.trim(),
-    candidate_position:document.getElementById('inp-position').value.trim(),
+    candidate_name:    candidateEmail,
+    candidate_email:   candidateEmail,
+    candidate_position:'',
     start_time:        startTime.toISOString(),
     end_time:          endTime.toISOString(),
     time_taken_seconds:timeTaken,
@@ -450,6 +465,12 @@ function renderResults({ correct, total, pct, level, timeTaken }) {
 
     <div class="result-desc" style="border-color:${level.color}">${level.desc}</div>
 
+    <div style="background:linear-gradient(135deg,#1a2e4a 0%,#2d5f8a 100%);border-radius:14px;padding:28px 24px;text-align:center;margin-bottom:20px;color:#fff">
+      <div style="font-size:44px;margin-bottom:12px">🎉</div>
+      <h3 style="font-size:19px;font-weight:800;margin-bottom:10px">Well done for completing the assessment!</h3>
+      <p style="font-size:14px;opacity:.85;line-height:1.65;max-width:400px;margin:0 auto">Every test you complete moves your application forward. Your results have been saved — our team reviews each submission carefully.</p>
+    </div>
+
     <div class="submit-status">
       <span id="submit-icon">⏳</span>
       <span id="submit-text">Saving your results…</span>
@@ -457,6 +478,7 @@ function renderResults({ correct, total, pct, level, timeTaken }) {
 
     <div class="result-actions">
       <button class="btn btn-primary" onclick="window.print()">🖨 Print / Save PDF</button>
+      <a href="/" class="btn" style="background:#f0f2f5;color:#1a2e4a;border:1.5px solid #dce3ea;text-decoration:none">← Back to All Tests</a>
     </div>
   `;
 

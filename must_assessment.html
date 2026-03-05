@@ -200,13 +200,22 @@
     }
 
     @media (max-width: 600px) {
-      .card { padding: 24px 18px; }
-      .must-pillars { grid-template-columns: 1fr; }
+      .card { padding: 20px 16px; }
+      .must-pillars { grid-template-columns: 1fr 1fr; }
       .form-grid { grid-template-columns: 1fr; }
       .insight-grid { grid-template-columns: 1fr; }
-      .likert-scale { gap: 4px; }
-      .likert-btn { max-width: 44px; }
+      .likert-scale { gap: 3px; }
+      .likert-btn { max-width: 40px; font-size: 11px; }
       .score-row { flex-wrap: wrap; }
+      .topbar { padding: 10px 16px; }
+      .topbar-meta { gap: 10px; }
+      #overall-progress-bar { width: 80px; }
+      .page-wrap { padding: 80px 14px 50px; }
+      .section-letter { width: 44px; height: 44px; font-size: 22px; }
+      .section-info h2 { font-size: 17px; }
+      .btn-lg { padding: 14px 24px; font-size: 15px; }
+      .print-row { flex-direction: column; }
+      .print-row .btn { width: 100%; justify-content: center; }
     }
   </style>
 </head>
@@ -289,45 +298,17 @@
   <div class="page-wrap">
     <div class="card">
       <div style="margin-bottom:24px">
-        <div style="font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:1.5px;margin-bottom:6px">Step 1 of 5</div>
-        <h2 style="font-size:22px;font-weight:800;color:var(--navy)">Your Information</h2>
-        <p style="font-size:14px;color:var(--muted);margin-top:4px">Kept confidential and used only to identify your submission.</p>
+        <div style="font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:1.5px;margin-bottom:6px">Before You Begin</div>
+        <h2 style="font-size:22px;font-weight:800;color:var(--navy)">One quick thing</h2>
+        <p style="font-size:14px;color:var(--muted);margin-top:4px">Just your email — so we can save your results. That's it!</p>
       </div>
-      <div class="form-grid">
-        <div class="field" id="f-fullname">
-          <label>Full Name <span class="req">*</span></label>
-          <input type="text" id="inp-fullname" placeholder="e.g. Ahmad bin Razali" />
-        </div>
-        <div class="field" id="f-position">
-          <label>Position Applied For <span class="req">*</span></label>
-          <input type="text" id="inp-position" placeholder="e.g. Service Engineer" />
-        </div>
-        <div class="field" id="f-date">
-          <label>Assessment Date <span class="req">*</span></label>
-          <input type="date" id="inp-date" />
-        </div>
-        <div class="field">
-          <label>Email Address</label>
-          <input type="email" id="inp-email" placeholder="e.g. ahmad@email.com" />
-        </div>
-        <div class="field">
-          <label>Years of Experience</label>
-          <select id="inp-experience">
-            <option value="">Select range</option>
-            <option>0 – 1 year (Fresh / Junior)</option>
-            <option>2 – 3 years</option>
-            <option>4 – 6 years</option>
-            <option>7 – 10 years</option>
-            <option>10+ years</option>
-          </select>
+      <div class="form-grid full">
+        <div class="field" id="f-email">
+          <label>Email Address <span class="req">*</span></label>
+          <input type="email" id="inp-email" placeholder="e.g. ahmad@email.com" autocomplete="email" inputmode="email" />
         </div>
       </div>
-      <div class="form-grid full mt-16">
-        <div class="field">
-          <label>Interviewer / HR Officer</label>
-          <input type="text" id="inp-interviewer" placeholder="Name of the person administering this assessment" />
-        </div>
-      </div>
+      <p style="font-size:12px;color:var(--muted);margin-top:12px;line-height:1.5">Your email is only used to link your results. We will not spam you.</p>
       <div class="nav-row" style="border-top:none;padding-top:24px">
         <button class="btn btn-outline" onclick="goTo('screen-intro')">&#8592; Back</button>
         <button class="btn btn-primary" onclick="startAssessment()">Start Assessment &rarr;</button>
@@ -542,6 +523,7 @@ T:[
 // ================================================================
 const answers = {};
 let timerInterval = null, startTime = null, assessmentStartISO = null, assessmentEndISO = null;
+let candidateEmail = '';
 const SECTION_ORDER = ['M','U','S','T'];
 const SECTION_SCREENS = { M:'screen-m', U:'screen-u', S:'screen-s', T:'screen-t' };
 const SECTION_MAX = 34; // 2×3 + 2×5 + 2×5 + 2×4
@@ -561,7 +543,9 @@ function goTo(id) {
   window.scrollTo(0, 0);
 }
 function goToInfo() {
-  document.getElementById('inp-date').valueAsDate = new Date();
+  // Pre-fill email from localStorage if available
+  const saved = localStorage.getItem('must_candidate_email');
+  if (saved) { const el = document.getElementById('inp-email'); if (el) el.value = saved; }
   goTo('screen-info');
 }
 function navSection(sec) { goTo(SECTION_SCREENS[sec]); }
@@ -599,14 +583,14 @@ function navSectionForward(cur, next) {
 // START
 // ================================================================
 function startAssessment() {
-  let ok = true;
-  ['inp-fullname','inp-position','inp-date'].forEach(id => {
-    const el = document.getElementById(id);
-    const f  = el.closest('.field');
-    if (!el.value.trim()) { f.classList.add('error'); ok = false; }
-    else f.classList.remove('error');
-  });
-  if (!ok) return;
+  const emailEl = document.getElementById('inp-email');
+  const emailF  = emailEl.closest('.field');
+  const email   = emailEl.value.trim();
+  if (!email) { emailF.classList.add('error'); emailEl.focus(); return; }
+  if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) { emailF.classList.add('error'); emailEl.focus(); return; }
+  emailF.classList.remove('error');
+  candidateEmail = email;
+  localStorage.setItem('must_candidate_email', email);
   document.getElementById('main-topbar').style.display = 'flex';
   buildSections();
   startTimer();
@@ -855,10 +839,10 @@ function showResults() {
   const rec    = getRecommendation(scores.OVERALL.pct);
   const flags  = getBehaviouralFlags(scores);
   const iqs    = getInterviewQuestions(scores);
-  const name   = document.getElementById('inp-fullname').value.trim();
-  const pos    = document.getElementById('inp-position').value.trim();
-  const dt     = document.getElementById('inp-date').value;
-  const hr     = document.getElementById('inp-interviewer').value.trim();
+  const name   = candidateEmail;
+  const pos    = '';
+  const dt     = new Date().toLocaleDateString('en-GB',{day:'2-digit',month:'short',year:'numeric'});
+  const hr     = '';
   const elapsed = startTime ? Math.floor((Date.now()-startTime)/1000) : 0;
   const em = String(Math.floor(elapsed/60)).padStart(2,'0');
   const es = String(elapsed%60).padStart(2,'0');
@@ -882,8 +866,7 @@ function showResults() {
           <div class="of">Overall</div>
         </div>
       </div>
-      <h2 style="font-size:22px;font-weight:800;color:var(--navy);margin-bottom:4px">${name}</h2>
-      <div style="font-size:14px;color:var(--muted)">${pos}${hr?' &nbsp;·&nbsp; Assessed by: '+hr:''}</div>
+      <h2 style="font-size:18px;font-weight:700;color:var(--navy);margin-bottom:4px;word-break:break-all">${name}</h2>
       <div style="font-size:13px;color:var(--muted);margin-top:4px">${dt} &nbsp;·&nbsp; Completion time: ${em}m ${es}s</div>
     </div>
 
@@ -949,9 +932,15 @@ function showResults() {
       <span id="odoo-status-text">Submitting results to MUST Engineering...</span>
     </div>` : ''}
 
+    <div style="background:linear-gradient(135deg,#1a2e4a 0%,#c9a84c 100%);border-radius:14px;padding:28px 24px;text-align:center;margin-bottom:24px;color:#fff">
+      <div style="font-size:44px;margin-bottom:12px">🎉</div>
+      <h3 style="font-size:19px;font-weight:800;margin-bottom:10px">Well done for completing the assessment!</h3>
+      <p style="font-size:14px;opacity:.9;line-height:1.65;max-width:420px;margin:0 auto">Thank you for your honest responses — they give us the clearest picture of who you are. Your profile has been submitted and our team will review it carefully.</p>
+    </div>
+
     <div class="print-row">
+      <a href="/" class="btn btn-outline" style="text-decoration:none">← Back to All Tests</a>
       <button class="btn btn-outline" onclick="window.print()">&#128424; Print / Save PDF</button>
-      <button class="btn btn-primary" onclick="location.reload()">New Assessment &rarr;</button>
     </div>`;
 
   setTimeout(() => {
@@ -983,9 +972,9 @@ async function submitToOdoo(scores, rec) {
 
     const payload  = {
       applicantId:   ODOO_APPLICANT_ID,
-      candidateName: document.getElementById('inp-fullname').value.trim(),
-      position:      document.getElementById('inp-position').value.trim(),
-      experience:    document.getElementById('inp-experience').value,
+      candidateName: candidateEmail,
+      position:      '',
+      experience:    '',
       scores: {
         overall: scores.OVERALL.pct,
         M: scores.M.pct,
@@ -1033,9 +1022,9 @@ async function submitToSupabase(scores, rec, flags) {
     const checks  = consistencyCheck();
     const payload = {
       test_type:           'profiler',
-      candidate_name:      document.getElementById('inp-fullname').value.trim(),
-      candidate_email:     (document.getElementById('inp-email')?.value || '').trim(),
-      candidate_position:  document.getElementById('inp-position').value.trim(),
+      candidate_name:      candidateEmail,
+      candidate_email:     candidateEmail,
+      candidate_position:  '',
       start_time:          assessmentStartISO || new Date().toISOString(),
       end_time:            assessmentEndISO   || new Date().toISOString(),
       time_taken_seconds:  elapsed,
