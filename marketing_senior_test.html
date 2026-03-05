@@ -274,14 +274,14 @@ footer{background:var(--navy);color:rgba(255,255,255,.5);text-align:center;paddi
     </div>
 
     <div class="case-card">
-      <h4>MCQ 1 of 2 — Channel Strategy</h4>
-      <div class="q-text" style="font-size:15px">What should be the primary channel focus for GreenTech's go-to-market launch?</div>
+      <h4>MCQ 1 of 2 — ABM Targeting Strategy</h4>
+      <div class="q-text" style="font-size:15px">GreenTech is targeting CFOs and sustainability directors at listed companies with RM 200,000 and 6 months. Which Account-Based Marketing (ABM) tier and approach is most appropriate for this budget and audience?</div>
       <div class="options" id="c1-mcq1-opts"></div>
     </div>
 
     <div class="case-card">
-      <h4>MCQ 2 of 2 — KPI Selection</h4>
-      <div class="q-text" style="font-size:15px">GreenTech wants to measure success across 6 months. Which set of KPIs is most appropriate for their stage?</div>
+      <h4>MCQ 2 of 2 — Pipeline Metrics</h4>
+      <div class="q-text" style="font-size:15px">After 3 months, GreenTech has generated 95 MQLs but only 6 sales meetings. The CMO asks which metrics to prioritise to diagnose the problem. What is the right approach?</div>
       <div class="options" id="c1-mcq2-opts"></div>
     </div>
 
@@ -316,14 +316,14 @@ footer{background:var(--navy);color:rgba(255,255,255,.5);text-align:center;paddi
     </div>
 
     <div class="case-card">
-      <h4>MCQ 1 of 2 — Immediate Response</h4>
-      <div class="q-text" style="font-size:15px">What is the most critical first action the marketing team should take?</div>
+      <h4>MCQ 1 of 2 — Crisis First Response</h4>
+      <div class="q-text" style="font-size:15px">The post has 500K+ shares and media outlets are calling for comment. The marketing team has 4 hours. Legal advises against any public acknowledgement until facts are fully verified. What is the correct first action?</div>
       <div class="options" id="c2-mcq1-opts"></div>
     </div>
 
     <div class="case-card">
-      <h4>MCQ 2 of 2 — Trust Rebuilding</h4>
-      <div class="q-text" style="font-size:15px">After the immediate crisis is addressed, which strategy best rebuilds brand trust over the following months?</div>
+      <h4>MCQ 2 of 2 — Long-Term Reputation Recovery</h4>
+      <div class="q-text" style="font-size:15px">The immediate crisis is contained. Which strategy most effectively rebuilds brand trust and purchase consideration over the following 6–12 months?</div>
       <div class="options" id="c2-mcq2-opts"></div>
     </div>
 
@@ -359,13 +359,13 @@ footer{background:var(--navy);color:rgba(255,255,255,.5);text-align:center;paddi
 
     <div class="case-card">
       <h4>MCQ 1 of 2 — Root Cause Diagnosis</h4>
-      <div class="q-text" style="font-size:15px">What is the most likely primary cause of RetailX's below-average email performance metrics?</div>
+      <div class="q-text" style="font-size:15px">RetailX sends the same weekly newsletter to all 800,000 customers. Open rate is 12% vs. 22% industry average; CTR is 1.1% vs. 3.5% industry average. What is the most likely primary cause?</div>
       <div class="options" id="c3-mcq1-opts"></div>
     </div>
 
     <div class="case-card">
-      <h4>MCQ 2 of 2 — Measuring Success</h4>
-      <div class="q-text" style="font-size:15px">The team implements AI-powered product recommendation emails. Which outcome best indicates the personalisation strategy is working?</div>
+      <h4>MCQ 2 of 2 — Measuring Personalisation Success</h4>
+      <div class="q-text" style="font-size:15px">RetailX implements AI-driven product recommendation emails. After 90 days, how should the team determine whether the personalisation strategy is genuinely working?</div>
       <div class="options" id="c3-mcq2-opts"></div>
     </div>
 
@@ -410,109 +410,109 @@ document.addEventListener('DOMContentLoaded', () => {
 // ─── DATA ────────────────────────────────────────────────────────────
 const STRATEGY_QUESTIONS = [
   {
-    text: 'A B2B company has high brand awareness but consistently low conversion rates. Which strategy most directly addresses this?',
+    text: 'A B2B SaaS CMO distinguishes their strategy between "demand generation" and "lead generation." What is the critical strategic difference between these two approaches?',
     options: [
-      'Increase social media ad frequency and budget',
-      'Audit and optimise bottom-of-funnel experiences — landing pages, sales collateral, and lead nurturing flows',
-      'Launch a full rebrand to refresh market perception',
-      'Hire additional sales staff to manually follow up on all leads'
+      'Demand generation uses only inbound tactics; lead generation uses only outbound tactics like cold calling and email sequences',
+      'Demand generation creates market awareness and category-level buying intent before capturing contact details; lead generation captures information from prospects who already have intent',
+      'Lead generation is always significantly more expensive per qualified lead than demand generation at equivalent scale',
+      'Demand generation is only relevant for new product categories entering a market — established categories should focus entirely on lead generation'
     ],
     correct: 1
   },
   {
-    text: 'You are launching a premium product into a market with 3 established competitors. Which positioning approach gives the strongest entry strategy?',
+    text: 'A premium B2B software vendor is losing enterprise deals to a competitor priced 30% lower, despite buyers rating the premium vendor as HIGHER quality. Research shows enterprise buyers cite "risk" as a key purchase barrier. Which pricing psychology concept best explains why the lower price may be HURTING the competitor in enterprise sales?',
     options: [
-      'Price-match the cheapest competitor to gain volume quickly',
-      'Copy the market leader\'s messaging with minor differentiation',
-      'Identify an unmet customer need or perception gap and own that space exclusively',
-      'Spend maximally on awareness campaigns before defining your value proposition'
+      'Price elasticity of demand — enterprise buyers are always inelastic to price regardless of perceived quality signals',
+      'The signalling effect of price — in high-stakes B2B purchases, a premium price signals quality, commitment, and reduced adoption risk; a low price raises questions about vendor stability and long-term support',
+      'Loss aversion bias — enterprise buyers fear the pain of overpaying more than they value any quality differential',
+      'Anchoring effect — the competitor\'s lower price makes the premium vendor appear disproportionately overpriced relative to value'
+    ],
+    correct: 1
+  },
+  {
+    text: 'A SaaS company adopts a Product-Led Growth (PLG) model where the product itself drives acquisition, conversion, and expansion. How does this fundamentally change the mandate of the marketing team?',
+    options: [
+      'Marketing becomes largely irrelevant in PLG — the product generates all growth without requiring traditional marketing investment',
+      'Marketing shifts upstream and downstream simultaneously — focus moves to driving product discovery and initial adoption, designing viral and referral loops within the product, and supporting expansion of existing users',
+      'PLG requires marketing to dramatically increase paid acquisition spend to fund the free-trial pipeline that the product needs to convert',
+      'PLG is structurally limited to B2C consumer apps and cannot be applied effectively to B2B SaaS products'
+    ],
+    correct: 1
+  },
+  {
+    text: 'A SaaS company\'s marketing team is co-accountable for Net Revenue Retention (NRR). The business reports an NRR of 118%. What does this specifically mean, and why does it matter strategically?',
+    options: [
+      'The company grew total revenue by 18% this year across all sources including new customer acquisition',
+      'Even with zero new customer acquisition, existing customers\' expansions, upsells, and cross-sells more than offset churn — the business grows 18% from its existing base alone, making growth increasingly capital-efficient over time',
+      'The company successfully renewed 118% of its customer contracts, indicating exceptionally low absolute churn',
+      'The company retains 118 revenue dollars for every 100 that enter a churn or downgrade risk state in any given period'
+    ],
+    correct: 1
+  },
+  {
+    text: 'The "Jobs-to-be-Done" (JTBD) framework fundamentally reframes how marketers define competition. According to JTBD, what is the most accurate "competitive set" for a morning commuter purchasing a fast food milkshake?',
+    options: [
+      'Other milkshake brands at competing QSR chains — the competitive set is defined by product category',
+      'Cold brew coffee and smoothies — the competitive set is defined by the morning beverage occasion and health perception',
+      'Any product hired to do the same job: keeping a commuter occupied, full, and unstressed during a long, boring morning drive — including a banana, bagel, podcast, or audiobook',
+      'Breakfast meal deals — the competitive set is defined by the daypart and caloric occasion rather than product format'
     ],
     correct: 2
-  },
-  {
-    text: 'A marketing team\'s CAC (Customer Acquisition Cost) has doubled over 12 months while revenue stayed flat. What is the most likely strategic cause?',
-    options: [
-      'Product quality has deteriorated significantly',
-      'Ad platforms have become more saturated and competitive, or the targetable audience has been largely exhausted',
-      'The marketing team\'s productivity has declined',
-      'Brand awareness has reached saturation — awareness is now too high'
-    ],
-    correct: 1
-  },
-  {
-    text: 'Which approach best describes "full-funnel" marketing strategy?',
-    options: [
-      'Running all ads only at the point of purchase decision',
-      'Using email as the sole channel across all customer lifecycle stages',
-      'Coordinating awareness, consideration, and conversion activities so they work together across the customer journey',
-      'Assigning the entire marketing budget to performance/direct response marketing'
-    ],
-    correct: 2
-  },
-  {
-    text: 'A global brand wants to expand into a new regional market. What should be the FIRST marketing step?',
-    options: [
-      'Replicate the existing global campaign verbatim — the brand\'s proven messaging will translate',
-      'Conduct thorough local market research — cultural insights, competitor landscape, regulatory environment, and specific customer needs',
-      'Launch influencer partnerships immediately to build early buzz',
-      'Set aggressive revenue targets and work backwards to determine the marketing approach'
-    ],
-    correct: 1
   }
 ];
 
 const CASE_MCQS = {
   c1m1: {
     options: [
-      'Instagram and TikTok influencer campaigns for broad consumer awareness',
-      'LinkedIn thought leadership, targeted ABM (Account-Based Marketing), and industry event presence',
-      'Mass TV and radio advertising for national brand awareness',
-      'Google Shopping ads and e-commerce marketplace partnerships'
-    ],
-    correct: 1
-  },
-  c1m2: {
-    options: [
-      'Instagram followers, TikTok views, and general website traffic growth',
-      'Qualified leads generated, sales meetings booked, CAC, and pipeline value created',
-      'Total ad impressions and share of voice against all industry competitors',
-      'Customer satisfaction (CSAT) scores from current existing clients'
-    ],
-    correct: 1
-  },
-  c2m1: {
-    options: [
-      'Immediately delete all social media posts related to the disputed product claims',
-      'Issue a legal cease-and-desist order against the original poster',
-      'Convene a cross-functional response team (marketing, legal, leadership) to verify facts and align on a unified response',
-      'Launch a counter-campaign promoting positive customer reviews and testimonials'
+      'ABM 1:Many — run broad LinkedIn content campaigns targeting all sustainability and finance job titles across all company sizes to maximise reach within the RM 200K budget',
+      'ABM 1:1 — build fully personalised outreach campaigns for each of the 5,000+ individual CFO and sustainability director contacts across all listed companies',
+      'ABM 1:Few — define a focused target account list of 50–100 highest-fit listed companies and run deeply personalised, multi-channel campaigns tailored to each account\'s specific context',
+      'Abandon ABM entirely — the RM 200K budget is insufficient for any ABM approach and should be reallocated to inbound SEO and content marketing'
     ],
     correct: 2
   },
+  c1m2: {
+    options: [
+      'LinkedIn follower growth, website sessions, and total content downloads — these vanity metrics prove the brand is building an audience before sales can happen',
+      'Total marketing spend efficiency (CPL only) — reducing cost per lead proves the campaign is improving regardless of lead quality',
+      'MQL-to-SQL conversion rate, average sales cycle length, pipeline value created, and CAC — these diagnose where leads stall and whether marketing is generating real business outcomes',
+      'Share of voice against competitors in the sustainability sector — if GreenTech outspends competitors on share of voice, market share growth will naturally follow'
+    ],
+    correct: 2
+  },
+  c2m1: {
+    options: [
+      'Delete or edit all existing social media posts about the disputed health claims to remove the evidence before media coverage escalates further',
+      'Instruct legal to issue a cease-and-desist to the original poster — removing the source of the claim stops further amplification',
+      'Immediately launch a positive customer testimonial campaign to flood social feeds with counter-narratives before the crisis narrative hardens',
+      'Convene an urgent cross-functional response team (marketing, legal, product, leadership) to verify the facts, align on a single narrative, and agree on a response before any public communication'
+    ],
+    correct: 3
+  },
   c2m2: {
     options: [
-      'Aggressively discount prices to attract customers back through value',
-      'Avoid the topic entirely and redirect all marketing focus to new product launches',
-      'Transparently communicate what changes were made, invite third-party verification, and authentically engage with concerned customers',
-      'Replace the brand name to create distance from the controversy'
+      'Aggressively discount the flagship product for the next 6 months — price reduction signals the brand is listening and makes repurchase feel lower-risk for concerned customers',
+      'Avoid the topic entirely in all future communications and redirect marketing focus exclusively to new product launches and feature announcements',
+      'Transparently communicate what specific changes were made to the product and claims, proactively invite independent third-party verification, and authentically engage with customers who raised concerns rather than managing them at arm\'s length',
+      'Retire the PulseWear brand name and relaunch under a new brand identity to create full distance from the controversy and start fresh with a clean reputation slate'
     ],
     correct: 2
   },
   c3m1: {
     options: [
-      'The product catalogue is too large for effective email curation',
-      'Lack of personalisation — one-size-fits-all content fails to resonate with different customer segments and purchase behaviours',
-      'Emails are being sent on the wrong day of the week',
-      'The brand\'s visual design and colour palette are insufficiently engaging'
+      'Sending frequency is too high — subscriber fatigue from weekly emails is causing disengagement, and reducing cadence to bi-monthly will restore open rates to industry average',
+      'The email send time is wrong — research consistently shows Tuesday at 10am drives the highest open rates, and RetailX is not optimising for this timing',
+      'Lack of behavioural segmentation and personalisation — one-size-fits-all content sends the wrong message to the wrong segment, causing recipients to disengage from emails that feel irrelevant to their actual purchase history and interests',
+      'The email design is insufficiently visual — plain text emails consistently underperform rich HTML designs with product imagery, and RetailX\'s template is not image-heavy enough'
     ],
-    correct: 1
+    correct: 2
   },
   c3m2: {
     options: [
-      'An increase in the total volume of emails sent per month',
-      'A reduction in the marketing team\'s headcount due to automation',
-      'Measurable improvement in open rates, CTR, revenue per email, and customer lifetime value over 90 days',
-      'The AI system eliminates the need for a human email marketing specialist'
+      'A/B test results show the personalised email variant outperforms the control on CTR — even one statistically significant test at 80% confidence confirms the strategy is working and should be fully rolled out',
+      'The marketing team\'s weekly email production time has been reduced by 40% through AI automation — demonstrating that the strategy is delivering operational efficiency gains as intended',
+      'Over a 90-day period: open rates improve toward industry average (22%+), CTR improves toward industry average (3.5%+), revenue-per-email increases, and repeat purchase rate or LTV trends upward for the personalised cohort versus a holdout control group',
+      'The AI personalisation system can now autonomously make creative and segmentation decisions without human review — demonstrating that the team has successfully implemented full marketing automation'
     ],
     correct: 2
   }
