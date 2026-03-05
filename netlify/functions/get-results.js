@@ -2,7 +2,9 @@
 const https = require('https');
 
 const SUPABASE_URL     = process.env.SUPABASE_URL  || 'https://ndaydueegykjvliblbly.supabase.co';
-const SUPABASE_SVC_KEY = process.env.SUPABASE_SERVICE_ROLE_KEY || '';
+const SUPABASE_SVC_KEY = process.env.SUPABASE_SERVICE_ROLE_KEY
+                      || process.env.SUPABASE_ANON_KEY
+                      || 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im5kYXlkdWVlZ3lranZsaWJsYmx5Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzIxMDQxMjIsImV4cCI6MjA4NzY4MDEyMn0.BwRzuNbMSj1b1B3eSYP1R9Y2a0SnkewxhtqTFIjJfzg';
 const ADMIN_PASSWORD   = process.env.ADMIN_PASSWORD || 'mustjobs2025';
 
 const CORS = {
@@ -19,10 +21,6 @@ exports.handler = async function(event) {
   const pwd = (event.headers['x-admin-password'] || event.queryStringParameters?.p || '').trim();
   if (pwd !== ADMIN_PASSWORD) {
     return { statusCode: 401, headers: CORS, body: JSON.stringify({ error: 'Unauthorised' }) };
-  }
-
-  if (!SUPABASE_SVC_KEY) {
-    return { statusCode: 503, headers: CORS, body: JSON.stringify({ error: 'Service key not configured. Set SUPABASE_SERVICE_ROLE_KEY in Netlify env vars.' }) };
   }
 
   const type  = event.queryStringParameters?.type  || 'all';
