@@ -38,3 +38,13 @@
   from = "/admin"
   to = "/admin.html"
   status = 301
+
+[[redirects]]
+  from = "/marketing"
+  to = "/marketing_test.html"
+  status = 301
+
+[[redirects]]
+  from = "/marketing-senior"
+  to = "/marketing_senior_test.html"
+  status = 301

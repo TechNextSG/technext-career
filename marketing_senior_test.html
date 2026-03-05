@@ -1,0 +1,822 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Senior Marketers Assessment — MUST Engineering</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --primary:#7c3aed;--primary2:#9d4edd;--primary-bg:#f5f3ff;
+  --navy:#1a2e4a;--navy2:#2d4a6b;
+  --bg:#f0f4f8;--white:#fff;--text:#1e2d3d;--muted:#6b7a8d;
+  --border:#dce3ea;--radius:14px;
+  --shadow:0 4px 24px rgba(26,46,74,.10);
+  --gold:#c9a84c;
+}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',system-ui,sans-serif;background:var(--bg);color:var(--text);min-height:100vh}
+
+/* HEADER */
+header{background:linear-gradient(135deg,#3b0764 0%,var(--primary) 100%);color:#fff;padding:14px 20px;display:flex;align-items:center;gap:12px;position:sticky;top:0;z-index:50;box-shadow:0 2px 16px rgba(0,0,0,.3)}
+.logo{width:38px;height:38px;background:rgba(255,255,255,.2);border-radius:9px;display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0}
+.brand h1{font-size:17px;font-weight:800}
+.brand p{font-size:11px;opacity:.6;margin-top:1px}
+
+/* SCREENS */
+.screen{display:none;min-height:calc(100vh - 56px)}
+.screen.active{display:block}
+
+/* SHARED LAYOUT */
+.page-wrap{max-width:680px;margin:0 auto;padding:36px 20px 60px}
+.card{background:var(--white);border-radius:var(--radius);box-shadow:var(--shadow);padding:36px 32px}
+
+/* LANDING */
+.landing-icon{font-size:52px;margin-bottom:16px;text-align:center}
+.card h2{font-size:22px;font-weight:900;color:var(--navy);margin-bottom:10px}
+.card > p{font-size:14px;color:var(--muted);line-height:1.65;margin-bottom:24px}
+.stats-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:24px}
+.stat{background:var(--primary-bg);border-radius:10px;padding:12px 8px;text-align:center}
+.stat-val{font-size:18px;font-weight:900;color:var(--primary);display:block}
+.stat-lbl{font-size:10px;color:var(--muted);margin-top:2px}
+.section-list{margin-bottom:28px}
+.section-list h4{font-size:12px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:1px;margin-bottom:12px}
+.section-item{display:flex;align-items:flex-start;gap:10px;font-size:13px;color:var(--text);padding:10px 0;border-bottom:1px solid var(--border)}
+.section-item:last-child{border-bottom:none}
+.section-num{width:24px;height:24px;border-radius:50%;background:var(--primary);color:#fff;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:800;flex-shrink:0}
+.section-info strong{display:block;font-weight:700;font-size:13px;color:var(--navy)}
+.section-info span{font-size:12px;color:var(--muted)}
+
+/* BUTTONS */
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;padding:12px 24px;border-radius:10px;font-size:14px;font-weight:700;cursor:pointer;border:none;transition:all .2s;text-decoration:none}
+.btn-primary{background:var(--primary);color:#fff}
+.btn-primary:hover{background:var(--primary2);transform:translateY(-1px)}
+.btn-outline{background:var(--white);color:var(--navy);border:1.5px solid var(--border)}
+.btn-outline:hover{border-color:var(--navy)}
+.btn-full{width:100%;justify-content:center}
+
+/* FORM / INFO */
+.field{margin-bottom:18px}
+.field label{display:block;font-size:13px;font-weight:700;color:var(--text);margin-bottom:6px}
+.field input{width:100%;padding:11px 14px;border:1.5px solid var(--border);border-radius:9px;font-size:14px;color:var(--text);background:#fff;outline:none;transition:border-color .2s}
+.field input:focus{border-color:var(--primary);box-shadow:0 0 0 3px rgba(124,58,237,.12)}
+.error-msg{color:#ef4444;font-size:12px;margin-top:10px;display:none}
+
+/* PROGRESS */
+.progress-header{margin-bottom:16px}
+.progress-bar{background:var(--border);border-radius:99px;height:6px;margin-bottom:6px;overflow:hidden}
+.progress-fill{height:100%;background:linear-gradient(90deg,var(--primary),var(--primary2));border-radius:99px;transition:width .4s ease}
+.progress-meta{display:flex;justify-content:space-between;font-size:12px;color:var(--muted)}
+.phase-badge{background:var(--primary-bg);color:var(--primary);font-weight:700;font-size:11px;padding:4px 12px;border-radius:99px;display:inline-block;margin-bottom:12px}
+
+/* MCQ SCREEN */
+.q-card{background:var(--white);border-radius:var(--radius);box-shadow:var(--shadow);padding:28px}
+.q-num{font-size:11px;font-weight:700;color:var(--primary);text-transform:uppercase;letter-spacing:1px;margin-bottom:8px}
+.q-text{font-size:16px;font-weight:700;color:var(--navy);line-height:1.55;margin-bottom:20px}
+.options{display:flex;flex-direction:column;gap:10px}
+.opt{display:flex;align-items:flex-start;gap:12px;padding:13px 16px;border:1.5px solid var(--border);border-radius:10px;cursor:pointer;transition:all .2s;font-size:14px;color:var(--text);background:#fff}
+.opt:hover{border-color:var(--primary);background:var(--primary-bg)}
+.opt.selected{border-color:var(--primary);background:var(--primary-bg)}
+.opt-letter{width:24px;height:24px;border-radius:50%;background:var(--bg);border:1.5px solid var(--border);display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;color:var(--muted);flex-shrink:0;transition:all .2s}
+.opt.selected .opt-letter{background:var(--primary);border-color:var(--primary);color:#fff}
+.q-nav{display:flex;justify-content:space-between;align-items:center;margin-top:22px}
+
+/* CASE STUDY */
+.case-context{background:linear-gradient(135deg,#3b0764 0%,var(--primary) 100%);border-radius:12px;padding:22px 22px;margin-bottom:22px;color:#fff}
+.case-context .case-tag{font-size:11px;font-weight:700;background:rgba(255,255,255,.2);display:inline-block;padding:3px 12px;border-radius:99px;margin-bottom:10px;letter-spacing:.5px}
+.case-context h3{font-size:16px;font-weight:800;margin-bottom:10px;line-height:1.35}
+.case-context p{font-size:13px;opacity:.9;line-height:1.65}
+
+.case-card{background:var(--white);border-radius:var(--radius);box-shadow:var(--shadow);padding:24px;margin-bottom:16px}
+.case-card h4{font-size:13px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.8px;margin-bottom:14px}
+
+/* TEXTAREA */
+.text-question{background:var(--white);border-radius:var(--radius);box-shadow:var(--shadow);padding:24px;margin-bottom:16px}
+.text-question .tq-label{font-size:11px;font-weight:700;color:var(--primary);text-transform:uppercase;letter-spacing:1px;margin-bottom:8px}
+.text-question .tq-prompt{font-size:14px;font-weight:700;color:var(--navy);line-height:1.55;margin-bottom:14px}
+.text-question textarea{width:100%;min-height:140px;padding:12px 14px;border:1.5px solid var(--border);border-radius:9px;font-size:14px;color:var(--text);line-height:1.6;resize:vertical;outline:none;font-family:inherit;transition:border-color .2s}
+.text-question textarea:focus{border-color:var(--primary);box-shadow:0 0 0 3px rgba(124,58,237,.12)}
+.char-count{font-size:11px;color:var(--muted);text-align:right;margin-top:5px}
+.text-hint{font-size:12px;color:var(--muted);background:var(--primary-bg);border-radius:8px;padding:10px 12px;margin-top:10px;line-height:1.5}
+
+/* RESULTS */
+.results-wrap{max-width:700px;margin:0 auto;padding:32px 20px 60px}
+.score-hero{background:linear-gradient(135deg,#3b0764 0%,var(--primary) 100%);border-radius:var(--radius);padding:32px 24px;text-align:center;color:#fff;margin-bottom:20px}
+.score-circle{width:96px;height:96px;border-radius:50%;background:rgba(255,255,255,.15);border:4px solid rgba(255,255,255,.4);display:flex;flex-direction:column;align-items:center;justify-content:center;margin:0 auto 16px}
+.score-pct{font-size:28px;font-weight:900;line-height:1}
+.score-label-sm{font-size:11px;opacity:.8;margin-top:2px}
+.score-hero h2{font-size:20px;font-weight:800;margin-bottom:6px}
+.score-hero p{font-size:13px;opacity:.85;line-height:1.55}
+.result-badge{display:inline-block;padding:6px 18px;border-radius:99px;font-size:13px;font-weight:800;background:rgba(255,255,255,.2);color:#fff;margin-bottom:12px}
+
+.info-card{background:var(--white);border-radius:var(--radius);box-shadow:var(--shadow);padding:22px 24px;margin-bottom:16px}
+.info-card h3{font-size:14px;font-weight:800;color:var(--navy);margin-bottom:14px;display:flex;align-items:center;gap:8px}
+
+.mcq-section{margin-bottom:10px}
+.mcq-section h4{font-size:12px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.8px;margin-bottom:10px;padding-bottom:6px;border-bottom:1px solid var(--border)}
+.review-item{border-left:3px solid var(--border);padding:10px 14px;margin-bottom:8px;border-radius:0 8px 8px 0;background:var(--bg)}
+.review-item.correct{border-left-color:#22c55e;background:#f0fdf4}
+.review-item.wrong{border-left-color:#ef4444;background:#fef2f2}
+.review-q{font-size:13px;font-weight:600;color:var(--text);margin-bottom:5px}
+.review-d{font-size:12px;color:var(--muted)}
+.review-d .ca{color:#16a34a;font-weight:700}
+.review-d .wa{color:#dc2626;font-weight:700}
+
+.text-review-item{background:var(--primary-bg);border-radius:10px;padding:14px 16px;margin-bottom:12px}
+.text-review-item .tr-label{font-size:11px;font-weight:700;color:var(--primary);text-transform:uppercase;letter-spacing:.8px;margin-bottom:6px}
+.text-review-item .tr-prompt{font-size:13px;font-weight:700;color:var(--navy);margin-bottom:8px;line-height:1.45}
+.text-review-item .tr-answer{font-size:13px;color:var(--text);line-height:1.6;background:var(--white);border-radius:8px;padding:10px 12px;border:1px solid var(--border);font-style:italic}
+.tr-pending{display:inline-block;background:var(--primary);color:#fff;font-size:11px;font-weight:700;padding:3px 10px;border-radius:99px;margin-top:6px}
+
+.positive-card{background:linear-gradient(135deg,#3b0764 0%,var(--primary) 100%);border-radius:var(--radius);padding:28px 24px;text-align:center;margin-bottom:20px;color:#fff}
+.positive-card .emoji{font-size:44px;margin-bottom:12px}
+.positive-card h3{font-size:19px;font-weight:800;margin-bottom:10px}
+.positive-card p{font-size:14px;opacity:.85;line-height:1.65;max-width:440px;margin:0 auto}
+.result-actions{display:flex;gap:12px;flex-wrap:wrap;justify-content:center;margin-top:8px}
+
+/* FOOTER */
+footer{background:var(--navy);color:rgba(255,255,255,.5);text-align:center;padding:18px 20px;font-size:12px}
+
+/* MOBILE */
+@media(max-width:640px){
+  .stats-grid{grid-template-columns:repeat(2,1fr)}
+  .card,.text-question,.case-card,.info-card,.q-card{padding:20px 16px}
+  .case-context{padding:18px 16px}
+  .page-wrap{padding:24px 14px 48px}
+  .q-text{font-size:15px}
+  .result-actions{flex-direction:column}
+  .result-actions .btn{width:100%;justify-content:center}
+  .score-circle{width:80px;height:80px}
+  .score-pct{font-size:24px}
+}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="logo">🎯</div>
+  <div class="brand">
+    <h1>Senior Marketers Assessment</h1>
+    <p>MUST Engineering · Advanced Candidate Portal</p>
+  </div>
+</header>
+
+<!-- ═══════════════════════════════ LANDING ═══════════════════════════ -->
+<div id="screen-landing" class="screen active">
+  <div class="page-wrap">
+    <div class="card">
+      <div class="landing-icon">🎯</div>
+      <h2>Advanced Senior Marketers Assessment</h2>
+      <p>This assessment is designed for experienced marketing professionals. It combines strategic MCQ questions with real-world case studies that require written analysis — there are no single "correct" answers for the case studies; your reasoning and depth of thinking are evaluated.</p>
+
+      <div class="stats-grid">
+        <div class="stat"><span class="stat-val">5</span><div class="stat-lbl">Strategy MCQs</div></div>
+        <div class="stat"><span class="stat-val">3</span><div class="stat-lbl">Case Studies</div></div>
+        <div class="stat"><span class="stat-val">~45</span><div class="stat-lbl">Minutes</div></div>
+        <div class="stat"><span class="stat-val">Expert</span><div class="stat-lbl">Level</div></div>
+      </div>
+
+      <div class="section-list">
+        <h4>Assessment Structure</h4>
+        <div class="section-item">
+          <div class="section-num">1</div>
+          <div class="section-info">
+            <strong>Strategic MCQ</strong>
+            <span>5 scenario-based multiple choice questions on advanced marketing strategy</span>
+          </div>
+        </div>
+        <div class="section-item">
+          <div class="section-num">2</div>
+          <div class="section-info">
+            <strong>Case Study: Campaign Strategy</strong>
+            <span>B2B go-to-market scenario · 2 MCQ + written analysis</span>
+          </div>
+        </div>
+        <div class="section-item">
+          <div class="section-num">3</div>
+          <div class="section-info">
+            <strong>Case Study: Brand Crisis</strong>
+            <span>Reputation management scenario · 2 MCQ + written crisis framework</span>
+          </div>
+        </div>
+        <div class="section-item">
+          <div class="section-num">4</div>
+          <div class="section-info">
+            <strong>Case Study: AI-Driven Marketing</strong>
+            <span>Personalisation at scale · 2 MCQ + written implementation roadmap</span>
+          </div>
+        </div>
+      </div>
+
+      <div style="background:var(--primary-bg);border-radius:10px;padding:14px 16px;margin-bottom:24px;font-size:13px;color:var(--text);line-height:1.6">
+        <strong style="color:var(--primary)">📝 Written responses:</strong> Your case study answers are reviewed by our senior team and are not auto-scored. Write as you would in a real strategic brief — clarity, structure, and depth of reasoning matter.
+      </div>
+
+      <button class="btn btn-primary btn-full" onclick="goToInfo()">Begin Assessment →</button>
+    </div>
+  </div>
+  <footer>© MUST Engineering · Candidate Assessment Portal · Results are confidential.</footer>
+</div>
+
+<!-- ═══════════════════════════════ INFO ═══════════════════════════════ -->
+<div id="screen-info" class="screen">
+  <div class="page-wrap" style="max-width:480px">
+    <div class="card">
+      <h2>One quick thing</h2>
+      <p style="font-size:13px;color:var(--muted);margin-bottom:24px;line-height:1.55">Just your email so we can save your results. That's it!</p>
+      <div class="field">
+        <label for="inp-email">Email Address <span style="color:#ef4444">*</span></label>
+        <input type="email" id="inp-email" placeholder="e.g. sarah@email.com" autocomplete="email" inputmode="email"
+               onkeydown="if(event.key==='Enter')startAssessment()" />
+      </div>
+      <div class="error-msg" id="info-error"></div>
+      <div style="display:flex;gap:10px;margin-top:8px">
+        <button class="btn btn-outline" onclick="showScreen('screen-landing')">← Back</button>
+        <button class="btn btn-primary" style="flex:1" onclick="startAssessment()">Start Assessment →</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════ MCQ (5 standalone) ════════════════ -->
+<div id="screen-mcq" class="screen">
+  <div class="page-wrap">
+    <div class="progress-header">
+      <div class="phase-badge">Phase 1 of 4 — Strategic MCQ</div>
+      <div class="progress-bar"><div class="progress-fill" id="mcq-progress" style="width:5%"></div></div>
+      <div class="progress-meta"><span id="mcq-counter">Question 1 of 5</span><span id="mcq-pct">5% complete</span></div>
+    </div>
+    <div class="q-card">
+      <div class="q-num" id="mcq-qnum">Question 1</div>
+      <div class="q-text" id="mcq-qtext"></div>
+      <div class="options" id="mcq-options"></div>
+    </div>
+    <div class="q-nav" style="margin-top:16px">
+      <button class="btn btn-outline" id="mcq-prev" onclick="prevMcq()" style="display:none">← Previous</button>
+      <div></div>
+      <button class="btn btn-primary" id="mcq-next" onclick="nextMcq()">Next →</button>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════ CASE 1 ════════════════════════════ -->
+<div id="screen-case1" class="screen">
+  <div class="page-wrap">
+    <div class="progress-header">
+      <div class="phase-badge">Phase 2 of 4 — Case Study: Campaign Strategy</div>
+      <div class="progress-bar"><div class="progress-fill" style="width:40%"></div></div>
+      <div class="progress-meta"><span>Case Study 1 of 3</span><span>40% complete</span></div>
+    </div>
+
+    <div class="case-context">
+      <div class="case-tag">📋 Scenario</div>
+      <h3>GreenTech Malaysia — B2B SaaS Go-to-Market</h3>
+      <p>GreenTech Malaysia is a B2B sustainability consulting firm launching a new carbon accounting SaaS platform. They have a RM 200,000 marketing budget and a 6-month go-to-market window. Their target audience is CFOs and sustainability directors at listed companies. They have no existing digital presence and minimal brand recognition in the sector.</p>
+    </div>
+
+    <div class="case-card">
+      <h4>MCQ 1 of 2 — Channel Strategy</h4>
+      <div class="q-text" style="font-size:15px">What should be the primary channel focus for GreenTech's go-to-market launch?</div>
+      <div class="options" id="c1-mcq1-opts"></div>
+    </div>
+
+    <div class="case-card">
+      <h4>MCQ 2 of 2 — KPI Selection</h4>
+      <div class="q-text" style="font-size:15px">GreenTech wants to measure success across 6 months. Which set of KPIs is most appropriate for their stage?</div>
+      <div class="options" id="c1-mcq2-opts"></div>
+    </div>
+
+    <div class="text-question">
+      <div class="tq-label">✍️ Written Response</div>
+      <div class="tq-prompt">GreenTech's marketing director asks you to recommend a content marketing strategy that positions them as thought leaders and generates inbound leads. Outline your approach — including content formats, topics, distribution channels, and a brief rationale for why this strategy fits their audience and go-to-market stage.</div>
+      <textarea id="c1-text" placeholder="Write your response here... (Aim for 200–400 words. Clarity and strategic reasoning matter more than length.)" oninput="updateCharCount('c1-text','c1-chars')"></textarea>
+      <div class="char-count" id="c1-chars">0 characters</div>
+      <div class="text-hint">💡 Consider: What content proves credibility to CFOs? Where do sustainability directors consume information? How does thought leadership connect to lead generation?</div>
+    </div>
+
+    <div class="q-nav" style="margin-top:4px">
+      <button class="btn btn-outline" onclick="showScreen('screen-mcq');resetMcqToLast()">← Previous</button>
+      <button class="btn btn-primary" onclick="validateAndGoCase(1)">Next Case Study →</button>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════ CASE 2 ════════════════════════════ -->
+<div id="screen-case2" class="screen">
+  <div class="page-wrap">
+    <div class="progress-header">
+      <div class="phase-badge">Phase 3 of 4 — Case Study: Brand Crisis</div>
+      <div class="progress-bar"><div class="progress-fill" style="width:65%"></div></div>
+      <div class="progress-meta"><span>Case Study 2 of 3</span><span>65% complete</span></div>
+    </div>
+
+    <div class="case-context">
+      <div class="case-tag">🔥 Crisis Scenario</div>
+      <h3>PulseWear — Viral Brand Crisis Response</h3>
+      <p>PulseWear is a mid-tier wearable tech brand. A viral social media post has accused them of misleading health claims on their flagship fitness tracker. The post has 500,000+ shares and is trending nationally. Media outlets are picking it up. The marketing team must respond within 4 hours.</p>
+    </div>
+
+    <div class="case-card">
+      <h4>MCQ 1 of 2 — Immediate Response</h4>
+      <div class="q-text" style="font-size:15px">What is the most critical first action the marketing team should take?</div>
+      <div class="options" id="c2-mcq1-opts"></div>
+    </div>
+
+    <div class="case-card">
+      <h4>MCQ 2 of 2 — Trust Rebuilding</h4>
+      <div class="q-text" style="font-size:15px">After the immediate crisis is addressed, which strategy best rebuilds brand trust over the following months?</div>
+      <div class="options" id="c2-mcq2-opts"></div>
+    </div>
+
+    <div class="text-question">
+      <div class="tq-label">✍️ Written Response</div>
+      <div class="tq-prompt">You are the senior marketing lead at PulseWear. Draft a crisis communication framework — including the initial public response (key message and tone), stakeholder communication priorities (employees, media, customers), and a 30-60-90 day reputation recovery roadmap.</div>
+      <textarea id="c2-text" placeholder="Write your response here... (Structure your answer clearly — use headings or bullets if helpful.)" oninput="updateCharCount('c2-text','c2-chars')"></textarea>
+      <div class="char-count" id="c2-chars">0 characters</div>
+      <div class="text-hint">💡 Consider: What tone does the brand need to strike (defensive vs. transparent)? What are the risks of silence vs. early acknowledgement? Who needs to hear from you first?</div>
+    </div>
+
+    <div class="q-nav" style="margin-top:4px">
+      <button class="btn btn-outline" onclick="showScreen('screen-case1')">← Previous</button>
+      <button class="btn btn-primary" onclick="validateAndGoCase(2)">Next Case Study →</button>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════ CASE 3 ════════════════════════════ -->
+<div id="screen-case3" class="screen">
+  <div class="page-wrap">
+    <div class="progress-header">
+      <div class="phase-badge">Phase 4 of 4 — Case Study: AI-Driven Marketing</div>
+      <div class="progress-bar"><div class="progress-fill" style="width:85%"></div></div>
+      <div class="progress-meta"><span>Case Study 3 of 3</span><span>85% complete</span></div>
+    </div>
+
+    <div class="case-context">
+      <div class="case-tag">🤖 AI Strategy Scenario</div>
+      <h3>RetailX — AI Personalisation at Scale</h3>
+      <p>RetailX is a mid-sized e-commerce retailer with 800,000 active customers. They send weekly email newsletters to their entire list with the same content. Email open rate: 12% (industry average: 22%). Click-through rate: 1.1% (industry average: 3.5%). The CMO has allocated budget for AI-driven personalisation but the team lacks implementation experience.</p>
+    </div>
+
+    <div class="case-card">
+      <h4>MCQ 1 of 2 — Root Cause Diagnosis</h4>
+      <div class="q-text" style="font-size:15px">What is the most likely primary cause of RetailX's below-average email performance metrics?</div>
+      <div class="options" id="c3-mcq1-opts"></div>
+    </div>
+
+    <div class="case-card">
+      <h4>MCQ 2 of 2 — Measuring Success</h4>
+      <div class="q-text" style="font-size:15px">The team implements AI-powered product recommendation emails. Which outcome best indicates the personalisation strategy is working?</div>
+      <div class="options" id="c3-mcq2-opts"></div>
+    </div>
+
+    <div class="text-question">
+      <div class="tq-label">✍️ Written Response</div>
+      <div class="tq-prompt">Outline a 90-day AI personalisation implementation roadmap for RetailX's email marketing. Include: the data you would need to collect, the AI tools or capabilities you would implement (and why), how you would measure success, and any risks or ethical considerations the team should be aware of.</div>
+      <textarea id="c3-text" placeholder="Write your response here... (A structured roadmap with phases is recommended.)" oninput="updateCharCount('c3-text','c3-chars')"></textarea>
+      <div class="char-count" id="c3-chars">0 characters</div>
+      <div class="text-hint">💡 Consider: What data signals drive personalisation? What are the risks of over-reliance on AI? How do you balance personalisation with customer privacy?</div>
+    </div>
+
+    <div class="q-nav" style="margin-top:4px">
+      <button class="btn btn-outline" onclick="showScreen('screen-case2')">← Previous</button>
+      <button class="btn btn-primary" onclick="submitAssessment()">Submit Assessment →</button>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════ RESULTS ════════════════════════════ -->
+<div id="screen-results" class="screen">
+  <div class="results-wrap" id="results-wrap"></div>
+  <footer>© MUST Engineering · Candidate Assessment Portal · Results are confidential.</footer>
+</div>
+
+<script>
+// ─── STATE ───────────────────────────────────────────────────────────
+let candidateEmail = '';
+let startTime;
+let currentMcq = 0;
+const mcqAnswers  = {};
+const caseAnswers = {};  // {c1m1, c1m2, c2m1, c2m2, c3m1, c3m2, c1text, c2text, c3text}
+
+document.addEventListener('DOMContentLoaded', () => {
+  const saved = localStorage.getItem('must_candidate_email');
+  if (saved) {
+    const el = document.getElementById('inp-email');
+    if (el) el.value = saved;
+  }
+  renderCaseMcqs();
+});
+
+// ─── DATA ────────────────────────────────────────────────────────────
+const STRATEGY_QUESTIONS = [
+  {
+    text: 'A B2B company has high brand awareness but consistently low conversion rates. Which strategy most directly addresses this?',
+    options: [
+      'Increase social media ad frequency and budget',
+      'Audit and optimise bottom-of-funnel experiences — landing pages, sales collateral, and lead nurturing flows',
+      'Launch a full rebrand to refresh market perception',
+      'Hire additional sales staff to manually follow up on all leads'
+    ],
+    correct: 1
+  },
+  {
+    text: 'You are launching a premium product into a market with 3 established competitors. Which positioning approach gives the strongest entry strategy?',
+    options: [
+      'Price-match the cheapest competitor to gain volume quickly',
+      'Copy the market leader\'s messaging with minor differentiation',
+      'Identify an unmet customer need or perception gap and own that space exclusively',
+      'Spend maximally on awareness campaigns before defining your value proposition'
+    ],
+    correct: 2
+  },
+  {
+    text: 'A marketing team\'s CAC (Customer Acquisition Cost) has doubled over 12 months while revenue stayed flat. What is the most likely strategic cause?',
+    options: [
+      'Product quality has deteriorated significantly',
+      'Ad platforms have become more saturated and competitive, or the targetable audience has been largely exhausted',
+      'The marketing team\'s productivity has declined',
+      'Brand awareness has reached saturation — awareness is now too high'
+    ],
+    correct: 1
+  },
+  {
+    text: 'Which approach best describes "full-funnel" marketing strategy?',
+    options: [
+      'Running all ads only at the point of purchase decision',
+      'Using email as the sole channel across all customer lifecycle stages',
+      'Coordinating awareness, consideration, and conversion activities so they work together across the customer journey',
+      'Assigning the entire marketing budget to performance/direct response marketing'
+    ],
+    correct: 2
+  },
+  {
+    text: 'A global brand wants to expand into a new regional market. What should be the FIRST marketing step?',
+    options: [
+      'Replicate the existing global campaign verbatim — the brand\'s proven messaging will translate',
+      'Conduct thorough local market research — cultural insights, competitor landscape, regulatory environment, and specific customer needs',
+      'Launch influencer partnerships immediately to build early buzz',
+      'Set aggressive revenue targets and work backwards to determine the marketing approach'
+    ],
+    correct: 1
+  }
+];
+
+const CASE_MCQS = {
+  c1m1: {
+    options: [
+      'Instagram and TikTok influencer campaigns for broad consumer awareness',
+      'LinkedIn thought leadership, targeted ABM (Account-Based Marketing), and industry event presence',
+      'Mass TV and radio advertising for national brand awareness',
+      'Google Shopping ads and e-commerce marketplace partnerships'
+    ],
+    correct: 1
+  },
+  c1m2: {
+    options: [
+      'Instagram followers, TikTok views, and general website traffic growth',
+      'Qualified leads generated, sales meetings booked, CAC, and pipeline value created',
+      'Total ad impressions and share of voice against all industry competitors',
+      'Customer satisfaction (CSAT) scores from current existing clients'
+    ],
+    correct: 1
+  },
+  c2m1: {
+    options: [
+      'Immediately delete all social media posts related to the disputed product claims',
+      'Issue a legal cease-and-desist order against the original poster',
+      'Convene a cross-functional response team (marketing, legal, leadership) to verify facts and align on a unified response',
+      'Launch a counter-campaign promoting positive customer reviews and testimonials'
+    ],
+    correct: 2
+  },
+  c2m2: {
+    options: [
+      'Aggressively discount prices to attract customers back through value',
+      'Avoid the topic entirely and redirect all marketing focus to new product launches',
+      'Transparently communicate what changes were made, invite third-party verification, and authentically engage with concerned customers',
+      'Replace the brand name to create distance from the controversy'
+    ],
+    correct: 2
+  },
+  c3m1: {
+    options: [
+      'The product catalogue is too large for effective email curation',
+      'Lack of personalisation — one-size-fits-all content fails to resonate with different customer segments and purchase behaviours',
+      'Emails are being sent on the wrong day of the week',
+      'The brand\'s visual design and colour palette are insufficiently engaging'
+    ],
+    correct: 1
+  },
+  c3m2: {
+    options: [
+      'An increase in the total volume of emails sent per month',
+      'A reduction in the marketing team\'s headcount due to automation',
+      'Measurable improvement in open rates, CTR, revenue per email, and customer lifetime value over 90 days',
+      'The AI system eliminates the need for a human email marketing specialist'
+    ],
+    correct: 2
+  }
+};
+
+// ─── NAVIGATION ──────────────────────────────────────────────────────
+function showScreen(id) {
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  window.scrollTo(0, 0);
+}
+
+function goToInfo() {
+  const saved = localStorage.getItem('must_candidate_email');
+  if (saved) {
+    const el = document.getElementById('inp-email');
+    if (el) el.value = saved;
+  }
+  showScreen('screen-info');
+}
+
+function startAssessment() {
+  const email = document.getElementById('inp-email').value.trim();
+  const err = document.getElementById('info-error');
+  if (!email) { err.textContent = 'Please enter your email address.'; err.style.display = 'block'; return; }
+  if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) { err.textContent = 'Please enter a valid email address.'; err.style.display = 'block'; return; }
+  err.style.display = 'none';
+  candidateEmail = email;
+  localStorage.setItem('must_candidate_email', email);
+  startTime = new Date();
+  currentMcq = 0;
+  renderMcq();
+  showScreen('screen-mcq');
+}
+
+// ─── STRATEGY MCQ ────────────────────────────────────────────────────
+function renderMcq() {
+  const q = STRATEGY_QUESTIONS[currentMcq];
+  const total = STRATEGY_QUESTIONS.length;
+  const pct = Math.round(((currentMcq + 1) / total) * 100);
+  document.getElementById('mcq-counter').textContent = `Question ${currentMcq + 1} of ${total}`;
+  document.getElementById('mcq-pct').textContent = pct + '% complete';
+  document.getElementById('mcq-progress').style.width = pct + '%';
+  document.getElementById('mcq-qnum').textContent = `Question ${currentMcq + 1}`;
+  document.getElementById('mcq-qtext').textContent = q.text;
+  renderOpts('mcq-options', q.options, mcqAnswers[currentMcq], (i) => {
+    mcqAnswers[currentMcq] = i;
+    renderOpts('mcq-options', q.options, i, null);
+  });
+  document.getElementById('mcq-prev').style.display = currentMcq > 0 ? 'inline-flex' : 'none';
+  document.getElementById('mcq-next').textContent = currentMcq === total - 1 ? 'Proceed to Case Studies →' : 'Next →';
+}
+
+function prevMcq() { if (currentMcq > 0) { currentMcq--; renderMcq(); } }
+
+function nextMcq() {
+  if (mcqAnswers[currentMcq] === undefined) { flashCard('.q-card'); return; }
+  if (currentMcq < STRATEGY_QUESTIONS.length - 1) {
+    currentMcq++;
+    renderMcq();
+    window.scrollTo(0, 0);
+  } else {
+    showScreen('screen-case1');
+  }
+}
+
+function resetMcqToLast() {
+  currentMcq = STRATEGY_QUESTIONS.length - 1;
+  renderMcq();
+}
+
+// ─── CASE STUDY MCQs ─────────────────────────────────────────────────
+function renderCaseMcqs() {
+  const CASE_KEYS = [
+    { key:'c1m1', el:'c1-mcq1-opts' },
+    { key:'c1m2', el:'c1-mcq2-opts' },
+    { key:'c2m1', el:'c2-mcq1-opts' },
+    { key:'c2m2', el:'c2-mcq2-opts' },
+    { key:'c3m1', el:'c3-mcq1-opts' },
+    { key:'c3m2', el:'c3-mcq2-opts' }
+  ];
+  CASE_KEYS.forEach(({ key, el }) => {
+    const q = CASE_MCQS[key];
+    renderOpts(el, q.options, caseAnswers[key], (i) => {
+      caseAnswers[key] = i;
+      renderOpts(el, q.options, i, null);
+    });
+  });
+}
+
+function validateAndGoCase(caseNum) {
+  if (caseNum === 1) {
+    if (caseAnswers['c1m1'] === undefined || caseAnswers['c1m2'] === undefined) {
+      alert('Please answer both multiple choice questions before continuing.'); return;
+    }
+    showScreen('screen-case2');
+  } else if (caseNum === 2) {
+    if (caseAnswers['c2m1'] === undefined || caseAnswers['c2m2'] === undefined) {
+      alert('Please answer both multiple choice questions before continuing.'); return;
+    }
+    showScreen('screen-case3');
+  }
+}
+
+// ─── SHARED OPT RENDERER ─────────────────────────────────────────────
+function renderOpts(containerId, options, selected, onSelect) {
+  const LETTERS = ['A','B','C','D'];
+  const el = document.getElementById(containerId);
+  if (!el) return;
+  el.innerHTML = '';
+  options.forEach((opt, i) => {
+    const div = document.createElement('div');
+    div.className = 'opt' + (selected === i ? ' selected' : '');
+    if (onSelect) {
+      div.onclick = () => onSelect(i);
+    }
+    div.innerHTML = `<div class="opt-letter" style="${selected===i?'background:var(--primary);border-color:var(--primary);color:#fff':''}">${LETTERS[i]}</div><span>${opt}</span>`;
+    el.appendChild(div);
+  });
+}
+
+function flashCard(sel) {
+  const card = document.querySelector(sel);
+  if (!card) return;
+  card.style.boxShadow = '0 0 0 2px #ef4444';
+  setTimeout(() => card.style.boxShadow = '', 1200);
+}
+
+// ─── CHAR COUNT ──────────────────────────────────────────────────────
+function updateCharCount(textareaId, countId) {
+  const len = document.getElementById(textareaId).value.length;
+  document.getElementById(countId).textContent = len + ' characters';
+}
+
+// ─── SUBMIT ──────────────────────────────────────────────────────────
+function submitAssessment() {
+  if (caseAnswers['c3m1'] === undefined || caseAnswers['c3m2'] === undefined) {
+    alert('Please answer both multiple choice questions before submitting.'); return;
+  }
+
+  const endTime = new Date();
+  const timeTaken = Math.round((endTime - startTime) / 1000);
+
+  // Gather text answers
+  caseAnswers.c1text = document.getElementById('c1-text').value.trim();
+  caseAnswers.c2text = document.getElementById('c2-text').value.trim();
+  caseAnswers.c3text = document.getElementById('c3-text').value.trim();
+
+  // Score MCQs only
+  const allMcq = [
+    { key: 0, correct: STRATEGY_QUESTIONS[0].correct, ans: mcqAnswers[0] },
+    { key: 1, correct: STRATEGY_QUESTIONS[1].correct, ans: mcqAnswers[1] },
+    { key: 2, correct: STRATEGY_QUESTIONS[2].correct, ans: mcqAnswers[2] },
+    { key: 3, correct: STRATEGY_QUESTIONS[3].correct, ans: mcqAnswers[3] },
+    { key: 4, correct: STRATEGY_QUESTIONS[4].correct, ans: mcqAnswers[4] },
+    { key: 'c1m1', correct: CASE_MCQS['c1m1'].correct, ans: caseAnswers['c1m1'] },
+    { key: 'c1m2', correct: CASE_MCQS['c1m2'].correct, ans: caseAnswers['c1m2'] },
+    { key: 'c2m1', correct: CASE_MCQS['c2m1'].correct, ans: caseAnswers['c2m1'] },
+    { key: 'c2m2', correct: CASE_MCQS['c2m2'].correct, ans: caseAnswers['c2m2'] },
+    { key: 'c3m1', correct: CASE_MCQS['c3m1'].correct, ans: caseAnswers['c3m1'] },
+    { key: 'c3m2', correct: CASE_MCQS['c3m2'].correct, ans: caseAnswers['c3m2'] }
+  ];
+
+  const mcqTotal = allMcq.length;
+  const mcqCorrect = allMcq.filter(q => q.ans === q.correct).length;
+  const mcqPct = Math.round((mcqCorrect / mcqTotal) * 100);
+  const label = mcqPct >= 80 ? 'Strong MCQ Performance' : mcqPct >= 60 ? 'Solid MCQ Performance' : 'Developing';
+
+  const payload = {
+    test_type: 'marketing_senior',
+    candidate_name: candidateEmail,
+    candidate_email: candidateEmail,
+    candidate_position: '',
+    start_time: startTime.toISOString(),
+    end_time: endTime.toISOString(),
+    time_taken_seconds: timeTaken,
+    score_raw: mcqCorrect,
+    score_max: mcqTotal,
+    score_pct: mcqPct,
+    result_label: label,
+    section_scores: {
+      'Strategy MCQ': { correct: allMcq.slice(0,5).filter(q=>q.ans===q.correct).length, total: 5 },
+      'Case Study MCQ': { correct: allMcq.slice(5).filter(q=>q.ans===q.correct).length, total: 6 }
+    },
+    answers: { mcq: mcqAnswers, case: caseAnswers },
+    flags: {}
+  };
+
+  renderResults(mcqPct, label, mcqCorrect, mcqTotal, timeTaken);
+  submitToBackend(payload);
+}
+
+async function submitToBackend(payload) {
+  try {
+    await fetch('/.netlify/functions/submit-test', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload)
+    });
+  } catch(e) { /* silent */ }
+}
+
+// ─── RENDER RESULTS ──────────────────────────────────────────────────
+function renderResults(pct, label, correct, total, timeTaken) {
+  showScreen('screen-results');
+  const mins = Math.floor(timeTaken / 60), secs = timeTaken % 60;
+  const timeStr = mins + ':' + String(secs).padStart(2, '0');
+  const LETTERS = ['A','B','C','D'];
+
+  let html = `
+    <div class="positive-card">
+      <div class="emoji">🏆</div>
+      <h3>Outstanding — you've completed the Senior Marketers Assessment!</h3>
+      <p>Your written case study responses and MCQ answers have been submitted to our senior team for review. We evaluate depth of thinking, strategic clarity, and the quality of your reasoning — not just the scores. Expect to hear from us shortly.</p>
+    </div>
+
+    <div class="score-hero">
+      <div class="score-circle">
+        <div class="score-pct">${pct}%</div>
+        <div class="score-label-sm">MCQ Score</div>
+      </div>
+      <div class="result-badge">${label}</div>
+      <h2>${correct} / ${total} MCQ Correct</h2>
+      <p>Time taken: ${timeStr} · Written responses submitted for expert review</p>
+    </div>
+
+    <div class="info-card">
+      <h3>📊 MCQ Results Breakdown</h3>
+
+      <div class="mcq-section">
+        <h4>Phase 1 — Strategic MCQ (5 Questions)</h4>`;
+
+  STRATEGY_QUESTIONS.forEach((q, i) => {
+    const isCorrect = mcqAnswers[i] === q.correct;
+    html += `
+      <div class="review-item ${isCorrect ? 'correct' : 'wrong'}">
+        <div class="review-q">Q${i+1}. ${q.text}</div>
+        <div class="review-d">
+          Your answer: <span class="${isCorrect?'ca':'wa'}">${LETTERS[mcqAnswers[i]]}. ${q.options[mcqAnswers[i]]}</span>
+          ${!isCorrect ? `<br>Correct: <span class="ca">${LETTERS[q.correct]}. ${q.options[q.correct]}</span>` : ''}
+        </div>
+      </div>`;
+  });
+
+  html += `</div><div class="mcq-section" style="margin-top:16px"><h4>Case Study MCQs (6 Questions)</h4>`;
+
+  const caseMcqMap = [
+    { key:'c1m1', label:'Case 1 — Channel Strategy', q:CASE_MCQS['c1m1'] },
+    { key:'c1m2', label:'Case 1 — KPI Selection', q:CASE_MCQS['c1m2'] },
+    { key:'c2m1', label:'Case 2 — Immediate Response', q:CASE_MCQS['c2m1'] },
+    { key:'c2m2', label:'Case 2 — Trust Rebuilding', q:CASE_MCQS['c2m2'] },
+    { key:'c3m1', label:'Case 3 — Root Cause Diagnosis', q:CASE_MCQS['c3m1'] },
+    { key:'c3m2', label:'Case 3 — Measuring Success', q:CASE_MCQS['c3m2'] }
+  ];
+
+  caseMcqMap.forEach(({ key, label: lbl, q }) => {
+    const isCorrect = caseAnswers[key] === q.correct;
+    html += `
+      <div class="review-item ${isCorrect?'correct':'wrong'}">
+        <div class="review-q">${lbl}</div>
+        <div class="review-d">
+          Your answer: <span class="${isCorrect?'ca':'wa'}">${LETTERS[caseAnswers[key]]}. ${q.options[caseAnswers[key]]}</span>
+          ${!isCorrect ? `<br>Correct: <span class="ca">${LETTERS[q.correct]}. ${q.options[q.correct]}</span>` : ''}
+        </div>
+      </div>`;
+  });
+
+  html += `</div></div>`;
+
+  // Written responses summary
+  html += `
+    <div class="info-card">
+      <h3>✍️ Written Responses — Submitted for Review</h3>
+      <p style="font-size:13px;color:var(--muted);margin-bottom:16px;line-height:1.55">Your case study responses will be reviewed by our senior team. The quality of your strategic thinking, structure, and reasoning carries significant weight in the evaluation.</p>`;
+
+  const textItems = [
+    { id:'c1text', label:'Case Study 1 — Content Marketing Strategy', ans: caseAnswers.c1text },
+    { id:'c2text', label:'Case Study 2 — Crisis Communication Framework', ans: caseAnswers.c2text },
+    { id:'c3text', label:'Case Study 3 — AI Personalisation Roadmap', ans: caseAnswers.c3text }
+  ];
+
+  textItems.forEach(({ label: lbl, ans }) => {
+    html += `
+      <div class="text-review-item">
+        <div class="tr-label">${lbl}</div>
+        <div class="tr-answer">${ans ? escHtml(ans) : '<em style="color:var(--muted)">No response submitted.</em>'}</div>
+        <div class="tr-pending">⏳ Pending expert review</div>
+      </div>`;
+  });
+
+  html += `</div>`;
+
+  html += `
+    <div class="result-actions">
+      <button class="btn btn-outline" onclick="window.print()">🖨 Print Results</button>
+      <a href="/" class="btn btn-outline">← Back to All Tests</a>
+    </div>`;
+
+  document.getElementById('results-wrap').innerHTML = html;
+}
+
+function escHtml(str) {
+  return str.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/\n/g,'<br>');
+}
+</script>
+</body>
+</html>

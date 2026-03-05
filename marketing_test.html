@@ -1,0 +1,618 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Marketing Associates Assessment — MUST Engineering</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --primary:#d97706;--primary2:#f59e0b;--primary-bg:#fffbeb;
+  --navy:#1a2e4a;--navy2:#2d4a6b;
+  --bg:#f0f4f8;--white:#fff;--text:#1e2d3d;--muted:#6b7a8d;
+  --border:#dce3ea;--radius:14px;
+  --shadow:0 4px 24px rgba(26,46,74,.10);
+}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',system-ui,sans-serif;background:var(--bg);color:var(--text);min-height:100vh}
+
+/* HEADER */
+header{background:var(--navy);color:#fff;padding:14px 20px;display:flex;align-items:center;gap:12px;position:sticky;top:0;z-index:50;box-shadow:0 2px 16px rgba(0,0,0,.25)}
+.logo{width:38px;height:38px;background:var(--primary);border-radius:9px;display:flex;align-items:center;justify-content:center;font-weight:900;font-size:17px;color:#fff;flex-shrink:0}
+.brand h1{font-size:17px;font-weight:800}
+.brand p{font-size:11px;opacity:.6;margin-top:1px}
+
+/* SCREENS */
+.screen{display:none;min-height:calc(100vh - 56px)}
+.screen.active{display:block}
+
+/* LANDING */
+.landing-wrap{max-width:560px;margin:0 auto;padding:40px 20px 60px}
+.landing-card{background:var(--white);border-radius:var(--radius);box-shadow:var(--shadow);padding:36px 32px;text-align:center}
+.landing-icon{font-size:52px;margin-bottom:16px}
+.landing-card h2{font-size:24px;font-weight:900;color:var(--navy);margin-bottom:10px}
+.landing-card p{font-size:14px;color:var(--muted);line-height:1.65;margin-bottom:24px}
+.stats-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:28px}
+.stat{background:var(--primary-bg);border-radius:10px;padding:14px 10px;text-align:center}
+.stat-val{font-size:20px;font-weight:900;color:var(--primary);display:block}
+.stat-lbl{font-size:11px;color:var(--muted);margin-top:3px}
+.topic-list{text-align:left;margin-bottom:28px}
+.topic-list h4{font-size:12px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:1px;margin-bottom:12px}
+.topic-item{display:flex;align-items:center;gap:10px;font-size:13px;color:var(--text);padding:8px 0;border-bottom:1px solid var(--border)}
+.topic-item:last-child{border-bottom:none}
+.topic-dot{width:8px;height:8px;border-radius:50%;background:var(--primary);flex-shrink:0}
+
+/* INFO */
+.form-wrap{max-width:480px;margin:0 auto;padding:40px 20px 60px}
+.form-card{background:var(--white);border-radius:var(--radius);box-shadow:var(--shadow);padding:36px 32px}
+.form-card h2{font-size:20px;font-weight:800;color:var(--navy);margin-bottom:6px}
+.form-card p{font-size:13px;color:var(--muted);margin-bottom:24px;line-height:1.55}
+.field{margin-bottom:18px}
+.field label{display:block;font-size:13px;font-weight:700;color:var(--text);margin-bottom:6px}
+.field input{width:100%;padding:11px 14px;border:1.5px solid var(--border);border-radius:9px;font-size:14px;color:var(--text);background:#fff;outline:none;transition:border-color .2s}
+.field input:focus{border-color:var(--primary);box-shadow:0 0 0 3px rgba(217,119,6,.12)}
+.error-msg{color:#ef4444;font-size:12px;margin-top:10px;display:none}
+
+/* BUTTONS */
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;padding:12px 24px;border-radius:10px;font-size:14px;font-weight:700;cursor:pointer;border:none;transition:all .2s;text-decoration:none}
+.btn-primary{background:var(--primary);color:#fff}
+.btn-primary:hover{background:var(--primary2);transform:translateY(-1px)}
+.btn-outline{background:var(--white);color:var(--navy);border:1.5px solid var(--border)}
+.btn-outline:hover{border-color:var(--navy);background:#f8f9fa}
+.btn-full{width:100%;justify-content:center}
+
+/* QUIZ */
+.quiz-wrap{max-width:680px;margin:0 auto;padding:28px 20px 60px}
+.progress-bar{background:var(--border);border-radius:99px;height:6px;margin-bottom:6px;overflow:hidden}
+.progress-fill{height:100%;background:linear-gradient(90deg,var(--primary),var(--primary2));border-radius:99px;transition:width .4s ease}
+.progress-label{font-size:12px;color:var(--muted);margin-bottom:20px;display:flex;justify-content:space-between}
+.q-card{background:var(--white);border-radius:var(--radius);box-shadow:var(--shadow);padding:28px 28px 24px}
+.q-category{font-size:11px;font-weight:700;color:var(--primary);text-transform:uppercase;letter-spacing:1px;margin-bottom:10px}
+.q-text{font-size:16px;font-weight:700;color:var(--navy);line-height:1.5;margin-bottom:22px}
+.options{display:flex;flex-direction:column;gap:10px}
+.opt{display:flex;align-items:flex-start;gap:12px;padding:13px 16px;border:1.5px solid var(--border);border-radius:10px;cursor:pointer;transition:all .2s;font-size:14px;color:var(--text);background:#fff}
+.opt:hover{border-color:var(--primary);background:var(--primary-bg)}
+.opt.selected{border-color:var(--primary);background:var(--primary-bg)}
+.opt-letter{width:24px;height:24px;border-radius:50%;background:var(--bg);border:1.5px solid var(--border);display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;color:var(--muted);flex-shrink:0;transition:all .2s}
+.opt.selected .opt-letter{background:var(--primary);border-color:var(--primary);color:#fff}
+.q-nav{display:flex;justify-content:space-between;align-items:center;margin-top:22px;gap:12px}
+.q-counter{font-size:13px;color:var(--muted);font-weight:600}
+
+/* TIMER */
+.timer{font-size:13px;color:var(--muted);background:var(--bg);padding:6px 14px;border-radius:99px;font-weight:600}
+.timer.warning{color:#ef4444;background:#fef2f2}
+
+/* RESULTS */
+.results-wrap{max-width:640px;margin:0 auto;padding:32px 20px 60px}
+.score-hero{background:linear-gradient(135deg,#92400e 0%,var(--primary) 100%);border-radius:var(--radius);padding:32px 24px;text-align:center;color:#fff;margin-bottom:20px}
+.score-circle{width:100px;height:100px;border-radius:50%;background:rgba(255,255,255,.15);border:4px solid rgba(255,255,255,.4);display:flex;flex-direction:column;align-items:center;justify-content:center;margin:0 auto 16px}
+.score-pct{font-size:30px;font-weight:900;line-height:1}
+.score-label-sm{font-size:11px;opacity:.8;margin-top:2px}
+.score-hero h2{font-size:20px;font-weight:800;margin-bottom:6px}
+.score-hero p{font-size:13px;opacity:.85;line-height:1.55}
+
+.result-label{display:inline-block;padding:6px 18px;border-radius:99px;font-size:13px;font-weight:800;margin-bottom:12px}
+.label-strong{background:rgba(255,255,255,.2);color:#fff}
+
+.section-scores{background:var(--white);border-radius:var(--radius);box-shadow:var(--shadow);padding:22px 24px;margin-bottom:16px}
+.section-scores h3{font-size:14px;font-weight:800;color:var(--navy);margin-bottom:16px}
+.section-row{margin-bottom:14px}
+.section-row:last-child{margin-bottom:0}
+.section-meta{display:flex;justify-content:space-between;font-size:13px;margin-bottom:5px}
+.section-name{font-weight:700;color:var(--text)}
+.section-pct{font-weight:700;color:var(--primary)}
+.section-bar{background:var(--bg);border-radius:99px;height:8px;overflow:hidden}
+.section-fill{height:100%;border-radius:99px;background:linear-gradient(90deg,var(--primary),var(--primary2));transition:width 1s ease}
+
+.review-card{background:var(--white);border-radius:var(--radius);box-shadow:var(--shadow);padding:22px 24px;margin-bottom:16px}
+.review-card h3{font-size:14px;font-weight:800;color:var(--navy);margin-bottom:14px}
+.review-item{border-left:3px solid var(--border);padding:10px 14px;margin-bottom:10px;border-radius:0 8px 8px 0;background:var(--bg)}
+.review-item.correct{border-left-color:#22c55e;background:#f0fdf4}
+.review-item.wrong{border-left-color:#ef4444;background:#fef2f2}
+.review-q{font-size:13px;font-weight:600;color:var(--text);margin-bottom:6px}
+.review-detail{font-size:12px;color:var(--muted)}
+.review-detail span{font-weight:700}
+.review-detail .correct-ans{color:#16a34a}
+.review-detail .wrong-ans{color:#dc2626}
+
+.positive-card{background:linear-gradient(135deg,#92400e 0%,var(--primary) 100%);border-radius:var(--radius);padding:28px 24px;text-align:center;margin-bottom:20px;color:#fff}
+.positive-card .emoji{font-size:44px;margin-bottom:12px}
+.positive-card h3{font-size:19px;font-weight:800;margin-bottom:10px}
+.positive-card p{font-size:14px;opacity:.85;line-height:1.65;max-width:400px;margin:0 auto}
+
+.result-actions{display:flex;gap:12px;flex-wrap:wrap;justify-content:center;margin-top:8px}
+
+/* FOOTER */
+footer{background:var(--navy);color:rgba(255,255,255,.5);text-align:center;padding:18px 20px;font-size:12px}
+
+/* MOBILE */
+@media(max-width:600px){
+  .stats-grid{grid-template-columns:1fr 1fr}
+  .landing-card,.form-card{padding:28px 20px}
+  .quiz-wrap{padding:20px 14px 48px}
+  .q-card{padding:22px 18px}
+  .q-text{font-size:15px}
+  .q-nav{flex-wrap:wrap;gap:10px}
+  .result-actions{flex-direction:column}
+  .result-actions .btn{width:100%;justify-content:center}
+  .score-circle{width:84px;height:84px}
+  .score-pct{font-size:26px}
+  .section-scores,.review-card,.positive-card{padding:18px 16px}
+}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="logo">📢</div>
+  <div class="brand">
+    <h1>Marketing Associates Assessment</h1>
+    <p>MUST Engineering · Candidate Portal</p>
+  </div>
+</header>
+
+<!-- LANDING SCREEN -->
+<div id="screen-landing" class="screen active">
+  <div class="landing-wrap">
+    <div class="landing-card">
+      <div class="landing-icon">📢</div>
+      <h2>Marketing Associates Assessment</h2>
+      <p>This test evaluates your foundation in marketing principles — from brand strategy and digital channels to campaign analytics and AI tools for modern marketers.</p>
+
+      <div class="stats-grid">
+        <div class="stat"><span class="stat-val">20</span><div class="stat-lbl">Questions</div></div>
+        <div class="stat"><span class="stat-val">25</span><div class="stat-lbl">Minutes</div></div>
+        <div class="stat"><span class="stat-val">MCQ</span><div class="stat-lbl">Format</div></div>
+      </div>
+
+      <div class="topic-list">
+        <h4>Topics Covered</h4>
+        <div class="topic-item"><div class="topic-dot"></div><span>Brand &amp; Positioning (5 questions)</span></div>
+        <div class="topic-item"><div class="topic-dot"></div><span>Digital &amp; Social Media (5 questions)</span></div>
+        <div class="topic-item"><div class="topic-dot"></div><span>Campaign &amp; Analytics (5 questions)</span></div>
+        <div class="topic-item"><div class="topic-dot"></div><span>AI for Marketing (5 questions)</span></div>
+      </div>
+
+      <button class="btn btn-primary btn-full" onclick="goToInfo()">Begin Assessment →</button>
+    </div>
+  </div>
+  <footer>© MUST Engineering · Candidate Assessment Portal · Results are confidential.</footer>
+</div>
+
+<!-- INFO SCREEN -->
+<div id="screen-info" class="screen">
+  <div class="form-wrap">
+    <div class="form-card">
+      <h2>One quick thing</h2>
+      <p>Just your email so we can save your results. That's it!</p>
+      <div class="field">
+        <label for="inp-email">Email Address <span style="color:#ef4444">*</span></label>
+        <input type="email" id="inp-email" placeholder="e.g. sarah@email.com" autocomplete="email" inputmode="email"
+               onkeydown="if(event.key==='Enter')startQuiz()" />
+      </div>
+      <div class="error-msg" id="info-error"></div>
+      <div style="display:flex;gap:10px;margin-top:8px">
+        <button class="btn btn-outline" onclick="showScreen('screen-landing')">← Back</button>
+        <button class="btn btn-primary" style="flex:1" onclick="startQuiz()">Start Test →</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- QUIZ SCREEN -->
+<div id="screen-quiz" class="screen">
+  <div class="quiz-wrap">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px">
+      <span class="q-counter" id="q-counter">Question 1 of 20</span>
+      <div class="timer" id="timer">25:00</div>
+    </div>
+    <div class="progress-bar"><div class="progress-fill" id="progress-fill" style="width:5%"></div></div>
+    <div class="progress-label">
+      <span id="progress-text">0% complete</span>
+      <span id="section-badge" style="font-weight:700;color:var(--primary)">Brand &amp; Positioning</span>
+    </div>
+    <div class="q-card">
+      <div class="q-category" id="q-category">Brand &amp; Positioning</div>
+      <div class="q-text" id="q-text"></div>
+      <div class="options" id="options"></div>
+    </div>
+    <div class="q-nav">
+      <button class="btn btn-outline" id="btn-prev" onclick="prevQ()" style="display:none">← Previous</button>
+      <div></div>
+      <button class="btn btn-primary" id="btn-next" onclick="nextQ()">Next →</button>
+    </div>
+  </div>
+</div>
+
+<!-- RESULTS SCREEN -->
+<div id="screen-results" class="screen">
+  <div class="results-wrap" id="results-wrap"></div>
+  <footer>© MUST Engineering · Candidate Assessment Portal · Results are confidential.</footer>
+</div>
+
+<script>
+// ─── STATE ───────────────────────────────────────────────────────────
+let candidateEmail = '';
+let currentQ = 0;
+let answers = {};
+let startTime, elapsed = 0;
+let timerInterval;
+
+// Pre-fill email from localStorage
+document.addEventListener('DOMContentLoaded', () => {
+  const saved = localStorage.getItem('must_candidate_email');
+  if (saved) {
+    const el = document.getElementById('inp-email');
+    if (el) el.value = saved;
+  }
+});
+
+// ─── QUESTIONS ───────────────────────────────────────────────────────
+const SECTIONS = ['Brand & Positioning','Digital & Social','Campaign & Analytics','AI for Marketing'];
+
+const QUESTIONS = [
+  // Brand & Positioning (Q1–5)
+  {
+    section: 'Brand & Positioning',
+    text: 'What is a "brand promise"?',
+    options: ['A tagline used in advertising', 'A legal commitment to customers', 'The core value a brand consistently delivers to its customers', 'A marketing budget allocation'],
+    correct: 2
+  },
+  {
+    section: 'Brand & Positioning',
+    text: 'Which of the following best describes "brand equity"?',
+    options: ['The monetary value of a brand\'s logo design', 'The value added to a product because of its brand name and reputation', 'The brand\'s annual advertising spend', 'The total number of social media followers'],
+    correct: 1
+  },
+  {
+    section: 'Brand & Positioning',
+    text: 'A company positions itself as "the affordable luxury option." This is an example of:',
+    options: ['Cost leadership', 'Differentiation positioning', 'Product extension', 'Market penetration'],
+    correct: 1
+  },
+  {
+    section: 'Brand & Positioning',
+    text: 'Which type of market segmentation divides consumers based on lifestyle, values, and personality?',
+    options: ['Demographic segmentation', 'Geographic segmentation', 'Psychographic segmentation', 'Behavioural segmentation'],
+    correct: 2
+  },
+  {
+    section: 'Brand & Positioning',
+    text: 'A USP (Unique Selling Proposition) primarily helps a brand to:',
+    options: ['Reduce production costs', 'Distinguish itself from competitors in the customer\'s mind', 'Improve internal team communication', 'Measure customer satisfaction scores'],
+    correct: 1
+  },
+
+  // Digital & Social (Q6–10)
+  {
+    section: 'Digital & Social',
+    text: 'What does CTR stand for in digital marketing?',
+    options: ['Customer Tracking Ratio', 'Click-Through Rate', 'Content Traffic Report', 'Campaign Targeting Reach'],
+    correct: 1
+  },
+  {
+    section: 'Digital & Social',
+    text: 'Which social media platform is generally considered most effective for B2B marketing?',
+    options: ['TikTok', 'Instagram', 'LinkedIn', 'Snapchat'],
+    correct: 2
+  },
+  {
+    section: 'Digital & Social',
+    text: 'What is the primary purpose of SEO (Search Engine Optimisation)?',
+    options: ['To run paid advertisements on Google', 'To increase organic visibility in search results', 'To manage email marketing subscriber lists', 'To track social media engagement metrics'],
+    correct: 1
+  },
+  {
+    section: 'Digital & Social',
+    text: 'A/B testing in digital marketing is used to:',
+    options: ['Compare two social media platforms against each other', 'Test two versions of content or creative to see which performs better', 'Analyse two different customer segments simultaneously', 'Run two campaigns with the same budget at the same time'],
+    correct: 1
+  },
+  {
+    section: 'Digital & Social',
+    text: 'What is "remarketing" in digital advertising?',
+    options: ['Rebranding a product for a new target market', 'Targeting users who have previously visited your website or engaged with your brand', 'Launching a failed campaign again with a new message', 'Advertising the same product in two different countries'],
+    correct: 1
+  },
+
+  // Campaign & Analytics (Q11–15)
+  {
+    section: 'Campaign & Analytics',
+    text: 'What does ROAS stand for?',
+    options: ['Return on Advertising Spend', 'Rate of Audience Satisfaction', 'Reach of Active Subscribers', 'Revenue on Awareness Scale'],
+    correct: 0
+  },
+  {
+    section: 'Campaign & Analytics',
+    text: 'A marketing funnel\'s "awareness" stage is best served by:',
+    options: ['Discount coupons and loyalty programmes', 'Detailed case studies and product comparisons', 'Broad-reach content like social media posts and display ads', 'Post-purchase email follow-up sequences'],
+    correct: 2
+  },
+  {
+    section: 'Campaign & Analytics',
+    text: 'Which metric best indicates whether a campaign\'s conversion goal was achieved?',
+    options: ['Impressions', 'Reach', 'Conversion rate', 'Bounce rate alone'],
+    correct: 2
+  },
+  {
+    section: 'Campaign & Analytics',
+    text: 'A customer buys after seeing 4 touchpoints: a social ad, a blog post, an email, and a search result. Which attribution model gives equal credit to ALL touchpoints?',
+    options: ['Last-click attribution', 'First-click attribution', 'Linear attribution', 'Time-decay attribution'],
+    correct: 2
+  },
+  {
+    section: 'Campaign & Analytics',
+    text: 'A campaign has a CPL (Cost Per Lead) of $5 and a budget of $1,000. How many leads would you expect to generate?',
+    options: ['100 leads', '150 leads', '200 leads', '500 leads'],
+    correct: 2
+  },
+
+  // AI for Marketing (Q16–20)
+  {
+    section: 'AI for Marketing',
+    text: 'Which of the following is a common use of AI in content marketing?',
+    options: ['Setting the annual marketing budget', 'Generating first drafts, product descriptions, and social captions', 'Designing physical store layouts and signage', 'Conducting face-to-face customer interviews'],
+    correct: 1
+  },
+  {
+    section: 'AI for Marketing',
+    text: 'A chatbot on a company website that answers FAQs and qualifies leads is an example of:',
+    options: ['Augmented Reality marketing', 'Programmatic advertising', 'AI-powered conversational marketing', 'Influencer marketing automation'],
+    correct: 2
+  },
+  {
+    section: 'AI for Marketing',
+    text: 'AI-driven "predictive analytics" in marketing is primarily used to:',
+    options: ['Automatically post on social media accounts', 'Forecast customer behaviour and purchasing likelihood', 'Design logos and visual brand assets', 'Replace all human marketing decision-making'],
+    correct: 1
+  },
+  {
+    section: 'AI for Marketing',
+    text: 'Which of the following best describes "personalisation at scale" enabled by AI?',
+    options: ['Sending the same email to all subscribers', 'Hiring a large team to write individual messages', 'Automatically tailoring content or offers to each user based on their data', 'Using the same template across all social media platforms'],
+    correct: 2
+  },
+  {
+    section: 'AI for Marketing',
+    text: 'When using an AI writing tool to produce marketing copy, what is the most important step before publishing?',
+    options: ['Ensure the AI used the maximum word count', 'Post immediately to capitalise on speed-to-market', 'Human review for accuracy, brand voice, and ethical compliance', 'Run the content through a second AI to verify the first AI\'s work'],
+    correct: 2
+  }
+];
+
+const SECTION_SCORES = {};
+SECTIONS.forEach(s => SECTION_SCORES[s] = { correct: 0, total: 0 });
+
+// ─── NAVIGATION ──────────────────────────────────────────────────────
+function showScreen(id) {
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  window.scrollTo(0, 0);
+}
+
+function goToInfo() {
+  const saved = localStorage.getItem('must_candidate_email');
+  if (saved) {
+    const el = document.getElementById('inp-email');
+    if (el) el.value = saved;
+  }
+  showScreen('screen-info');
+}
+
+function startQuiz() {
+  const email = document.getElementById('inp-email').value.trim();
+  const err = document.getElementById('info-error');
+  if (!email) { err.textContent = 'Please enter your email address.'; err.style.display = 'block'; return; }
+  if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) { err.textContent = 'Please enter a valid email address.'; err.style.display = 'block'; return; }
+  err.style.display = 'none';
+  candidateEmail = email;
+  localStorage.setItem('must_candidate_email', email);
+  startTime = new Date();
+  elapsed = 0;
+  currentQ = 0;
+  answers = {};
+  SECTIONS.forEach(s => SECTION_SCORES[s] = { correct: 0, total: 0 });
+  showScreen('screen-quiz');
+  renderQ();
+  startTimer();
+}
+
+// ─── TIMER ───────────────────────────────────────────────────────────
+function startTimer() {
+  const LIMIT = 25 * 60;
+  let remaining = LIMIT;
+  const el = document.getElementById('timer');
+  timerInterval = setInterval(() => {
+    elapsed++;
+    remaining--;
+    const m = Math.floor(Math.abs(remaining) / 60);
+    const s = Math.abs(remaining) % 60;
+    el.textContent = (remaining < 0 ? '-' : '') + m + ':' + String(s).padStart(2, '0');
+    el.className = 'timer' + (remaining < 120 ? ' warning' : '');
+  }, 1000);
+}
+
+// ─── RENDER QUESTION ─────────────────────────────────────────────────
+function renderQ() {
+  const q = QUESTIONS[currentQ];
+  const pct = Math.round(((currentQ + 1) / QUESTIONS.length) * 100);
+  document.getElementById('q-counter').textContent = `Question ${currentQ + 1} of ${QUESTIONS.length}`;
+  document.getElementById('progress-fill').style.width = pct + '%';
+  document.getElementById('progress-text').textContent = pct + '% complete';
+  document.getElementById('section-badge').textContent = q.section;
+  document.getElementById('q-category').textContent = q.section;
+  document.getElementById('q-text').textContent = q.text;
+
+  const LETTERS = ['A','B','C','D'];
+  const optDiv = document.getElementById('options');
+  optDiv.innerHTML = '';
+  q.options.forEach((opt, i) => {
+    const div = document.createElement('div');
+    div.className = 'opt' + (answers[currentQ] === i ? ' selected' : '');
+    div.onclick = () => selectOpt(i);
+    div.innerHTML = `<div class="opt-letter">${LETTERS[i]}</div><span>${opt}</span>`;
+    optDiv.appendChild(div);
+  });
+
+  document.getElementById('btn-prev').style.display = currentQ > 0 ? 'inline-flex' : 'none';
+  document.getElementById('btn-next').textContent = currentQ === QUESTIONS.length - 1 ? 'Submit →' : 'Next →';
+}
+
+function selectOpt(i) {
+  answers[currentQ] = i;
+  document.querySelectorAll('.opt').forEach((el, idx) => {
+    el.classList.toggle('selected', idx === i);
+    el.querySelector('.opt-letter').style.background = idx === i ? 'var(--primary)' : '';
+    el.querySelector('.opt-letter').style.borderColor = idx === i ? 'var(--primary)' : '';
+    el.querySelector('.opt-letter').style.color = idx === i ? '#fff' : '';
+  });
+}
+
+function nextQ() {
+  if (answers[currentQ] === undefined) {
+    const card = document.querySelector('.q-card');
+    card.style.boxShadow = '0 0 0 2px #ef4444, var(--shadow)';
+    setTimeout(() => card.style.boxShadow = '', 1200);
+    return;
+  }
+  if (currentQ < QUESTIONS.length - 1) {
+    currentQ++;
+    renderQ();
+    window.scrollTo(0, 0);
+  } else {
+    submitQuiz();
+  }
+}
+
+function prevQ() {
+  if (currentQ > 0) { currentQ--; renderQ(); window.scrollTo(0, 0); }
+}
+
+// ─── SUBMIT ──────────────────────────────────────────────────────────
+function submitQuiz() {
+  clearInterval(timerInterval);
+  const endTime = new Date();
+  const timeTaken = Math.round((endTime - startTime) / 1000);
+
+  let totalCorrect = 0;
+  SECTIONS.forEach(s => SECTION_SCORES[s] = { correct: 0, total: 0 });
+
+  QUESTIONS.forEach((q, i) => {
+    SECTION_SCORES[q.section].total++;
+    if (answers[i] === q.correct) {
+      SECTION_SCORES[q.section].correct++;
+      totalCorrect++;
+    }
+  });
+
+  const scorePct = Math.round((totalCorrect / QUESTIONS.length) * 100);
+  let label = '';
+  if (scorePct >= 80) label = 'Strong Pass';
+  else if (scorePct >= 65) label = 'Pass';
+  else if (scorePct >= 50) label = 'Borderline';
+  else label = 'Needs Development';
+
+  const payload = {
+    test_type: 'marketing',
+    candidate_name: candidateEmail,
+    candidate_email: candidateEmail,
+    candidate_position: '',
+    start_time: startTime.toISOString(),
+    end_time: endTime.toISOString(),
+    time_taken_seconds: timeTaken,
+    score_raw: totalCorrect,
+    score_max: QUESTIONS.length,
+    score_pct: scorePct,
+    result_label: label,
+    section_scores: SECTION_SCORES,
+    answers: answers,
+    flags: {}
+  };
+
+  renderResults(scorePct, label, totalCorrect, timeTaken);
+  submitToBackend(payload);
+}
+
+async function submitToBackend(payload) {
+  try {
+    await fetch('/.netlify/functions/submit-test', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload)
+    });
+  } catch (e) { /* silent */ }
+}
+
+// ─── RENDER RESULTS ──────────────────────────────────────────────────
+function renderResults(pct, label, correct, timeTaken) {
+  showScreen('screen-results');
+  const mins = Math.floor(timeTaken / 60), secs = timeTaken % 60;
+  const timeStr = mins + ':' + String(secs).padStart(2, '0');
+
+  let html = `
+    <div class="positive-card">
+      <div class="emoji">🎉</div>
+      <h3>Well done for completing the assessment!</h3>
+      <p>Every step you take shows initiative. Your results have been submitted — our team reviews each submission carefully and will be in touch.</p>
+    </div>
+
+    <div class="score-hero">
+      <div class="score-circle">
+        <div class="score-pct">${pct}%</div>
+        <div class="score-label-sm">Score</div>
+      </div>
+      <div class="result-label label-strong">${label}</div>
+      <h2>${correct} / ${QUESTIONS.length} Correct</h2>
+      <p>Time taken: ${timeStr} · Marketing Associates Assessment</p>
+    </div>
+
+    <div class="section-scores">
+      <h3>📊 Score by Section</h3>`;
+
+  SECTIONS.forEach(s => {
+    const sc = SECTION_SCORES[s];
+    const p = Math.round((sc.correct / sc.total) * 100);
+    html += `
+      <div class="section-row">
+        <div class="section-meta">
+          <span class="section-name">${s}</span>
+          <span class="section-pct">${sc.correct}/${sc.total} · ${p}%</span>
+        </div>
+        <div class="section-bar"><div class="section-fill" style="width:${p}%"></div></div>
+      </div>`;
+  });
+  html += `</div>`;
+
+  // Answer review
+  html += `<div class="review-card"><h3>📝 Answer Review</h3>`;
+  QUESTIONS.forEach((q, i) => {
+    const isCorrect = answers[i] === q.correct;
+    const LETTERS = ['A','B','C','D'];
+    html += `
+      <div class="review-item ${isCorrect ? 'correct' : 'wrong'}">
+        <div class="review-q">Q${i+1}. ${q.text}</div>
+        <div class="review-detail">
+          Your answer: <span class="${isCorrect ? 'correct-ans' : 'wrong-ans'}">${LETTERS[answers[i]]}. ${q.options[answers[i]]}</span>
+          ${!isCorrect ? `<br>Correct answer: <span class="correct-ans">${LETTERS[q.correct]}. ${q.options[q.correct]}</span>` : ''}
+        </div>
+      </div>`;
+  });
+  html += `</div>`;
+
+  html += `
+    <div class="result-actions">
+      <button class="btn btn-outline" onclick="window.print()">🖨 Print Results</button>
+      <a href="/" class="btn btn-outline">← Back to All Tests</a>
+    </div>`;
+
+  document.getElementById('results-wrap').innerHTML = html;
+
+  // Animate bars
+  setTimeout(() => {
+    document.querySelectorAll('.section-fill').forEach(el => {
+      el.style.width = el.style.width;
+    });
+  }, 100);
+}
+</script>
+</body>
+</html>
