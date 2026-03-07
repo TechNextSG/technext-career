@@ -48,3 +48,8 @@
   from = "/marketing-senior"
   to = "/marketing_senior_test.html"
   status = 301
+
+[[redirects]]
+  from = "/cmpt"
+  to = "/cmpt_test.html"
+  status = 301
