@@ -53,3 +53,64 @@
   from = "/cmpt"
   to = "/cmpt_test.html"
   status = 301
+
+# ── TechNext portal (separate brand under /technext) ────────────────────────
+[[redirects]]
+  from = "/technext"
+  to = "/technext/index.html"
+  status = 200
+
+[[redirects]]
+  from = "/technext/"
+  to = "/technext/index.html"
+  status = 200
+
+[[redirects]]
+  from = "/technext/profiler"
+  to = "/technext/profiler.html"
+  status = 301
+
+[[redirects]]
+  from = "/technext/iq"
+  to = "/technext/iq_test.html"
+  status = 301
+
+[[redirects]]
+  from = "/technext/cyber"
+  to = "/technext/cyber_test.html"
+  status = 301
+
+[[redirects]]
+  from = "/technext/ai"
+  to = "/technext/ai_test.html"
+  status = 301
+
+[[redirects]]
+  from = "/technext/ai-intern"
+  to = "/technext/ai_intern_test.html"
+  status = 301
+
+[[redirects]]
+  from = "/technext/marketing"
+  to = "/technext/marketing_test.html"
+  status = 301
+
+[[redirects]]
+  from = "/technext/marketing-senior"
+  to = "/technext/marketing_senior_test.html"
+  status = 301
+
+[[redirects]]
+  from = "/technext/cmpt"
+  to = "/technext/cmpt_test.html"
+  status = 301
+
+[[redirects]]
+  from = "/technext/quiz"
+  to = "/technext/quiz.html"
+  status = 301
+
+[[redirects]]
+  from = "/technext/admin"
+  to = "/technext/admin.html"
+  status = 301
