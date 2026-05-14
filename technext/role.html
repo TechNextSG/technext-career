@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Your Role — TechNext Careers</title>
+<link rel="stylesheet" href="/technext/tn.css">
+<style>
+.hero{background:linear-gradient(135deg,#0f3a52 0%,#155670 100%);color:#fff;padding:36px 20px 28px;text-align:center}
+.hero .icon{font-size:48px;margin-bottom:8px}
+.hero h2{font-size:24px;font-weight:900;margin-bottom:8px;line-height:1.2}
+.hero p{font-size:14px;opacity:.82;max-width:520px;margin:0 auto;line-height:1.6}
+main{max-width:720px;margin:0 auto;padding:28px 16px 60px}
+.section-label{font-size:11.5px;font-weight:700;color:#6b7a8d;text-transform:uppercase;letter-spacing:1.5px;margin-bottom:14px}
+.book-cta{
+  background:linear-gradient(135deg,#19c2a6,#149a83);
+  border-radius:14px;padding:22px 24px;color:#0f3a52;
+  display:flex;align-items:center;gap:14px;margin-top:14px;
+  box-shadow:0 6px 26px rgba(25,194,166,.32);
+}
+.book-cta.disabled{background:#e5e7eb;color:#9ca3af;box-shadow:none}
+.book-cta .b-icon{font-size:32px}
+.book-cta .b-info{flex:1}
+.book-cta h4{font-size:16px;font-weight:800;margin-bottom:3px}
+.book-cta p{font-size:12.5px;opacity:.85}
+.back-link{display:inline-flex;align-items:center;gap:5px;color:#6b7a8d;text-decoration:none;font-size:13px;margin-bottom:14px}
+.back-link:hover{color:#0f3a52}
+.reset-link{font-size:11px;color:#9ca3af;text-decoration:underline;cursor:pointer;margin-top:14px;display:inline-block}
+.reset-link:hover{color:#dc2626}
+@media(max-width:640px){
+  .hero{padding:28px 16px 22px}
+  .hero h2{font-size:20px}
+  .book-cta{padding:18px;flex-direction:column;text-align:center}
+}
+</style>
+</head>
+<body>
+
+<header class="tn-header">
+  <div class="tn-logo">T</div>
+  <div class="tn-brand">
+    <h1 id="role-title">TechNext Careers</h1>
+    <p>Candidate Assessment Portal</p>
+  </div>
+  <span class="tn-pill" id="role-pill">Role</span>
+</header>
+
+<section class="hero">
+  <div class="icon" id="role-icon">🎯</div>
+  <h2 id="role-name">Loading…</h2>
+  <p id="role-blurb"></p>
+</section>
+
+<main>
+  <a class="back-link" href="/technext/">← Change role</a>
+
+  <div class="section-label">Your assessment plan</div>
+  <div id="steps"></div>
+
+  <div id="book-cta-wrap">
+    <div class="book-cta disabled" id="book-cta">
+      <div class="b-icon">🗓️</div>
+      <div class="b-info">
+        <h4>Book your interview</h4>
+        <p id="book-sub">Finish all three assessments above to unlock interview booking.</p>
+      </div>
+    </div>
+  </div>
+
+  <span class="reset-link" onclick="resetProgress()">Reset progress for this role</span>
+</main>
+
+<footer class="tn-footer">© TechNext · Candidate Assessment Portal</footer>
+
+<script src="/technext/tn.js"></script>
+<script>
+(function () {
+  // Get role from URL — either query string ?role=... or path /technext/{role}
+  function getRole() {
+    var q = new URLSearchParams(window.location.search).get('role');
+    if (q) return q;
+    var m = window.location.pathname.match(/\/technext\/([a-z0-9-]+)\/?$/);
+    return m ? m[1] : '';
+  }
+
+  var role = getRole();
+  if (!role || !TN.ROLES[role]) {
+    document.getElementById('role-name').textContent = 'Unknown role';
+    document.getElementById('role-blurb').textContent = 'Pick a role from the portal.';
+    return;
+  }
+
+  // Save role so subsequent tests know what we're applying for
+  localStorage.setItem(TN.STORAGE.role, role);
+
+  var spec = TN.ROLES[role];
+  document.getElementById('role-icon').textContent = spec.icon;
+  document.getElementById('role-name').textContent = spec.label;
+  document.getElementById('role-blurb').textContent = spec.blurb;
+  document.getElementById('role-pill').textContent = spec.label;
+  document.title = spec.label + ' — TechNext Careers';
+
+  function render() {
+    var stepsEl = document.getElementById('steps');
+    stepsEl.innerHTML = '';
+    var firstPendingIdx = -1;
+    spec.tests.forEach(function (t, i) {
+      var done = TN.isDone(role, t.slug);
+      if (!done && firstPendingIdx < 0) firstPendingIdx = i;
+      var locked = !done && firstPendingIdx >= 0 && firstPendingIdx !== i; // earlier pending blocks later
+      var row = document.createElement('a');
+      row.className = 'tn-role-step' + (done ? ' done' : '') + (locked ? ' locked' : '');
+      row.href = (done || !locked) ? (t.path + '?role=' + encodeURIComponent(role)) : 'javascript:void(0)';
+      row.innerHTML =
+        '<div class="tn-step-num">' + (done ? '✓' : (i+1)) + '</div>' +
+        '<div class="tn-step-info"><h4>' + TN.esc(t.label) + '</h4><p>' + TN.esc(t.desc) + '</p></div>' +
+        '<div class="tn-step-status ' + (done ? '' : 'pending') + '">' + (done ? 'Completed' : (locked ? 'Locked' : 'Start')) + '</div>';
+      if (locked) row.style.pointerEvents = 'none';
+      stepsEl.appendChild(row);
+    });
+
+    var bookEl = document.getElementById('book-cta');
+    var bookSub = document.getElementById('book-sub');
+    if (TN.allDone(role)) {
+      bookEl.classList.remove('disabled');
+      bookEl.style.cursor = 'pointer';
+      bookSub.textContent = 'All assessments complete. Pick a time slot to confirm your interview.';
+      bookEl.onclick = function () { window.location.href = '/technext/booking?role=' + encodeURIComponent(role); };
+    } else {
+      bookEl.classList.add('disabled');
+      bookEl.style.cursor = 'default';
+      bookEl.onclick = null;
+    }
+  }
+  render();
+
+  // Re-check when user returns to this tab (e.g. after finishing a test)
+  document.addEventListener('visibilitychange', function () { if (!document.hidden) render(); });
+
+  window.resetProgress = function () {
+    if (!confirm('Clear progress for this role? Your test results in the database are kept; this only resets your local "done" markers.')) return;
+    TN.resetRole(role);
+    render();
+    TN.toast('Progress reset for ' + spec.label, 'success');
+  };
+})();
+</script>
+
+</body>
+</html>

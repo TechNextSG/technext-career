@@ -1,0 +1,252 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Odoo Developer Technical — TechNext</title>
+<link rel="stylesheet" href="/technext/tn.css">
+</head>
+<body>
+
+<header class="tn-header">
+  <div class="tn-logo">T</div>
+  <div class="tn-brand"><h1>Odoo Developer — Technical</h1><p>Python · ORM · Views · Security · 20 questions · 35 min</p></div>
+  <span class="tn-pill">Test 3 of 3</span>
+</header>
+
+<div id="screen-landing" class="tn-screen active">
+  <div class="tn-wrap">
+    <div class="tn-card">
+      <div style="text-align:center;font-size:48px;margin-bottom:10px">🧰</div>
+      <h2 style="text-align:center">Odoo Developer — Technical</h2>
+      <p class="sub" style="text-align:center">Hands-on Odoo development: Python, ORM, views, inheritance, security, QWeb, and integration patterns.</p>
+      <div class="tn-stats-grid" style="margin:18px 0 20px">
+        <div class="tn-stat"><div class="tn-stat-val">20</div><div class="tn-stat-lbl">Questions</div></div>
+        <div class="tn-stat"><div class="tn-stat-val">35 min</div><div class="tn-stat-lbl">Time limit</div></div>
+        <div class="tn-stat"><div class="tn-stat-val">Hard</div><div class="tn-stat-lbl">Difficulty</div></div>
+      </div>
+      <button class="tn-btn primary block lg" id="btn-begin">Begin →</button>
+    </div>
+  </div>
+</div>
+
+<div id="screen-info" class="tn-screen"><div class="tn-wrap" id="info-mount"></div></div>
+
+<div id="screen-quiz" class="tn-screen">
+  <div class="tn-quiz-header">
+    <div class="tn-quiz-progress">
+      <div class="tn-quiz-progress-lbl" id="qlbl">Question 1 of 20</div>
+      <div class="tn-quiz-progress-bar"><div class="tn-quiz-progress-fill" id="qfill" style="width:5%"></div></div>
+    </div>
+    <div class="tn-timer" id="timer">35:00</div>
+  </div>
+  <div class="tn-quiz-body">
+    <div id="qcard"></div>
+    <div class="tn-warn" id="warn">Please select an answer to continue.</div>
+    <div class="tn-q-nav">
+      <button class="tn-btn outline" id="btn-prev" style="visibility:hidden">← Previous</button>
+      <button class="tn-btn primary" id="btn-next">Next →</button>
+    </div>
+  </div>
+</div>
+
+<div id="screen-results" class="tn-screen"><div class="tn-quiz-body" id="results-body"></div></div>
+
+<footer class="tn-footer">© TechNext · Results are confidential.</footer>
+
+<script src="/technext/tn.js"></script>
+<script>
+(function () {
+  var QUESTIONS = [
+    { text:'In an Odoo model, the difference between _inherit and _inherits (classic Odoo inheritance) is best described as:', opts:[
+      'They are the same thing',
+      '_inherit extends the same model in place; _inherits creates a delegation relationship to another model (e.g., res.partner)',
+      '_inherits is for v8 only; _inherit replaces it in newer versions',
+      '_inherit is for views, _inherits is for models'], ans:1 },
+    { text:'Which field type stores a many-to-many relation between two models in Odoo?', opts:[
+      'fields.One2many', 'fields.Many2one', 'fields.Many2many', 'fields.Reference'], ans:2 },
+    { ctx:'You add a new computed field that depends on another field on the same record.',
+      text:'To make it recompute correctly when the dependency changes:', opts:[
+      'Override the create() method',
+      'Decorate the compute method with @api.depends listing the dependencies',
+      'Set store=False and forget about it',
+      'Use a related field instead of a computed field'], ans:1 },
+    { text:'In Odoo, the model that represents a partner (customer/vendor) is:', opts:[
+      'res.users', 'res.partner', 'account.partner', 'crm.partner'], ans:1 },
+    { text:'Which file declares dependencies, version, and category for an Odoo module?', opts:[
+      '__init__.py', '__manifest__.py', 'setup.py', 'manifest.json'], ans:1 },
+    { ctx:'You inherit a form view and need to insert a field after an existing field with name "partner_id".',
+      text:'The xpath/position you would typically use is:', opts:[
+      '<xpath expr="//field[@name=\'partner_id\']" position="after">',
+      '<replace target="partner_id">',
+      '<insert at="partner_id" type="after">',
+      'You cannot extend a form view — only override'], ans:0 },
+    { text:'Record-level access in Odoo is enforced via:', opts:[
+      'ir.model.access.csv only',
+      'ir.rule (record rules), in addition to ir.model.access.csv (ACLs)',
+      'PostgreSQL row-level security only',
+      'Code-level checks in compute methods'], ans:1 },
+    { text:'In ir.model.access.csv, the columns perm_read, perm_write, perm_create, perm_unlink mean:', opts:[
+      'Database column flags',
+      'Whether a group can read / write / create / delete records of that model',
+      'Whether fields are stored on disk',
+      'Whether the model appears in the menu'], ans:1 },
+    { text:'Which decorator marks a method as runnable only on a NEW record (not yet saved) for onchange behaviour?', opts:[
+      '@api.depends', '@api.onchange', '@api.constrains', '@api.model_create_multi'], ans:1 },
+    { ctx:'You want a Python method that runs whenever certain field values are set, ensuring data integrity (raising ValidationError if invalid).',
+      text:'The right decorator is:', opts:[
+      '@api.depends', '@api.onchange', '@api.constrains', '@api.returns'], ans:2 },
+    { text:'In QWeb reports / templates, the syntax for outputting a value is closest to:', opts:[
+      '{{ object.name }}', '<t t-esc="object.name"/>', '<%= object.name %>', '<? echo object.name ?>'], ans:1 },
+    { ctx:'A new model needs to track sequential numbers like "INV/2026/0001".',
+      text:'The idiomatic Odoo solution is:', opts:[
+      'Use Python\'s uuid module on create()',
+      'Configure an ir.sequence record and call self.env[\'ir.sequence\'].next_by_code() during create()',
+      'Auto-increment via PostgreSQL only',
+      'Manually maintain a counter table'], ans:1 },
+    { text:'When using the ORM, calling .search([]) on a model in Odoo returns:', opts:[
+      'A list of dictionaries',
+      'A recordset (iterable of records of that model)',
+      'A pandas DataFrame',
+      'A raw SQL cursor'], ans:1 },
+    { text:'Which is the safest way to write a SQL filter in Odoo to avoid injection?', opts:[
+      'String-concatenate user input into the query',
+      'Use the ORM\'s domain notation (e.g. [(\'state\',\'=\',state)])',
+      'Use f-strings inside self.env.cr.execute',
+      'Disable safe mode'], ans:1 },
+    { ctx:'You need to call an external HTTP API from inside an Odoo model.',
+      text:'Best practice:', opts:[
+      'Block the request thread synchronously inside a button click',
+      'Use the requests library inside a queued/scheduled action, with proper error handling and timeouts',
+      'Open a socket directly',
+      'Embed JavaScript in the QWeb template to call the API from the browser'], ans:1 },
+    { text:'In Odoo, what does @api.model_create_multi indicate?', opts:[
+      'The method creates records in batch (recordset of vals dicts), the modern signature',
+      'The method must be called only once per database',
+      'The method runs only as superuser',
+      'It enables multi-tenant mode'], ans:0 },
+    { text:'A "store=True" computed field is:', opts:[
+      'Always recomputed on every read',
+      'Stored in the database and recomputed only when its dependencies change — searchable directly',
+      'Permanently frozen after first compute',
+      'Stored only in memory'], ans:1 },
+    { ctx:'You want to extend res.partner with a new boolean field "is_strategic" that should only be visible to a specific group.',
+      text:'The cleanest way to enforce that visibility:', opts:[
+      'Hide it in CSS',
+      'Use groups attribute on the field tag in the view (or on the field definition) referencing the security group XML ID',
+      'Override the read() method to drop the field',
+      'It is impossible without forking Odoo'], ans:1 },
+    { text:'In QWeb templates, t-if and t-foreach are used for:', opts:[
+      'Database transactions',
+      'Conditional rendering and loops',
+      'Field validation',
+      'Wizard transitions'], ans:1 },
+    { ctx:'A scheduled action should run every 5 minutes to sync records from an external system.',
+      text:'In Odoo this is configured by:', opts:[
+      'A cron job at the operating-system level only',
+      'An ir.cron record (in XML data or admin UI) pointing to the model method to call',
+      'Hardcoding a while-loop in __init__.py',
+      'It is not supported'], ans:1 }
+  ];
+
+  var LEVELS = [
+    { min:85, label:'Proficient',  desc:'Strong Odoo development fundamentals. Ready to own modules end-to-end.' },
+    { min:70, label:'Capable',     desc:'Solid working knowledge with minor gaps. Ready for mid-level Odoo work.' },
+    { min:50, label:'Developing',  desc:'Knows the surface — needs hands-on coaching on ORM, security, and views.' },
+    { min:0,  label:'Insufficient',desc:'Below threshold for an Odoo Developer role at this stage.' }
+  ];
+
+  var ROLE = (new URLSearchParams(window.location.search).get('role')) || localStorage.getItem(TN.STORAGE.role) || 'odoo-developer';
+  if (ROLE) localStorage.setItem(TN.STORAGE.role, ROLE);
+
+  var current=0, answers={}, startTime, endTime, timerInt, elapsed=0, TIME=35*60, timeOver=false;
+
+  document.getElementById('btn-begin').onclick = function () {
+    if (localStorage.getItem(TN.STORAGE.email) && localStorage.getItem(TN.STORAGE.phone)) startQuiz();
+    else { TN.renderInfoForm(document.getElementById('info-mount'), { role: ROLE, onSuccess: startQuiz }); TN.showScreen('screen-info'); }
+  };
+  function startQuiz() { current=0; answers={}; startTime=new Date(); TN.showScreen('screen-quiz'); render(); timerInt=setInterval(tick,1000); }
+  function tick() {
+    elapsed++;
+    var rem=TIME-elapsed, el=document.getElementById('timer'), abs=Math.abs(rem);
+    el.textContent = rem >= 0 ? (String(Math.floor(abs/60)).padStart(2,'0')+':'+String(abs%60).padStart(2,'0')) : 'Over';
+    el.className = 'tn-timer' + (rem<=0?' red':rem<=120?' red':rem<=300?' amber':'');
+    if (rem<=0) timeOver=true;
+  }
+  function render() {
+    var q = QUESTIONS[current];
+    document.getElementById('qlbl').textContent = 'Question ' + (current+1) + ' of ' + QUESTIONS.length;
+    document.getElementById('qfill').style.width = (((current+1)/QUESTIONS.length)*100) + '%';
+    document.getElementById('btn-prev').style.visibility = current > 0 ? 'visible' : 'hidden';
+    document.getElementById('btn-next').textContent = current === QUESTIONS.length - 1 ? 'Submit →' : 'Next →';
+    document.getElementById('warn').classList.remove('show');
+    var html = '<div class="tn-q-card"><div class="tn-q-num">Question ' + (current+1) + ' / ' + QUESTIONS.length + '</div>';
+    if (q.ctx) html += '<div class="tn-q-context">' + TN.esc(q.ctx) + '</div>';
+    html += '<div class="tn-q-text">' + TN.esc(q.text) + '</div><div class="tn-options">';
+    var letters = ['A','B','C','D'];
+    q.opts.forEach(function (o, i) {
+      var sel = answers[current] === i ? ' selected' : '';
+      html += '<div class="tn-opt' + sel + '" data-v="' + i + '"><div class="tn-opt-label">' + letters[i] + '</div><div class="tn-opt-text">' + TN.esc(o) + '</div></div>';
+    });
+    html += '</div></div>';
+    document.getElementById('qcard').innerHTML = html;
+    document.querySelectorAll('.tn-opt').forEach(function (el) {
+      el.addEventListener('click', function () {
+        var v = parseInt(el.getAttribute('data-v'), 10);
+        answers[current] = v;
+        document.querySelectorAll('.tn-opt').forEach(function (e) { e.classList.remove('selected'); });
+        el.classList.add('selected');
+      });
+    });
+  }
+  document.getElementById('btn-prev').onclick = function () { if (current > 0) { current--; render(); window.scrollTo(0,0); } };
+  document.getElementById('btn-next').onclick = function () {
+    if (answers[current] === undefined) { document.getElementById('warn').classList.add('show'); return; }
+    if (current < QUESTIONS.length - 1) { current++; render(); window.scrollTo(0,0); }
+    else { finish(); }
+  };
+
+  function finish() {
+    clearInterval(timerInt);
+    endTime = new Date();
+    var timeTaken = Math.round((endTime - startTime) / 1000);
+    var correct = 0;
+    QUESTIONS.forEach(function (q, i) { if (answers[i] === q.ans) correct++; });
+    var pct = Math.round((correct / QUESTIONS.length) * 100);
+    var level = LEVELS.find(function (l) { return pct >= l.min; });
+    document.getElementById('results-body').innerHTML =
+      '<div class="tn-result-hero"><div class="icon">🧰</div><h2>Odoo Developer — Technical</h2>' +
+        '<div class="tn-result-pct">' + pct + '%</div><div class="tn-result-label">' + level.label + '</div>' +
+        '<div class="tn-result-sub">' + correct + ' / ' + QUESTIONS.length + ' correct</div></div>' +
+      '<div class="tn-stats-grid">' +
+        '<div class="tn-stat"><div class="tn-stat-val">' + correct + '</div><div class="tn-stat-lbl">Correct</div></div>' +
+        '<div class="tn-stat"><div class="tn-stat-val">' + (QUESTIONS.length - correct) + '</div><div class="tn-stat-lbl">Incorrect</div></div>' +
+        '<div class="tn-stat"><div class="tn-stat-val">' + (Math.floor(timeTaken/60)) + 'm ' + (timeTaken%60) + 's</div><div class="tn-stat-lbl">Time</div></div>' +
+      '</div>' +
+      '<div class="tn-q-card"><div class="tn-q-num">Result interpretation</div><div style="font-size:14px;color:#374151;line-height:1.6">' + level.desc + '</div></div>' +
+      '<div class="tn-q-card" id="ss" style="display:flex;align-items:center;gap:10px;font-size:14px"><span id="ss-icon">⏳</span><span id="ss-text">Saving your results…</span></div>' +
+      '<div style="display:flex;gap:10px;flex-wrap:wrap">' +
+        '<a class="tn-btn primary" href="/technext/' + TN.esc(ROLE) + '">← Back to role dashboard</a>' +
+        '<button class="tn-btn outline" onclick="window.print()">🖨 Print / Save PDF</button>' +
+      '</div>';
+    TN.showScreen('screen-results');
+    if (ROLE) TN.markDone(ROLE, 'odoo-technical');
+    TN.submitTest({
+      test_type: 'tn_odoo_technical',
+      start_time: startTime.toISOString(), end_time: endTime.toISOString(),
+      time_taken_seconds: timeTaken, score_raw: correct, score_max: QUESTIONS.length,
+      score_pct: pct, result_label: level.label, answers: answers, flags: { time_over: timeOver }
+    }).then(function (out) {
+      var icon=document.getElementById('ss-icon'), text=document.getElementById('ss-text');
+      if (out.ok) { icon.textContent = '✅'; text.textContent = 'Results saved.'; }
+      else { icon.textContent = '⚠️'; text.textContent = 'Could not save results: ' + (out.body && out.body.error ? out.body.error : 'server error'); }
+    }).catch(function () {
+      document.getElementById('ss-icon').textContent = '⚠️';
+      document.getElementById('ss-text').textContent = 'Could not reach server. Please screenshot this page.';
+    });
+  }
+})();
+</script>
+
+</body>
+</html>

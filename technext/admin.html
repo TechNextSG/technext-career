@@ -42,12 +42,10 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
 .stat-card.all{border-color:#0f3a52}
 .stat-card.profiler{border-color:#0f3a52}
 .stat-card.iq{border-color:#2563eb}
-.stat-card.cyber{border-color:#16a34a}
-.stat-card.ai{border-color:#7c3aed}
-.stat-card.ai_intern{border-color:#9333ea}
-.stat-card.marketing{border-color:#d97706}
-.stat-card.marketing_senior{border-color:#b45309}
-.stat-card.cmpt{border-color:#059669}
+.stat-card.ai_technical{border-color:#7c3aed}
+.stat-card.fc_technical{border-color:#d97706}
+.stat-card.odoo_technical{border-color:#059669}
+.stat-card.booking{border-color:#19c2a6}
 .stat-num{font-size:26px;font-weight:900;color:#0f3a52}
 .stat-lbl{font-size:11.5px;color:#6b7280;margin-top:4px;font-weight:600;text-transform:uppercase;letter-spacing:.3px}
 
@@ -184,17 +182,22 @@ tr:hover td{background:#fafafa}
     </div>
 
     <div class="filters">
-      <span class="filter-label">Filter:</span>
+      <span class="filter-label">Role:</span>
+      <select id="filter-role" onchange="applyFilters()">
+        <option value="all">All roles</option>
+        <option value="ai-engineer">AI Engineer</option>
+        <option value="functional-consultant">Functional Consultant / BA</option>
+        <option value="odoo-developer">Odoo Developer</option>
+      </select>
+      <span class="filter-label">Test:</span>
       <select id="filter-type" onchange="applyFilters()">
-        <option value="all">All TechNext Tests</option>
+        <option value="all">All tests</option>
         <option value="tn_profiler">TechNext Profiler</option>
         <option value="tn_iq">IQ Assessment</option>
-        <option value="tn_cyber">Cyber Security</option>
-        <option value="tn_ai">AI Competency</option>
-        <option value="tn_ai_intern">AI Intern — Advanced</option>
-        <option value="tn_marketing">Marketing Associates</option>
-        <option value="tn_marketing_senior">Senior Marketers</option>
-        <option value="tn_cmpt">CMPT Profile</option>
+        <option value="tn_ai_technical">AI Engineer — Technical</option>
+        <option value="tn_fc_technical">FC / BA — Technical</option>
+        <option value="tn_odoo_technical">Odoo Dev — Technical</option>
+        <option value="tn_booking">Interview Booking</option>
       </select>
       <span class="filter-label">From:</span>
       <input type="date" id="filter-from" onchange="applyFilters()" />
@@ -223,16 +226,27 @@ tr:hover td{background:#fafafa}
 <div class="toast" id="toast"></div>
 
 <script>
-const TN_TYPES = ['tn_profiler','tn_iq','tn_cyber','tn_ai','tn_ai_intern','tn_marketing','tn_marketing_senior','tn_cmpt'];
+const TN_TYPES = ['tn_profiler','tn_iq','tn_ai_technical','tn_fc_technical','tn_odoo_technical','tn_booking'];
 const TYPE_LABEL = {
-  tn_profiler:'TechNext Profiler', tn_iq:'IQ Assessment', tn_cyber:'Cyber Security',
-  tn_ai:'AI Competency', tn_ai_intern:'AI Intern — Advanced',
-  tn_marketing:'Marketing', tn_marketing_senior:'Senior Marketers', tn_cmpt:'CMPT Profile'
+  tn_profiler:'TechNext Profiler',
+  tn_iq:'IQ Assessment',
+  tn_ai_technical:'AI Engineer — Technical',
+  tn_fc_technical:'FC / BA — Technical',
+  tn_odoo_technical:'Odoo Dev — Technical',
+  tn_booking:'Interview Booking'
 };
 const TYPE_COLOR = {
-  tn_profiler:'#0f3a52', tn_iq:'#2563eb', tn_cyber:'#16a34a',
-  tn_ai:'#7c3aed', tn_ai_intern:'#9333ea',
-  tn_marketing:'#d97706', tn_marketing_senior:'#b45309', tn_cmpt:'#059669'
+  tn_profiler:'#0f3a52',
+  tn_iq:'#2563eb',
+  tn_ai_technical:'#7c3aed',
+  tn_fc_technical:'#d97706',
+  tn_odoo_technical:'#059669',
+  tn_booking:'#19c2a6'
+};
+const ROLE_LABEL = {
+  'ai-engineer':'AI Engineer',
+  'functional-consultant':'Functional Consultant / BA',
+  'odoo-developer':'Odoo Developer'
 };
 
 let allData = [];
@@ -334,26 +348,32 @@ function renderCharts() {
 
 function applyFilters() {
   const type = document.getElementById('filter-type').value;
+  const role = document.getElementById('filter-role').value;
   const from = document.getElementById('filter-from').value;
   const to   = document.getElementById('filter-to').value;
   const q    = (document.getElementById('filter-search').value || '').toLowerCase().trim();
   filtered = allData.filter(r => {
     if (type !== 'all' && r.test_type !== type) return false;
+    if (role !== 'all' && (r.candidate_role||'') !== role) return false;
     if (from && (r.created_at||'') < from) return false;
     if (to && (r.created_at||'') > to + 'T23:59:59') return false;
     if (q) {
-      const hay = [(r.candidate_name||''),(r.candidate_email||''),(r.candidate_phone||''),(r.candidate_position||'')].join(' ').toLowerCase();
+      const hay = [(r.candidate_name||''),(r.candidate_email||''),(r.candidate_phone||''),(r.candidate_linkedin||''),(r.candidate_position||''),(r.candidate_role||'')].join(' ').toLowerCase();
       if (!hay.includes(q)) return false;
     }
     return true;
   });
+  let title = 'TechNext Candidates';
+  if (role !== 'all') title = ROLE_LABEL[role] || role;
+  if (type !== 'all') title += ' · ' + (TYPE_LABEL[type] || type);
   document.getElementById('table-title').textContent =
-    `${type === 'all' ? 'All TechNext Candidates' : TYPE_LABEL[type]} — ${filtered.length} record${filtered.length===1?'':'s'}`;
+    `${title} — ${filtered.length} record${filtered.length===1?'':'s'}`;
   renderTable();
 }
 
 function clearFilters() {
   document.getElementById('filter-type').value = 'all';
+  document.getElementById('filter-role').value = 'all';
   document.getElementById('filter-from').value = '';
   document.getElementById('filter-to').value   = '';
   document.getElementById('filter-search').value = '';
@@ -369,16 +389,16 @@ function renderTable() {
       <td><strong>${esc(r.candidate_name||'—')}</strong></td>
       <td><span class="email-link" onclick="viewByEmail('${esc(r.candidate_email||'')}')">${esc(r.candidate_email||'—')}</span></td>
       <td style="color:#6b7280;white-space:nowrap">${esc(r.candidate_phone||'—')}</td>
+      <td style="font-size:12px;white-space:nowrap">${esc(ROLE_LABEL[r.candidate_role]||r.candidate_role||'—')}</td>
       <td><span class="badge badge-${(r.test_type||'').replace('tn_','')}">${TYPE_LABEL[r.test_type]||r.test_type}</span></td>
       <td style="font-size:12px;white-space:nowrap">${fmtDateShort(r.end_time||r.created_at)}</td>
-      <td style="white-space:nowrap">${fmtDuration(r.time_taken_seconds)}</td>
       <td><strong>${r.score_pct!=null?r.score_pct+'%':'—'}</strong></td>
       <td>${resultPill(r.result_label)}</td>
       <td><div class="actions-cell"><button class="btn-icon btn-view" onclick="viewCandidate(${i})">Result</button></div></td>
     </tr>
   `).join('');
   area.innerHTML = `<div style="overflow-x:auto"><table>
-    <thead><tr><th>#</th><th>Name</th><th>Email</th><th>Phone</th><th>Test</th><th>Completed</th><th>Duration</th><th>Score</th><th>Result</th><th>Actions</th></tr></thead>
+    <thead><tr><th>#</th><th>Name</th><th>Email</th><th>Phone</th><th>Role</th><th>Test</th><th>Completed</th><th>Score</th><th>Result</th><th>Actions</th></tr></thead>
     <tbody>${rows}</tbody></table></div>`;
 }
 
@@ -400,7 +420,9 @@ function viewCandidate(idx) {
     <div class="modal-section"><h4>Candidate Info</h4>
       <div class="detail-row"><span class="d-lbl">Email</span><span class="d-val"><span class="email-link" onclick="viewByEmail('${esc(r.candidate_email||'')}')">${esc(r.candidate_email||'—')}</span></span></div>
       <div class="detail-row"><span class="d-lbl">Handphone</span><span class="d-val">${esc(r.candidate_phone||'—')}</span></div>
-      <div class="detail-row"><span class="d-lbl">Position</span><span class="d-val">${esc(r.candidate_position||'—')}</span></div>
+      <div class="detail-row"><span class="d-lbl">Role applied</span><span class="d-val">${esc(ROLE_LABEL[r.candidate_role]||r.candidate_role||'—')}</span></div>
+      <div class="detail-row"><span class="d-lbl">LinkedIn</span><span class="d-val">${r.candidate_linkedin?`<a href="${esc(r.candidate_linkedin)}" target="_blank" rel="noopener" style="color:#0f3a52">${esc(r.candidate_linkedin)}</a>`:'—'}</span></div>
+      <div class="detail-row"><span class="d-lbl">Resume</span><span class="d-val">${r.candidate_resume_url?`<a href="${esc(r.candidate_resume_url)}" target="_blank" rel="noopener" style="color:#0f3a52">Download / view</a>`:'—'}</span></div>
       <div class="detail-row"><span class="d-lbl">Started</span><span class="d-val">${fmtDateFull(r.start_time)}</span></div>
       <div class="detail-row"><span class="d-lbl">Completed</span><span class="d-val">${fmtDateFull(r.end_time)}</span></div>
     </div>
@@ -438,13 +460,16 @@ function viewByEmail(email) {
   if (!records.length) { showToast('No tests for that email.'); return; }
   const phone = records.find(r => r.candidate_phone)?.candidate_phone || '—';
   const name = records.find(r => r.candidate_name)?.candidate_name || '—';
+  const role = records.find(r => r.candidate_role)?.candidate_role || '';
+  const linkedin = records.find(r => r.candidate_linkedin)?.candidate_linkedin || '';
+  const resume = records.find(r => r.candidate_resume_url)?.candidate_resume_url || '';
   const totalTime = records.reduce((s,r) => s + (r.time_taken_seconds||0), 0);
   const scored = records.filter(r => r.score_pct != null);
   const avg = scored.length ? Math.round(scored.reduce((s,r)=>s+r.score_pct,0)/scored.length) : 0;
 
   document.getElementById('modal-body').innerHTML = `
     <div class="modal-head">
-      <div><h3>${esc(name)}</h3><div class="sub">${esc(email)} · ${esc(phone)}</div></div>
+      <div><h3>${esc(name)}</h3><div class="sub">${esc(email)} · ${esc(phone)}${role?` · <strong>${esc(ROLE_LABEL[role]||role)}</strong>`:''}</div></div>
       <button class="modal-close" onclick="closeModal()">✕ Close</button>
     </div>
     <div class="candidate-summary">
@@ -453,6 +478,10 @@ function viewByEmail(email) {
       <div class="cs-card"><div class="cs-num" style="font-size:14px">${fmtDuration(totalTime)}</div><div class="cs-lbl">Total time</div></div>
       <div class="cs-card"><div class="cs-num" style="font-size:13px">${fmtDateShort(records[0].created_at)}</div><div class="cs-lbl">First test</div></div>
     </div>
+    ${(linkedin||resume)?`<div class="modal-section"><h4>Profile</h4>
+      ${linkedin?`<div class="detail-row"><span class="d-lbl">LinkedIn</span><span class="d-val"><a href="${esc(linkedin)}" target="_blank" rel="noopener" style="color:#0f3a52">${esc(linkedin)}</a></span></div>`:''}
+      ${resume?`<div class="detail-row"><span class="d-lbl">Resume</span><span class="d-val"><a href="${esc(resume)}" target="_blank" rel="noopener" style="color:#0f3a52">Download / view</a></span></div>`:''}
+    </div>`:''}
     <div class="modal-section"><h4>Score profile across tests</h4><div class="modal-chart-wrap"><canvas id="email-chart"></canvas></div></div>
     <div class="modal-section"><h4>All test results</h4>
       ${records.map(r=>`
@@ -500,10 +529,11 @@ function emailAddress(email, name) {
 
 function exportCSV() {
   if (!filtered.length) { showToast('No data to export.'); return; }
-  const headers = ['#','Name','Email','Phone','Position','Test','Start','End','Duration(s)','Raw','Max','%','Result','Submitted'];
+  const headers = ['#','Name','Email','Phone','Role','LinkedIn','Resume','Test','Start','End','Duration(s)','Raw','Max','%','Result','Submitted'];
   const rows = filtered.map((r,i) => [
     i+1, csv(r.candidate_name), csv(r.candidate_email), csv(r.candidate_phone),
-    csv(r.candidate_position), TYPE_LABEL[r.test_type]||r.test_type,
+    csv(ROLE_LABEL[r.candidate_role]||r.candidate_role||''), csv(r.candidate_linkedin), csv(r.candidate_resume_url),
+    TYPE_LABEL[r.test_type]||r.test_type,
     fmtDateFull(r.start_time), fmtDateFull(r.end_time),
     r.time_taken_seconds??'', r.score_raw??'', r.score_max??'', r.score_pct??'',
     csv(r.result_label), fmtDateFull(r.created_at)

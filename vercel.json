@@ -1,0 +1,26 @@
+{
+  "cleanUrls": true,
+  "trailingSlash": false,
+  "rewrites": [
+    { "source": "/.netlify/functions/submit-test", "destination": "/api/submit-test" },
+    { "source": "/.netlify/functions/get-results", "destination": "/api/get-results" },
+
+    { "source": "/",                                "destination": "/technext/index.html" },
+    { "source": "/technext",                        "destination": "/technext/index.html" },
+    { "source": "/technext/",                       "destination": "/technext/index.html" },
+
+    { "source": "/technext/ai-engineer",            "destination": "/technext/role.html?role=ai-engineer" },
+    { "source": "/technext/functional-consultant",  "destination": "/technext/role.html?role=functional-consultant" },
+    { "source": "/technext/odoo-developer",         "destination": "/technext/role.html?role=odoo-developer" },
+
+    { "source": "/technext/profiler",               "destination": "/technext/profiler.html" },
+    { "source": "/technext/iq",                     "destination": "/technext/iq_test.html" },
+    { "source": "/technext/ai-technical",           "destination": "/technext/ai_technical.html" },
+    { "source": "/technext/fc-technical",           "destination": "/technext/fc_technical.html" },
+    { "source": "/technext/odoo-technical",         "destination": "/technext/odoo_technical.html" },
+
+    { "source": "/technext/booking",                "destination": "/technext/booking.html" },
+    { "source": "/technext/quiz",                   "destination": "/technext/quiz.html" },
+    { "source": "/technext/admin",                  "destination": "/technext/admin.html" }
+  ]
+}

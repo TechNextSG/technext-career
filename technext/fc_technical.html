@@ -1,0 +1,264 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Functional Consultant / BA — Technical — TechNext</title>
+<link rel="stylesheet" href="/technext/tn.css">
+</head>
+<body>
+
+<header class="tn-header">
+  <div class="tn-logo">T</div>
+  <div class="tn-brand"><h1>Functional Consultant / BA</h1><p>Requirements · BPMN · ERP · 20 questions · 30 min</p></div>
+  <span class="tn-pill">Test 3 of 3</span>
+</header>
+
+<div id="screen-landing" class="tn-screen active">
+  <div class="tn-wrap">
+    <div class="tn-card">
+      <div style="text-align:center;font-size:48px;margin-bottom:10px">🧭</div>
+      <h2 style="text-align:center">Functional Consultant / Business Analyst</h2>
+      <p class="sub" style="text-align:center">Mixed scenarios on requirements gathering, stakeholder management, process modelling, ERP fundamentals, gap analysis, and UAT.</p>
+      <div class="tn-stats-grid" style="margin:18px 0 20px">
+        <div class="tn-stat"><div class="tn-stat-val">20</div><div class="tn-stat-lbl">Questions</div></div>
+        <div class="tn-stat"><div class="tn-stat-val">30 min</div><div class="tn-stat-lbl">Time limit</div></div>
+        <div class="tn-stat"><div class="tn-stat-val">MCQ</div><div class="tn-stat-lbl">Format</div></div>
+      </div>
+      <button class="tn-btn primary block lg" id="btn-begin">Begin →</button>
+    </div>
+  </div>
+</div>
+
+<div id="screen-info" class="tn-screen"><div class="tn-wrap" id="info-mount"></div></div>
+
+<div id="screen-quiz" class="tn-screen">
+  <div class="tn-quiz-header">
+    <div class="tn-quiz-progress">
+      <div class="tn-quiz-progress-lbl" id="qlbl">Question 1 of 20</div>
+      <div class="tn-quiz-progress-bar"><div class="tn-quiz-progress-fill" id="qfill" style="width:5%"></div></div>
+    </div>
+    <div class="tn-timer" id="timer">30:00</div>
+  </div>
+  <div class="tn-quiz-body">
+    <div id="qcard"></div>
+    <div class="tn-warn" id="warn">Please select an answer to continue.</div>
+    <div class="tn-q-nav">
+      <button class="tn-btn outline" id="btn-prev" style="visibility:hidden">← Previous</button>
+      <button class="tn-btn primary" id="btn-next">Next →</button>
+    </div>
+  </div>
+</div>
+
+<div id="screen-results" class="tn-screen"><div class="tn-quiz-body" id="results-body"></div></div>
+
+<footer class="tn-footer">© TechNext · Results are confidential.</footer>
+
+<script src="/technext/tn.js"></script>
+<script>
+(function () {
+  var QUESTIONS = [
+    { text:'The PRIMARY purpose of requirements elicitation (vs. just being told the requirements) is to:', opts:[
+      'Produce as long a requirements document as possible',
+      'Surface implicit needs, conflicting expectations, and unstated assumptions before design begins',
+      'Avoid talking to end users until the system is built',
+      'Allow the BA to choose the technology stack'], ans:1 },
+    { ctx:'A stakeholder says "make it faster." That sentence on its own is:',
+      text:'It is best described as:', opts:[
+      'A clear functional requirement',
+      'A non-functional requirement that is not yet measurable; you need a specific metric and target',
+      'A constraint',
+      'A user story already in INVEST format'], ans:1 },
+    { text:'In MoSCoW prioritisation, which letter means "this release will fail without it"?', opts:[
+      'M — Must have', 'S — Should have', 'C — Could have', 'W — Won\'t have this time'], ans:0 },
+    { text:'A well-written user story typically follows the format:', opts:[
+      '"As a [role], I want [feature] so that [benefit]"',
+      '"The system shall [do something at all times]"',
+      '"Implement table X with columns Y, Z"',
+      '"[Job title]: [free-form description]"'], ans:0 },
+    { ctx:'You map a process and discover it has 4 different paths depending on customer type, with 2 of them only being used 1% of the time.',
+      text:'The most consultant-grade move is:', opts:[
+      'Build all four paths exactly as-is to preserve current behaviour',
+      'Surface the question of whether the 1%-paths are still needed, before automating them',
+      'Quietly skip the rare paths to simplify the build',
+      'Add another decision branch "just in case" of future variations'], ans:1 },
+    { text:'In a fit-gap analysis on an ERP, a "gap" is best described as:', opts:[
+      'A documentation issue',
+      'A required business capability that the out-of-the-box product does not deliver',
+      'A bug in the vendor\'s codebase',
+      'A late delivery'], ans:1 },
+    { ctx:'You\'ve been told a process must be "exactly as today." After investigation you find that 70% of the manual steps exist only to compensate for a missing system feature in the old system.',
+      text:'The right consulting response is:', opts:[
+      'Replicate every manual step in the new system to avoid resistance',
+      'Highlight which steps are compensating-controls and design them out, with stakeholder agreement',
+      'Stop the project and demand a full re-scoping',
+      'Implement it as-is and raise the issue after go-live'], ans:1 },
+    { text:'In BPMN, a diamond shape typically represents:', opts:[
+      'A data store', 'A gateway / decision point', 'A start event', 'An external system'], ans:1 },
+    { text:'A swimlane diagram is MOST useful for:', opts:[
+      'Showing the database schema',
+      'Showing who is responsible for each step of a process across roles or departments',
+      'Specifying API endpoints',
+      'Estimating effort in story points'], ans:1 },
+    { text:'A functional spec answers "what the system must do." A technical spec answers:', opts:[
+      'When the system will be delivered',
+      'How the system will be built — components, data structures, integrations',
+      'Why the project is funded',
+      'The colour scheme of the user interface'], ans:1 },
+    { ctx:'A senior stakeholder repeatedly bypasses the agreed prioritisation and adds new must-haves mid-sprint.',
+      text:'Best response:', opts:[
+      'Take the new items in silently and reduce the team\'s other commitments',
+      'Surface impact transparently (what gets dropped/delayed), and route changes through the agreed change-control process',
+      'Refuse all changes — the spec is fixed',
+      'Escalate immediately to the CEO'], ans:1 },
+    { text:'A "user acceptance test" (UAT) is PRIMARILY about:', opts:[
+      'Performance benchmarking',
+      'Confirming the system meets the business need in real-world scenarios, signed off by the business',
+      'Vendor sign-off',
+      'Whether code compiles'], ans:1 },
+    { text:'In a typical ERP migration, master data MEANS:', opts:[
+      'Backup tapes',
+      'Reference entities like customers, vendors, products, chart of accounts — the data the system operates on',
+      'The admin password',
+      'Transactional history only'], ans:1 },
+    { ctx:'A customer wants their existing Excel-based pricing rules replicated in the ERP. There are 14 nested conditions.',
+      text:'The functional consultant should FIRST:', opts:[
+      'Implement all 14 rules immediately',
+      'Map the rules with the business owner, validate which still apply, and look for ways to simplify',
+      'Recommend keeping the Excel — ERPs can\'t handle complex pricing',
+      'Tell the developer to "make Excel work inside the ERP"'], ans:1 },
+    { text:'"Three amigos" in agile delivery refers to:', opts:[
+      'Three project managers reviewing a story',
+      'Business (BA/PO) + Developer + Tester aligning on a user story before build',
+      'Three sponsors approving a budget',
+      'A type of retrospective format'], ans:1 },
+    { ctx:'Two departments insist their workflow is the "correct" one for the same shared process. You\'re asked to write the spec.',
+      text:'Most effective approach:', opts:[
+      'Pick the workflow from the louder department',
+      'Facilitate a joint session to map both, agree on differences vs. true variants, and document a single agreed flow',
+      'Implement both workflows side-by-side forever',
+      'Escalate to a senior executive immediately'], ans:1 },
+    { text:'A KPI for an order-to-cash process that an FC would track at go-live is:', opts:[
+      'Number of database tables',
+      'Average order-to-invoice cycle time and exception rate',
+      'Number of training slides',
+      'Number of meetings held during discovery'], ans:1 },
+    { text:'Out of these documents, which is MOST appropriate for sign-off at the end of the discovery phase?', opts:[
+      'A complete deployment script',
+      'A functional specification / scope document covering processes, gaps, and approach',
+      'The user manual',
+      'A go-live readiness report'], ans:1 },
+    { ctx:'A user complains the new system "doesn\'t do what we agreed." You check — the requirement was never written down, only discussed.',
+      text:'Process lesson:', opts:[
+      'Avoid that user in future',
+      'Capture and confirm decisions in writing as they happen; verbal agreements without trace are ambiguous',
+      'Add an addendum and move on',
+      'Blame the developer'], ans:1 },
+    { text:'In ERP context, "process-led" implementation means:', opts:[
+      'Implement only the modules the vendor wants to sell',
+      'Anchor the implementation in the agreed end-to-end business processes — not in module-by-module configuration',
+      'Let each user configure their own process',
+      'Wait for users to complain, then adjust'], ans:1 }
+  ];
+
+  var LEVELS = [
+    { min:85, label:'Proficient',  desc:'Strong functional/BA fundamentals. Ready to lead discovery and stakeholder workshops.' },
+    { min:70, label:'Capable',     desc:'Good understanding with minor gaps. Ready for mid-level delivery with senior oversight.' },
+    { min:50, label:'Developing',  desc:'Foundational knowledge in place. Targeted coaching needed.' },
+    { min:0,  label:'Insufficient',desc:'Below threshold for an FC/BA role at this stage.' }
+  ];
+
+  var ROLE = (new URLSearchParams(window.location.search).get('role')) || localStorage.getItem(TN.STORAGE.role) || 'functional-consultant';
+  if (ROLE) localStorage.setItem(TN.STORAGE.role, ROLE);
+
+  var current=0, answers={}, startTime, endTime, timerInt, elapsed=0, TIME=30*60, timeOver=false;
+
+  document.getElementById('btn-begin').onclick = function () {
+    if (localStorage.getItem(TN.STORAGE.email) && localStorage.getItem(TN.STORAGE.phone)) startQuiz();
+    else { TN.renderInfoForm(document.getElementById('info-mount'), { role: ROLE, onSuccess: startQuiz }); TN.showScreen('screen-info'); }
+  };
+  function startQuiz() { current=0; answers={}; startTime=new Date(); TN.showScreen('screen-quiz'); render(); timerInt=setInterval(tick,1000); }
+  function tick() {
+    elapsed++;
+    var rem=TIME-elapsed, el=document.getElementById('timer'), abs=Math.abs(rem);
+    el.textContent = rem >= 0 ? (String(Math.floor(abs/60)).padStart(2,'0')+':'+String(abs%60).padStart(2,'0')) : 'Over';
+    el.className = 'tn-timer' + (rem<=0?' red':rem<=120?' red':rem<=300?' amber':'');
+    if (rem<=0) timeOver=true;
+  }
+  function render() {
+    var q = QUESTIONS[current];
+    document.getElementById('qlbl').textContent = 'Question ' + (current+1) + ' of ' + QUESTIONS.length;
+    document.getElementById('qfill').style.width = (((current+1)/QUESTIONS.length)*100) + '%';
+    document.getElementById('btn-prev').style.visibility = current > 0 ? 'visible' : 'hidden';
+    document.getElementById('btn-next').textContent = current === QUESTIONS.length - 1 ? 'Submit →' : 'Next →';
+    document.getElementById('warn').classList.remove('show');
+    var html = '<div class="tn-q-card"><div class="tn-q-num">Question ' + (current+1) + ' / ' + QUESTIONS.length + '</div>';
+    if (q.ctx) html += '<div class="tn-q-context">' + TN.esc(q.ctx) + '</div>';
+    html += '<div class="tn-q-text">' + TN.esc(q.text) + '</div><div class="tn-options">';
+    var letters = ['A','B','C','D'];
+    q.opts.forEach(function (o, i) {
+      var sel = answers[current] === i ? ' selected' : '';
+      html += '<div class="tn-opt' + sel + '" data-v="' + i + '"><div class="tn-opt-label">' + letters[i] + '</div><div class="tn-opt-text">' + TN.esc(o) + '</div></div>';
+    });
+    html += '</div></div>';
+    document.getElementById('qcard').innerHTML = html;
+    document.querySelectorAll('.tn-opt').forEach(function (el) {
+      el.addEventListener('click', function () {
+        var v = parseInt(el.getAttribute('data-v'), 10);
+        answers[current] = v;
+        document.querySelectorAll('.tn-opt').forEach(function (e) { e.classList.remove('selected'); });
+        el.classList.add('selected');
+      });
+    });
+  }
+  document.getElementById('btn-prev').onclick = function () { if (current > 0) { current--; render(); window.scrollTo(0,0); } };
+  document.getElementById('btn-next').onclick = function () {
+    if (answers[current] === undefined) { document.getElementById('warn').classList.add('show'); return; }
+    if (current < QUESTIONS.length - 1) { current++; render(); window.scrollTo(0,0); }
+    else { finish(); }
+  };
+
+  function finish() {
+    clearInterval(timerInt);
+    endTime = new Date();
+    var timeTaken = Math.round((endTime - startTime) / 1000);
+    var correct = 0;
+    QUESTIONS.forEach(function (q, i) { if (answers[i] === q.ans) correct++; });
+    var pct = Math.round((correct / QUESTIONS.length) * 100);
+    var level = LEVELS.find(function (l) { return pct >= l.min; });
+    document.getElementById('results-body').innerHTML =
+      '<div class="tn-result-hero"><div class="icon">🧭</div><h2>Functional Consultant / BA</h2>' +
+        '<div class="tn-result-pct">' + pct + '%</div><div class="tn-result-label">' + level.label + '</div>' +
+        '<div class="tn-result-sub">' + correct + ' / ' + QUESTIONS.length + ' correct</div></div>' +
+      '<div class="tn-stats-grid">' +
+        '<div class="tn-stat"><div class="tn-stat-val">' + correct + '</div><div class="tn-stat-lbl">Correct</div></div>' +
+        '<div class="tn-stat"><div class="tn-stat-val">' + (QUESTIONS.length - correct) + '</div><div class="tn-stat-lbl">Incorrect</div></div>' +
+        '<div class="tn-stat"><div class="tn-stat-val">' + (Math.floor(timeTaken/60)) + 'm ' + (timeTaken%60) + 's</div><div class="tn-stat-lbl">Time</div></div>' +
+      '</div>' +
+      '<div class="tn-q-card"><div class="tn-q-num">Result interpretation</div><div style="font-size:14px;color:#374151;line-height:1.6">' + level.desc + '</div></div>' +
+      '<div class="tn-q-card" id="ss" style="display:flex;align-items:center;gap:10px;font-size:14px"><span id="ss-icon">⏳</span><span id="ss-text">Saving your results…</span></div>' +
+      '<div style="display:flex;gap:10px;flex-wrap:wrap">' +
+        '<a class="tn-btn primary" href="/technext/' + TN.esc(ROLE) + '">← Back to role dashboard</a>' +
+        '<button class="tn-btn outline" onclick="window.print()">🖨 Print / Save PDF</button>' +
+      '</div>';
+    TN.showScreen('screen-results');
+    if (ROLE) TN.markDone(ROLE, 'fc-technical');
+    TN.submitTest({
+      test_type: 'tn_fc_technical',
+      start_time: startTime.toISOString(), end_time: endTime.toISOString(),
+      time_taken_seconds: timeTaken, score_raw: correct, score_max: QUESTIONS.length,
+      score_pct: pct, result_label: level.label, answers: answers, flags: { time_over: timeOver }
+    }).then(function (out) {
+      var icon=document.getElementById('ss-icon'), text=document.getElementById('ss-text');
+      if (out.ok) { icon.textContent = '✅'; text.textContent = 'Results saved.'; }
+      else { icon.textContent = '⚠️'; text.textContent = 'Could not save results: ' + (out.body && out.body.error ? out.body.error : 'server error'); }
+    }).catch(function () {
+      document.getElementById('ss-icon').textContent = '⚠️';
+      document.getElementById('ss-text').textContent = 'Could not reach server. Please screenshot this page.';
+    });
+  }
+})();
+</script>
+
+</body>
+</html>

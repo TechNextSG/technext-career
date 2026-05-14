@@ -1,0 +1,199 @@
+/* TechNext shared styles ─ used by every page in /technext */
+:root{
+  --navy:#0f3a52; --navy-2:#082a3a; --teal:#19c2a6; --teal-2:#149a83;
+  --bg:#f0f4f8; --text:#1e2d3d; --muted:#6b7a8d; --border:#dce3ea;
+  --error:#dc2626; --success:#16a34a;
+  --radius:14px; --shadow:0 4px 24px rgba(15,58,82,.10);
+  --font:-apple-system,BlinkMacSystemFont,'Segoe UI',system-ui,sans-serif;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:var(--font);background:var(--bg);color:var(--text);min-height:100vh;line-height:1.5}
+
+/* ── HEADER ──────────────────────────────────────────────── */
+.tn-header{
+  background:var(--navy);color:#fff;padding:14px 20px;
+  display:flex;align-items:center;gap:12px;flex-shrink:0;
+  position:sticky;top:0;z-index:40;box-shadow:0 2px 10px rgba(0,0,0,.18);
+}
+.tn-logo{
+  width:36px;height:36px;background:var(--teal);border-radius:9px;
+  display:flex;align-items:center;justify-content:center;
+  font-weight:900;font-size:18px;color:var(--navy);flex-shrink:0;
+}
+.tn-brand{flex:1;min-width:0}
+.tn-brand h1{font-size:16px;font-weight:800;line-height:1.1}
+.tn-brand p{font-size:11.5px;opacity:.7;margin-top:2px}
+.tn-pill{background:var(--teal);color:var(--navy);font-size:10.5px;font-weight:800;padding:4px 10px;border-radius:99px;letter-spacing:.4px;white-space:nowrap}
+
+/* ── SCREENS ─────────────────────────────────────────────── */
+.tn-screen{display:none;min-height:calc(100vh - 64px)}
+.tn-screen.active{display:flex;flex-direction:column}
+.tn-wrap{flex:1;display:flex;align-items:center;justify-content:center;padding:28px 16px}
+.tn-card{background:#fff;border-radius:var(--radius);padding:32px 28px;max-width:560px;width:100%;box-shadow:var(--shadow)}
+.tn-card.lg{max-width:760px}
+.tn-card h2{font-size:22px;color:var(--navy);font-weight:800;margin-bottom:6px;line-height:1.25}
+.tn-card .sub{font-size:14px;color:var(--muted);margin-bottom:22px;line-height:1.55}
+
+/* ── FORM ────────────────────────────────────────────────── */
+.tn-field{margin-bottom:16px}
+.tn-field label{display:block;font-size:13px;font-weight:600;color:#374151;margin-bottom:6px}
+.tn-field .opt{color:var(--muted);font-weight:400}
+.tn-field .req{color:var(--error);font-weight:700}
+.tn-field input,.tn-field select,.tn-field textarea{
+  width:100%;padding:12px 14px;border:1.5px solid var(--border);border-radius:9px;
+  font-size:15px;outline:none;background:#fff;color:var(--text);font-family:var(--font);
+  transition:border-color .15s,box-shadow .15s;
+}
+.tn-field input:focus,.tn-field select:focus,.tn-field textarea:focus{border-color:var(--teal);box-shadow:0 0 0 3px rgba(25,194,166,.18)}
+.tn-field input.err,.tn-field select.err{border-color:var(--error)}
+.tn-field .help{font-size:11.5px;color:var(--muted);margin-top:6px;line-height:1.4}
+.tn-field .file-info{font-size:12px;color:var(--success);margin-top:6px;display:none}
+.tn-field .file-info.show{display:block}
+
+.tn-error{background:#fef2f2;border:1px solid #fecaca;color:#991b1b;padding:10px 14px;border-radius:9px;font-size:13.5px;margin-bottom:14px;display:none}
+.tn-error.show{display:block}
+
+/* ── BUTTONS ─────────────────────────────────────────────── */
+.tn-btn{
+  display:inline-flex;align-items:center;justify-content:center;gap:6px;
+  padding:12px 22px;border:none;border-radius:10px;
+  font-weight:700;font-size:14px;cursor:pointer;transition:all .15s;
+  text-decoration:none;font-family:var(--font);line-height:1;
+}
+.tn-btn.primary{background:var(--navy);color:#fff}
+.tn-btn.primary:hover:not(:disabled){background:var(--navy-2);transform:translateY(-1px)}
+.tn-btn.primary:disabled{background:#bfc8d2;cursor:not-allowed;transform:none}
+.tn-btn.gold{background:var(--teal);color:var(--navy)}
+.tn-btn.gold:hover:not(:disabled){background:var(--teal-2);color:#fff}
+.tn-btn.outline{background:#fff;border:1.5px solid var(--border);color:var(--navy)}
+.tn-btn.outline:hover{background:var(--bg)}
+.tn-btn.lg{padding:14px 28px;font-size:15px}
+.tn-btn.sm{padding:8px 16px;font-size:13px}
+.tn-btn.block{width:100%}
+
+/* ── PROGRESS BAR ────────────────────────────────────────── */
+.tn-progress-bar{height:6px;background:#e5e7eb;border-radius:99px;overflow:hidden;margin-bottom:14px}
+.tn-progress-fill{height:100%;background:var(--teal);transition:width .4s ease}
+
+/* ── QUIZ ────────────────────────────────────────────────── */
+.tn-quiz-header{background:var(--navy);color:#fff;padding:14px 20px;display:flex;align-items:center;gap:14px;flex-shrink:0}
+.tn-quiz-progress{flex:1;min-width:0}
+.tn-quiz-progress-lbl{font-size:12.5px;opacity:.85;margin-bottom:5px;line-height:1.2}
+.tn-quiz-progress-bar{height:5px;background:rgba(255,255,255,.18);border-radius:99px;overflow:hidden}
+.tn-quiz-progress-fill{height:100%;background:var(--teal);transition:width .4s}
+.tn-timer{font-size:18px;font-weight:800;color:var(--teal);font-variant-numeric:tabular-nums;min-width:70px;text-align:right}
+.tn-timer.amber{color:#f59e0b}
+.tn-timer.red{color:var(--error);animation:tnPulse 1.2s infinite}
+@keyframes tnPulse{0%,100%{opacity:1}50%{opacity:.55}}
+
+.tn-quiz-body{flex:1;padding:24px 16px 60px;max-width:720px;margin:0 auto;width:100%}
+.tn-q-card{background:#fff;border-radius:var(--radius);padding:24px;box-shadow:0 2px 12px rgba(0,0,0,.06);margin-bottom:18px}
+.tn-q-num{font-size:11px;font-weight:700;color:var(--teal-2);text-transform:uppercase;letter-spacing:1.1px;margin-bottom:9px}
+.tn-q-context{background:#f0fdfa;border-left:3px solid var(--teal);padding:11px 14px;border-radius:0 8px 8px 0;font-size:14px;color:#065f46;margin-bottom:14px;line-height:1.55}
+.tn-q-text{font-size:16px;color:var(--navy);font-weight:600;line-height:1.5;margin-bottom:18px}
+
+.tn-options{display:grid;gap:9px}
+.tn-opt{
+  display:flex;align-items:flex-start;gap:11px;
+  padding:13px 15px;border:1.5px solid var(--border);border-radius:10px;cursor:pointer;
+  transition:all .15s;background:#fff;
+}
+.tn-opt:hover{border-color:var(--teal);background:#f0fdfa}
+.tn-opt.selected{border-color:var(--teal);background:#ccfbf1}
+.tn-opt-label{
+  width:26px;height:26px;border-radius:50%;background:#f3f4f6;
+  display:flex;align-items:center;justify-content:center;
+  font-size:12.5px;font-weight:700;color:var(--muted);flex-shrink:0;
+}
+.tn-opt.selected .tn-opt-label{background:var(--teal);color:#fff}
+.tn-opt-text{font-size:14.5px;color:#374151;line-height:1.45;flex:1}
+
+.tn-q-nav{display:flex;justify-content:space-between;align-items:center;gap:10px;margin-top:6px}
+.tn-warn{background:#fef2f2;border:1px solid #fecaca;border-radius:8px;padding:11px 14px;margin-top:14px;font-size:13.5px;color:#991b1b;display:none}
+.tn-warn.show{display:block}
+
+/* ── RESULTS ─────────────────────────────────────────────── */
+.tn-result-hero{
+  background:linear-gradient(135deg,var(--navy) 0%,#155670 100%);
+  border-radius:var(--radius);padding:30px 24px;text-align:center;color:#fff;margin-bottom:18px
+}
+.tn-result-hero .icon{font-size:50px;margin-bottom:10px}
+.tn-result-hero h2{font-size:24px;font-weight:800;margin-bottom:6px}
+.tn-result-pct{font-size:46px;font-weight:900;color:var(--teal);line-height:1;margin:14px 0 6px}
+.tn-result-label{font-size:15px;font-weight:700;opacity:.95}
+.tn-result-sub{font-size:13px;opacity:.7;margin-top:6px}
+.tn-stats-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:16px}
+.tn-stat{background:#fff;border-radius:11px;padding:14px;text-align:center;box-shadow:0 2px 8px rgba(0,0,0,.05)}
+.tn-stat-val{font-size:17px;font-weight:800;color:var(--navy)}
+.tn-stat-lbl{font-size:10.5px;color:var(--muted);text-transform:uppercase;letter-spacing:.4px;margin-top:3px}
+
+/* ── ROLE DASHBOARD ──────────────────────────────────────── */
+.tn-role-step{
+  display:flex;align-items:center;gap:14px;padding:16px 18px;
+  background:#fff;border-radius:12px;margin-bottom:10px;
+  box-shadow:0 2px 10px rgba(0,0,0,.05);transition:all .15s;
+}
+.tn-role-step.done{background:#f0fdfa;border-left:4px solid var(--teal)}
+.tn-role-step.locked{opacity:.55}
+.tn-step-num{
+  width:34px;height:34px;border-radius:50%;background:var(--bg);
+  display:flex;align-items:center;justify-content:center;
+  font-weight:800;color:var(--muted);flex-shrink:0;
+}
+.tn-role-step.done .tn-step-num{background:var(--teal);color:#fff}
+.tn-step-info{flex:1;min-width:0}
+.tn-step-info h4{font-size:15px;color:var(--navy);font-weight:700;margin-bottom:2px}
+.tn-step-info p{font-size:12.5px;color:var(--muted);line-height:1.4}
+.tn-step-status{font-size:11.5px;font-weight:700;color:var(--teal-2);text-transform:uppercase;letter-spacing:.4px;flex-shrink:0}
+.tn-step-status.pending{color:var(--muted)}
+
+/* ── BOOKING SLOTS ───────────────────────────────────────── */
+.tn-slots-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(120px,1fr));gap:10px;margin-bottom:18px}
+.tn-slot{
+  background:#fff;border:1.5px solid var(--border);border-radius:10px;
+  padding:12px 10px;text-align:center;cursor:pointer;transition:all .15s;
+}
+.tn-slot:hover{border-color:var(--teal);background:#f0fdfa}
+.tn-slot.selected{border-color:var(--teal);background:#ccfbf1}
+.tn-slot.unavailable{opacity:.4;cursor:not-allowed;background:#f3f4f6}
+.tn-slot-day{font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.5px;font-weight:700}
+.tn-slot-date{font-size:15px;font-weight:800;color:var(--navy);margin:3px 0 1px}
+.tn-slot-time{font-size:13px;color:var(--text);font-weight:600}
+
+/* ── TOAST ───────────────────────────────────────────────── */
+.tn-toast{
+  position:fixed;bottom:20px;left:50%;transform:translate(-50%,8px);
+  background:var(--navy);color:#fff;padding:12px 22px;border-radius:99px;
+  font-size:13.5px;font-weight:600;z-index:200;opacity:0;
+  transition:all .25s;pointer-events:none;max-width:90%;
+}
+.tn-toast.show{opacity:1;transform:translate(-50%,0)}
+.tn-toast.error{background:var(--error)}
+.tn-toast.success{background:var(--success)}
+
+/* ── FOOTER ──────────────────────────────────────────────── */
+.tn-footer{background:var(--navy);color:rgba(255,255,255,.55);text-align:center;padding:16px 20px;font-size:11.5px}
+
+/* ── MOBILE ──────────────────────────────────────────────── */
+@media(max-width:640px){
+  .tn-card{padding:24px 20px}
+  .tn-card h2{font-size:20px}
+  .tn-quiz-body{padding:18px 12px 50px}
+  .tn-q-card{padding:18px 16px}
+  .tn-q-text{font-size:15px}
+  .tn-opt{padding:11px 13px}
+  .tn-opt-text{font-size:14px}
+  .tn-q-nav{flex-direction:column-reverse;align-items:stretch}
+  .tn-q-nav .tn-btn{width:100%}
+  .tn-stats-grid{grid-template-columns:1fr 1fr}
+  .tn-result-hero{padding:24px 18px}
+  .tn-result-hero h2{font-size:20px}
+  .tn-result-pct{font-size:38px}
+  .tn-role-step{padding:14px}
+  .tn-step-info h4{font-size:14px}
+  .tn-step-info p{font-size:11.5px}
+  .tn-slots-grid{grid-template-columns:repeat(auto-fill,minmax(100px,1fr));gap:8px}
+  .tn-slot{padding:10px 8px}
+  .tn-slot-date{font-size:13.5px}
+  .tn-timer{font-size:16px;min-width:60px}
+}
