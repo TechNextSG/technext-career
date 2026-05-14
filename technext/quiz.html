@@ -1,0 +1,307 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>About TechNext — Company Quiz</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{--navy:#0f3a52;--gold:#19c2a6;--bg:#f0f4f8;--text:#1e2d3d;--muted:#6b7a8d;--border:#dce3ea;}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;background:var(--bg);color:var(--text);min-height:100vh}
+.screen{display:none;min-height:100vh}
+.screen.active{display:flex;flex-direction:column}
+nav{background:var(--navy);padding:16px 24px;display:flex;align-items:center;gap:12px;flex-shrink:0;color:#fff}
+.nav-logo{color:var(--gold);font-size:20px;font-weight:900;letter-spacing:1px}
+.nav-title{font-size:14px;opacity:.75}
+.nav-badge{margin-left:auto;background:var(--gold);color:var(--navy);font-size:11px;font-weight:800;padding:4px 12px;border-radius:20px;letter-spacing:.5px}
+.wrap{flex:1;display:flex;align-items:center;justify-content:center;padding:32px 16px}
+.card{background:#fff;border-radius:16px;padding:36px 30px;max-width:640px;width:100%;box-shadow:0 4px 32px rgba(0,0,0,.08)}
+h1{font-size:26px;color:var(--navy);font-weight:800;margin-bottom:8px}
+.subtitle{font-size:15px;color:var(--muted);margin-bottom:24px}
+.lesson{background:#f0fdfa;border-left:4px solid var(--gold);padding:16px 18px;border-radius:0 10px 10px 0;font-size:14px;line-height:1.65;color:#0a4a3e;margin-bottom:18px}
+.lesson strong{color:#065f46}
+.q-text{font-size:17px;color:var(--navy);font-weight:700;margin-bottom:16px;line-height:1.45}
+.options{display:grid;gap:10px;margin-bottom:18px}
+.opt{padding:13px 16px;border:1.5px solid var(--border);border-radius:10px;cursor:pointer;display:flex;align-items:flex-start;gap:11px;transition:all .15s;font-size:14.5px;line-height:1.4}
+.opt:hover{border-color:var(--gold);background:#f0fdfa}
+.opt.correct{border-color:#16a34a;background:#dcfce7}
+.opt.wrong{border-color:#dc2626;background:#fee2e2}
+.opt.disabled{pointer-events:none;opacity:.85}
+.opt-letter{width:26px;height:26px;border-radius:50%;background:#f3f4f6;color:var(--muted);display:flex;align-items:center;justify-content:center;font-weight:700;font-size:13px;flex-shrink:0}
+.opt.correct .opt-letter{background:#16a34a;color:#fff}
+.opt.wrong .opt-letter{background:#dc2626;color:#fff}
+.feedback{background:#f0f4f8;border-radius:10px;padding:14px 16px;font-size:14px;line-height:1.55;margin-bottom:14px;display:none}
+.feedback.show{display:block}
+.feedback.good{background:#dcfce7;color:#065f46}
+.feedback.bad{background:#fee2e2;color:#991b1b}
+.row{display:flex;justify-content:space-between;align-items:center;gap:12px;margin-top:10px}
+.progress{font-size:12px;color:var(--muted);font-weight:600}
+.btn{padding:12px 24px;border:none;border-radius:10px;font-weight:700;font-size:14px;cursor:pointer;transition:all .2s}
+.btn-primary{background:var(--navy);color:#fff}
+.btn-primary:hover{background:#08283a}
+.btn-primary:disabled{background:#bfc8d2;cursor:not-allowed}
+.btn-outline{background:#fff;border:1.5px solid var(--border);color:var(--navy)}
+.score-hero{text-align:center;padding:20px 0 8px}
+.score-num{font-size:60px;font-weight:900;color:var(--gold);line-height:1}
+.score-lbl{font-size:13px;color:var(--muted);margin-top:6px;letter-spacing:.5px;text-transform:uppercase}
+.facts h3{font-size:14px;color:var(--navy);margin:18px 0 10px;text-transform:uppercase;letter-spacing:.7px}
+.facts li{margin-bottom:8px;font-size:14px;line-height:1.55;color:var(--text);padding-left:6px}
+.facts ul{list-style:disc;padding-left:22px}
+.bar{height:6px;background:#e5e7eb;border-radius:3px;margin-bottom:20px;overflow:hidden}
+.bar-fill{height:100%;background:var(--gold);transition:width .35s}
+@media(max-width:560px){.card{padding:24px 18px}h1{font-size:22px}.q-text{font-size:16px}}
+</style>
+</head>
+<body>
+
+<div id="screen-landing" class="screen active">
+  <nav><span class="nav-logo">TechNext</span><span class="nav-title">Company Quiz</span><span class="nav-badge">About Us</span></nav>
+  <div class="wrap">
+    <div class="card">
+      <h1>About TechNext — Quiz</h1>
+      <p class="subtitle">A short, interactive quiz that teaches you about TechNext along the way. 10 questions · ~5 minutes · learn as you go.</p>
+      <div class="lesson"><strong>How it works:</strong> Each question has a short fact-card. Pick an answer; we'll tell you instantly whether it's right and explain why. By the end you'll know what TechNext does and how we work.</div>
+      <button class="btn btn-primary" style="width:100%" onclick="start()">Begin Quiz →</button>
+    </div>
+  </div>
+</div>
+
+<div id="screen-quiz" class="screen">
+  <nav><span class="nav-logo">TechNext</span><span class="nav-title">Company Quiz</span><span class="nav-badge" id="badge-progress">1 / 10</span></nav>
+  <div class="wrap">
+    <div class="card">
+      <div class="bar"><div class="bar-fill" id="bar-fill" style="width:10%"></div></div>
+      <div class="lesson" id="lesson"></div>
+      <div class="q-text" id="q-text"></div>
+      <div class="options" id="options"></div>
+      <div class="feedback" id="feedback"></div>
+      <div class="row">
+        <div class="progress" id="progress">Question 1 of 10</div>
+        <button class="btn btn-primary" id="btn-next" onclick="nextQ()" disabled>Next →</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div id="screen-done" class="screen">
+  <nav><span class="nav-logo">TechNext</span><span class="nav-title">Company Quiz</span><span class="nav-badge">Done</span></nav>
+  <div class="wrap">
+    <div class="card">
+      <div class="score-hero">
+        <div class="score-num" id="score-num">0 / 10</div>
+        <div class="score-lbl">Final Score</div>
+      </div>
+      <p id="score-msg" style="text-align:center;font-size:15px;color:var(--muted);margin-bottom:20px"></p>
+      <div class="facts">
+        <h3>Things you learned about TechNext</h3>
+        <ul id="recap"></ul>
+      </div>
+      <div class="row" style="margin-top:24px">
+        <a href="/technext/" class="btn btn-outline" style="text-decoration:none">← Back to Portal</a>
+        <button class="btn btn-primary" onclick="restart()">Retry Quiz</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+const QUESTIONS = [
+  {
+    lesson: 'TechNext is a technology services company focused on helping businesses adopt modern engineering, AI, and digital tools — practically, not theoretically.',
+    text: 'What best describes what TechNext does?',
+    opts: [
+      'Manufactures consumer electronics',
+      'A technology services company that helps businesses adopt modern engineering, AI, and digital tools',
+      'A retail e-commerce marketplace',
+      'A traditional advertising agency'
+    ],
+    ans: 1,
+    fact: 'TechNext = technology services. We deliver practical engineering + AI capability, not slideware.'
+  },
+  {
+    lesson: 'TechNext values "practical first": we ship working systems before perfect documents. Our north star is measurable customer outcomes, not vanity deliverables.',
+    text: 'What is TechNext\'s "practical-first" principle?',
+    opts: [
+      'Always document a project for 6 months before writing code',
+      'Pick the cheapest vendor regardless of fit',
+      'Ship working systems that move real customer outcomes — before perfect documents',
+      'Outsource everything that is not core engineering'
+    ],
+    ans: 2,
+    fact: 'Practical-first: we ship working systems that move real outcomes.'
+  },
+  {
+    lesson: 'TechNext teams are small, senior, and cross-functional. A typical pod includes engineering, AI, and product working together end-to-end.',
+    text: 'How are TechNext delivery teams typically structured?',
+    opts: [
+      'Large pyramids with one senior person managing many juniors',
+      'Small, senior, cross-functional pods (engineering + AI + product) working end-to-end',
+      'Single-discipline silos that hand work between teams',
+      'Fully offshored teams with no in-house presence'
+    ],
+    ans: 1,
+    fact: 'Small, senior, cross-functional pods — owners end-to-end.'
+  },
+  {
+    lesson: 'We invest in AI not as a buzzword, but as a leverage tool: our engineers use AI daily for coding, documentation, analysis, and prototyping.',
+    text: 'How does TechNext use AI internally?',
+    opts: [
+      'It is forbidden — too risky',
+      'Only the AI team is allowed to use it',
+      'As a daily leverage tool across coding, docs, analysis, and prototyping by every engineer',
+      'Only for marketing collateral'
+    ],
+    ans: 2,
+    fact: 'Every TechNext engineer uses AI daily as leverage.'
+  },
+  {
+    lesson: 'TechNext is industry-agnostic but has deep experience in field-services, manufacturing, energy, and digital-first SMEs.',
+    text: 'Which industries does TechNext have the most experience in?',
+    opts: [
+      'Hollywood film production',
+      'Field-services, manufacturing, energy, and digital-first SMEs',
+      'Only fashion retail',
+      'Aerospace defence contracting'
+    ],
+    ans: 1,
+    fact: 'Sweet spot: field-services, manufacturing, energy, digital-first SMEs.'
+  },
+  {
+    lesson: 'Hiring at TechNext is mindset-first: we care more about curiosity, ownership, and ability to learn fast than a polished CV.',
+    text: 'What does TechNext look for first in candidates?',
+    opts: [
+      'A famous alma mater',
+      'Curiosity, ownership, and the ability to learn fast',
+      '10+ years of pre-existing experience exactly matching the role',
+      'Knowing the founder personally'
+    ],
+    ans: 1,
+    fact: 'Mindset > pedigree. Curious owners who learn fast win at TechNext.'
+  },
+  {
+    lesson: 'Engineers at TechNext are expected to talk to customers directly. We collapse the distance between code and real-world impact.',
+    text: 'What is unusual about how TechNext engineers work with customers?',
+    opts: [
+      'They never talk to customers — only sales does',
+      'They talk to customers directly so they understand real-world impact',
+      'They only respond by support tickets',
+      'They visit customers once a year for an audit'
+    ],
+    ans: 1,
+    fact: 'Engineers + customers talk directly. No telephone game.'
+  },
+  {
+    lesson: 'TechNext favours small, reversible decisions over big, locked-in ones. If you can ship a 1-week version of something, do it.',
+    text: 'TechNext\'s decision-making style is best described as:',
+    opts: [
+      'Big-bang releases after 12 months of planning',
+      'Small, reversible decisions — ship a 1-week version when you can',
+      'Avoid all decisions until consensus is reached by everyone',
+      'Decided centrally by one person, no input from teams'
+    ],
+    ans: 1,
+    fact: 'Small, reversible, fast decisions beat big-bang plans.'
+  },
+  {
+    lesson: 'TechNext rejects "AI for AI\'s sake." Every AI feature we build must pass a basic test: does it save time, reduce errors, or unlock something that was impossible before?',
+    text: 'When does TechNext recommend NOT using AI?',
+    opts: [
+      'Whenever the problem is too important',
+      'When it would not save time, reduce errors, or unlock something previously impossible',
+      'On weekends',
+      'For any task that involves customer data'
+    ],
+    ans: 1,
+    fact: 'No AI for AI\'s sake — there must be a real, measurable lift.'
+  },
+  {
+    lesson: 'TechNext\'s long-term promise: every project leaves the customer more capable — better tools, clearer processes, and team members who learned something new.',
+    text: 'What is TechNext\'s long-term promise to customers?',
+    opts: [
+      'They will depend on us forever',
+      'Every project leaves them more capable — better tools, clearer processes, and a smarter team',
+      'We will charge them less every year',
+      'We will hand them a 200-page report'
+    ],
+    ans: 1,
+    fact: 'We leave customers stronger — more capable tools, processes, and people.'
+  }
+];
+
+let current = 0, score = 0, answered = false;
+const recap = [];
+
+function showScreen(id) {
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  window.scrollTo(0, 0);
+}
+
+function start() { current = 0; score = 0; recap.length = 0; showScreen('screen-quiz'); render(); }
+function restart() { start(); }
+
+function render() {
+  answered = false;
+  const q = QUESTIONS[current];
+  document.getElementById('lesson').innerHTML = '<strong>Did you know?</strong> ' + q.lesson;
+  document.getElementById('q-text').textContent = q.text;
+  document.getElementById('progress').textContent = `Question ${current+1} of ${QUESTIONS.length}`;
+  document.getElementById('badge-progress').textContent = `${current+1} / ${QUESTIONS.length}`;
+  document.getElementById('bar-fill').style.width = `${((current+1)/QUESTIONS.length)*100}%`;
+  const fb = document.getElementById('feedback');
+  fb.classList.remove('show','good','bad'); fb.textContent = '';
+  document.getElementById('btn-next').disabled = true;
+  document.getElementById('btn-next').textContent = current === QUESTIONS.length - 1 ? 'See Results →' : 'Next →';
+  const opts = document.getElementById('options');
+  opts.innerHTML = '';
+  const letters = ['A','B','C','D'];
+  q.opts.forEach((text, i) => {
+    const el = document.createElement('div');
+    el.className = 'opt';
+    el.innerHTML = `<div class="opt-letter">${letters[i]}</div><div>${text}</div>`;
+    el.onclick = () => choose(i, el);
+    opts.appendChild(el);
+  });
+}
+
+function choose(i, el) {
+  if (answered) return;
+  answered = true;
+  const q = QUESTIONS[current];
+  const all = document.querySelectorAll('.opt');
+  all.forEach((o, idx) => {
+    o.classList.add('disabled');
+    if (idx === q.ans) o.classList.add('correct');
+    else if (idx === i) o.classList.add('wrong');
+  });
+  const fb = document.getElementById('feedback');
+  if (i === q.ans) {
+    score++;
+    fb.className = 'feedback show good';
+    fb.innerHTML = `<strong>✓ Correct.</strong> ${q.fact}`;
+  } else {
+    fb.className = 'feedback show bad';
+    fb.innerHTML = `<strong>Not quite.</strong> ${q.fact}`;
+  }
+  recap.push(q.fact);
+  document.getElementById('btn-next').disabled = false;
+}
+
+function nextQ() {
+  if (current < QUESTIONS.length - 1) { current++; render(); }
+  else finish();
+}
+
+function finish() {
+  document.getElementById('score-num').textContent = `${score} / ${QUESTIONS.length}`;
+  const msg = score === 10 ? 'Perfect — you know TechNext inside out.'
+            : score >= 7   ? 'Solid grasp of who we are.'
+            : score >= 4   ? 'Good start — review the facts below.'
+            :                'Worth a re-read — every fact below is genuinely how we work.';
+  document.getElementById('score-msg').textContent = msg;
+  document.getElementById('recap').innerHTML = recap.map(f => `<li>${f}</li>`).join('');
+  showScreen('screen-done');
+}
+</script>
+</body>
+</html>
