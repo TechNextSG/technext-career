@@ -60,7 +60,7 @@
     doneKey:   function (role, slug) { return 'tn_done_' + role + '_' + slug; }
   };
 
-  var INTERVIEW_EMAIL = 'sky@technext.asia';
+  var INTERVIEW_EMAIL = 'career@technext.asia';
 
   /* ── DOM helpers ─────────────────────────────────────────── */
   function $(id) { return document.getElementById(id); }
