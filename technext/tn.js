@@ -9,6 +9,7 @@
       icon: '🤖',
       blurb: 'Design, build, and deploy LLM-powered systems — RAG, agents, evaluation, fine-tuning.',
       tests: [
+        { slug: 'company-quiz', test_type: 'tn_company_quiz', label: 'About TechNext',            path: '/technext/quiz',           desc: 'Learn who we are + short recall quiz · 10 questions · ~5 min' },
         { slug: 'profiler',     test_type: 'tn_profiler',     label: 'TechNext Profiler',         path: '/technext/profiler',       desc: 'Personality · DISC + Type · 32 questions · ~12 min' },
         { slug: 'iq',           test_type: 'tn_iq',           label: 'Reasoning Test',            path: '/technext/iq',             desc: 'Numerical, verbal, logical · 25 questions · 35 min' },
         { slug: 'ai-technical', test_type: 'tn_ai_technical', label: 'AI Engineer — Technical',   path: '/technext/ai-technical',   desc: 'Transformers, RAG, agents · 25 questions · 40 min' }
@@ -19,6 +20,7 @@
       icon: '🧭',
       blurb: 'Translate business needs into working ERP solutions — discovery, modelling, configuration, UAT.',
       tests: [
+        { slug: 'company-quiz', test_type: 'tn_company_quiz', label: 'About TechNext',                     path: '/technext/quiz',         desc: 'Learn who we are + short recall quiz · 10 questions · ~5 min' },
         { slug: 'profiler',     test_type: 'tn_profiler',     label: 'TechNext Profiler',                  path: '/technext/profiler',     desc: 'Personality · DISC + Type · 32 questions · ~12 min' },
         { slug: 'iq',           test_type: 'tn_iq',           label: 'Reasoning Test',                     path: '/technext/iq',           desc: 'Numerical, verbal, logical · 25 questions · 35 min' },
         { slug: 'fc-technical', test_type: 'tn_fc_technical', label: 'Functional Consultant — Technical',  path: '/technext/fc-technical', desc: 'Requirements, BPMN, ERP · 20 questions · 30 min' }
@@ -29,6 +31,7 @@
       icon: '🧰',
       blurb: 'Build Odoo modules — Python, ORM, views, security, QWeb, integration.',
       tests: [
+        { slug: 'company-quiz',   test_type: 'tn_company_quiz',   label: 'About TechNext',             path: '/technext/quiz',           desc: 'Learn who we are + short recall quiz · 10 questions · ~5 min' },
         { slug: 'profiler',       test_type: 'tn_profiler',       label: 'TechNext Profiler',          path: '/technext/profiler',       desc: 'Personality · DISC + Type · 32 questions · ~12 min' },
         { slug: 'iq',             test_type: 'tn_iq',             label: 'Reasoning Test',             path: '/technext/iq',             desc: 'Numerical, verbal, logical · 25 questions · 35 min' },
         { slug: 'odoo-technical', test_type: 'tn_odoo_technical', label: 'Odoo Developer — Technical', path: '/technext/odoo-technical', desc: 'Python, ORM, views, security · 20 questions · 35 min' }
@@ -39,8 +42,9 @@
       icon: '🛡️',
       blurb: 'Protect systems and data — cryptography, network security, web/app security, identity, detection & response.',
       tests: [
-        { slug: 'profiler',        test_type: 'tn_profiler',        label: 'TechNext Profiler',         path: '/technext/profiler',        desc: 'Personality · DISC + Type · 32 questions · ~12 min' },
-        { slug: 'iq',              test_type: 'tn_iq',              label: 'Reasoning Test',            path: '/technext/iq',              desc: 'Numerical, verbal, logical · 25 questions · 35 min' },
+        { slug: 'company-quiz',    test_type: 'tn_company_quiz',    label: 'About TechNext',             path: '/technext/quiz',            desc: 'Learn who we are + short recall quiz · 10 questions · ~5 min' },
+        { slug: 'profiler',        test_type: 'tn_profiler',        label: 'TechNext Profiler',          path: '/technext/profiler',        desc: 'Personality · DISC + Type · 32 questions · ~12 min' },
+        { slug: 'iq',              test_type: 'tn_iq',              label: 'Reasoning Test',             path: '/technext/iq',              desc: 'Numerical, verbal, logical · 25 questions · 35 min' },
         { slug: 'cyber-technical', test_type: 'tn_cyber_technical', label: 'Cyber Security — Technical', path: '/technext/cyber-technical', desc: 'Crypto, network, web, IAM, IR · 26 questions · 40 min' }
       ]
     }
@@ -240,22 +244,35 @@
   }
 
   /* ── Booking helpers ─────────────────────────────────────── */
-  function generateSlots(daysAhead, times) {
-    daysAhead = daysAhead || 10;
-    times = times || ['09:00','11:00','14:00','16:00']; // local-time slot starts
+  // Generate booking days. Times depend on day-of-week:
+  //   Mon–Fri: 09:00, 11:00, 14:00, 16:00
+  //   Sat:     10:00, 11:00, 12:00, 13:00
+  //   Sun:     skipped
+  // Returns an array of { date: Date, times: [Date,...] }, one entry per available day.
+  function generateBookingDays(daysToInclude) {
+    daysToInclude = daysToInclude || 12; // ~2 weeks of weekdays + Saturdays
+    var WEEKDAY_TIMES = ['09:00','11:00','14:00','16:00'];
+    var SATURDAY_TIMES = ['10:00','11:00','12:00','13:00'];
     var out = [];
     var now = new Date();
-    for (var i = 1; i <= daysAhead + 7 && out.length < daysAhead * times.length; i++) {
+    for (var i = 1; out.length < daysToInclude && i < 28; i++) {
       var d = new Date(now.getFullYear(), now.getMonth(), now.getDate() + i);
       var dow = d.getDay();
-      if (dow === 0 || dow === 6) continue; // skip weekends
-      times.forEach(function (hhmm) {
+      if (dow === 0) continue; // Sunday: skip
+      var times = (dow === 6 ? SATURDAY_TIMES : WEEKDAY_TIMES);
+      var slots = times.map(function (hhmm) {
         var parts = hhmm.split(':');
-        var slot = new Date(d.getFullYear(), d.getMonth(), d.getDate(), parseInt(parts[0],10), parseInt(parts[1],10));
-        out.push(slot);
+        return new Date(d.getFullYear(), d.getMonth(), d.getDate(), parseInt(parts[0],10), parseInt(parts[1],10));
       });
+      out.push({ date: d, times: slots, isSaturday: dow === 6 });
     }
     return out;
+  }
+  // Backward-compat: previous flat-list API.
+  function generateSlots(daysAhead, times) {
+    return generateBookingDays(daysAhead).reduce(function (acc, d) {
+      return acc.concat(d.times);
+    }, []);
   }
   function fmtSlotDay(d) { return d.toLocaleDateString('en-GB', { weekday: 'short' }); }
   function fmtSlotDate(d) { return d.toLocaleDateString('en-GB', { day: '2-digit', month: 'short' }); }
@@ -296,6 +313,53 @@
     return 'https://calendar.google.com/calendar/render?' + params.toString();
   }
 
+  /* ── Celebration animation ───────────────────────────────── */
+  // Show a celebratory banner + confetti burst. Loads canvas-confetti
+  // from CDN on first use so we don't pay the cost up-front.
+  function celebrate(opts) {
+    opts = opts || {};
+    var title = opts.title || 'Amazing — you did it! 🎉';
+    var subtitle = opts.subtitle || 'Test completed.';
+
+    // Banner
+    var banner = document.createElement('div');
+    banner.className = 'tn-celebrate';
+    banner.innerHTML =
+      '<span class="tn-celebrate-ic">🎉</span>' +
+      '<div class="tn-celebrate-msg">' +
+        '<div class="tn-celebrate-title">' + esc(title) + '</div>' +
+        '<div class="tn-celebrate-sub">' + esc(subtitle) + '</div>' +
+      '</div>';
+    document.body.appendChild(banner);
+    setTimeout(function () { banner.classList.add('show'); }, 30);
+    setTimeout(function () {
+      banner.classList.remove('show');
+      setTimeout(function () { banner.remove(); }, 400);
+    }, 3200);
+
+    function runConfetti() {
+      if (!window.confetti) return;
+      var end = Date.now() + 1400;
+      (function frame() {
+        window.confetti({ particleCount: 6, angle: 60,  spread: 60, startVelocity: 50, origin: { x: 0, y: 0.85 } });
+        window.confetti({ particleCount: 6, angle: 120, spread: 60, startVelocity: 50, origin: { x: 1, y: 0.85 } });
+        if (Date.now() < end) requestAnimationFrame(frame);
+      })();
+      // Final centre burst
+      window.confetti({ particleCount: 80, spread: 70, origin: { y: 0.55 } });
+    }
+
+    if (window.confetti) {
+      runConfetti();
+    } else {
+      var s = document.createElement('script');
+      s.src = 'https://cdn.jsdelivr.net/npm/canvas-confetti@1.9.3/dist/confetti.browser.min.js';
+      s.async = true;
+      s.onload = runConfetti;
+      document.head.appendChild(s);
+    }
+  }
+
   /* ── Public API ──────────────────────────────────────────── */
   window.TN = {
     ROLES: ROLES,
@@ -304,6 +368,7 @@
     $:$, esc: esc,
     showScreen: showScreen,
     toast: toast,
+    celebrate: celebrate,
     renderInfoForm: renderInfoForm,
     uploadResume: uploadResume,
     submitTest: submitTest,
@@ -313,6 +378,7 @@
     nextPending: nextPending,
     resetRole: resetRole,
     generateSlots: generateSlots,
+    generateBookingDays: generateBookingDays,
     fmtSlotDay: fmtSlotDay,
     fmtSlotDate: fmtSlotDate,
     fmtSlotTime: fmtSlotTime,

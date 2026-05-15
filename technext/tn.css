@@ -160,6 +160,30 @@ body{font-family:var(--font);background:var(--bg);color:var(--text);min-height:1
 .tn-slot-date{font-size:15px;font-weight:800;color:var(--navy);margin:3px 0 1px}
 .tn-slot-time{font-size:13px;color:var(--text);font-weight:600}
 
+/* ── CELEBRATION BANNER ──────────────────────────────────── */
+.tn-celebrate{
+  position:fixed;top:80px;left:50%;
+  transform:translate(-50%,-12px) scale(.96);
+  background:linear-gradient(135deg,#19c2a6 0%,#0f3a52 100%);
+  color:#fff;padding:14px 22px;border-radius:99px;
+  display:flex;align-items:center;gap:14px;
+  box-shadow:0 12px 40px rgba(15,58,82,.32);
+  font-family:var(--font);z-index:300;
+  opacity:0;pointer-events:none;
+  transition:opacity .35s ease, transform .45s cubic-bezier(.34,1.56,.64,1);
+  max-width:92%;
+}
+.tn-celebrate.show{opacity:1;transform:translate(-50%,0) scale(1)}
+.tn-celebrate-ic{font-size:34px;line-height:1;display:inline-block;animation:tnPop .6s ease}
+@keyframes tnPop{0%{transform:scale(.3) rotate(-15deg)}60%{transform:scale(1.15) rotate(8deg)}100%{transform:scale(1) rotate(0)}}
+.tn-celebrate-title{font-size:15px;font-weight:800;line-height:1.2}
+.tn-celebrate-sub{font-size:12px;opacity:.85;margin-top:2px}
+@media(max-width:640px){
+  .tn-celebrate{top:72px;padding:12px 18px}
+  .tn-celebrate-ic{font-size:28px}
+  .tn-celebrate-title{font-size:14px}
+}
+
 /* ── TOAST ───────────────────────────────────────────────── */
 .tn-toast{
   position:fixed;bottom:20px;left:50%;transform:translate(-50%,8px);

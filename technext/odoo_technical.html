@@ -214,21 +214,30 @@
     QUESTIONS.forEach(function (q, i) { if (answers[i] === q.ans) correct++; });
     var pct = Math.round((correct / QUESTIONS.length) * 100);
     var level = LEVELS.find(function (l) { return pct >= l.min; });
+    var passed = pct >= 75;
+    var heroHtml = passed
+      ? ('<div class="tn-result-hero"><div class="icon">🧰</div><h2>Odoo Developer — Technical</h2>' +
+           '<div class="tn-result-pct">' + pct + '%</div><div class="tn-result-label">' + level.label + '</div>' +
+           '<div class="tn-result-sub">' + correct + ' / ' + QUESTIONS.length + ' correct</div></div>')
+      : ('<div class="tn-result-hero"><div class="icon">✓</div><h2>Thanks for completing the Odoo Developer — Technical</h2>' +
+           '<div class="tn-result-sub" style="margin-top:10px">Your submission has been received.</div></div>');
+    var detailHtml = passed
+      ? ('<div class="tn-stats-grid">' +
+           '<div class="tn-stat"><div class="tn-stat-val">' + correct + '</div><div class="tn-stat-lbl">Correct</div></div>' +
+           '<div class="tn-stat"><div class="tn-stat-val">' + (QUESTIONS.length - correct) + '</div><div class="tn-stat-lbl">Incorrect</div></div>' +
+           '<div class="tn-stat"><div class="tn-stat-val">' + (Math.floor(timeTaken/60)) + 'm ' + (timeTaken%60) + 's</div><div class="tn-stat-lbl">Time</div></div>' +
+         '</div>' +
+         '<div class="tn-q-card"><div class="tn-q-num">Result interpretation</div><div style="font-size:14px;color:#374151;line-height:1.6">' + level.desc + '</div></div>')
+      : ('<div class="tn-q-card" style="border-left:4px solid #19c2a6;background:#f0fdfa">' +
+           '<div style="font-size:14.5px;color:#0a4a3e;line-height:1.65"><strong>What happens next:</strong> the TechNext team will review your full application and be in touch via email or handphone with next steps. Detailed scoring is not shared back to candidates.</div></div>');
     document.getElementById('results-body').innerHTML =
-      '<div class="tn-result-hero"><div class="icon">🧰</div><h2>Odoo Developer — Technical</h2>' +
-        '<div class="tn-result-pct">' + pct + '%</div><div class="tn-result-label">' + level.label + '</div>' +
-        '<div class="tn-result-sub">' + correct + ' / ' + QUESTIONS.length + ' correct</div></div>' +
-      '<div class="tn-stats-grid">' +
-        '<div class="tn-stat"><div class="tn-stat-val">' + correct + '</div><div class="tn-stat-lbl">Correct</div></div>' +
-        '<div class="tn-stat"><div class="tn-stat-val">' + (QUESTIONS.length - correct) + '</div><div class="tn-stat-lbl">Incorrect</div></div>' +
-        '<div class="tn-stat"><div class="tn-stat-val">' + (Math.floor(timeTaken/60)) + 'm ' + (timeTaken%60) + 's</div><div class="tn-stat-lbl">Time</div></div>' +
-      '</div>' +
-      '<div class="tn-q-card"><div class="tn-q-num">Result interpretation</div><div style="font-size:14px;color:#374151;line-height:1.6">' + level.desc + '</div></div>' +
+      heroHtml + detailHtml +
       '<div class="tn-q-card" id="ss" style="display:flex;align-items:center;gap:10px;font-size:14px"><span id="ss-icon">⏳</span><span id="ss-text">Saving your results…</span></div>' +
       '<div style="display:flex;gap:10px;flex-wrap:wrap">' +
         '<a class="tn-btn primary" href="/technext/' + TN.esc(ROLE) + '">← Back to role dashboard</a>' +
       '</div>';
     TN.showScreen('screen-results');
+    if (TN.celebrate) TN.celebrate({ title: 'Amazing — Odoo Developer — Technical complete! 🎉', subtitle: 'Submission received.' });
     if (ROLE) TN.markDone(ROLE, 'odoo-technical');
     TN.submitTest({
       test_type: 'tn_odoo_technical',

@@ -194,6 +194,7 @@ tr:hover td{background:#fafafa}
       <span class="filter-label">Test:</span>
       <select id="filter-type" onchange="applyFilters()">
         <option value="all">All tests</option>
+        <option value="tn_company_quiz">About TechNext (quiz)</option>
         <option value="tn_profiler">TechNext Profiler</option>
         <option value="tn_iq">Reasoning Test</option>
         <option value="tn_ai_technical">AI Engineer — Technical</option>
@@ -229,8 +230,9 @@ tr:hover td{background:#fafafa}
 <div class="toast" id="toast"></div>
 
 <script>
-const TN_TYPES = ['tn_profiler','tn_iq','tn_ai_technical','tn_fc_technical','tn_odoo_technical','tn_cyber_technical','tn_booking'];
+const TN_TYPES = ['tn_company_quiz','tn_profiler','tn_iq','tn_ai_technical','tn_fc_technical','tn_odoo_technical','tn_cyber_technical','tn_booking'];
 const TYPE_LABEL = {
+  tn_company_quiz:'About TechNext (quiz)',
   tn_profiler:'TechNext Profiler',
   tn_iq:'Reasoning Test',
   tn_ai_technical:'AI Engineer — Technical',
@@ -240,6 +242,7 @@ const TYPE_LABEL = {
   tn_booking:'Interview Booking'
 };
 const TYPE_COLOR = {
+  tn_company_quiz:'#155670',
   tn_profiler:'#0f3a52',
   tn_iq:'#2563eb',
   tn_ai_technical:'#7c3aed',

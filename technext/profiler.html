@@ -356,6 +356,7 @@
 
     document.getElementById('results-body').innerHTML = html;
     TN.showScreen('screen-results');
+    if (TN.celebrate) TN.celebrate({ title: 'Amazing — profile complete! 🎉', subtitle: 'You\'re a ' + s.primary + s.secondary.toLowerCase() + ' · ' + s.type });
     if (ROLE) TN.markDone(ROLE, 'profiler');
 
     TN.submitTest({
