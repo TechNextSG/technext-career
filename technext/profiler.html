@@ -3,46 +3,43 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>TechNext Profiler — Cultural Fit</title>
+<title>TechNext Profiler — Personality Assessment</title>
 <link rel="stylesheet" href="/technext/tn.css">
 </head>
 <body>
 
 <header class="tn-header">
   <div class="tn-logo">T</div>
-  <div class="tn-brand"><h1>TechNext Profiler</h1><p>Cultural Fit · PROC Framework</p></div>
+  <div class="tn-brand"><h1>TechNext Profiler</h1><p>Personality Profile · DISC + Type</p></div>
   <span class="tn-pill">Test 1 of 3</span>
 </header>
 
-<!-- LANDING -->
 <div id="screen-landing" class="tn-screen active">
   <div class="tn-wrap">
     <div class="tn-card">
       <div style="text-align:center;font-size:48px;margin-bottom:10px">🧩</div>
       <h2 style="text-align:center">TechNext Profiler</h2>
-      <p class="sub" style="text-align:center">A short cultural-fit assessment. We're checking alignment with how TechNext works: <strong>Practical-first</strong>, <strong>Responsibility</strong>, <strong>Outcomes over outputs</strong>, <strong>Curiosity</strong>.</p>
+      <p class="sub" style="text-align:center">A personality profile inspired by the DISC and Type frameworks. Two parts:
+        <strong>16 work-style</strong> questions (your DISC profile) and <strong>16 preference</strong> questions
+        (your 4-letter Type). There are no right or wrong answers — pick the choice that's most like you most of the time.</p>
       <div class="tn-stats-grid" style="margin:18px 0 20px">
-        <div class="tn-stat"><div class="tn-stat-val">24</div><div class="tn-stat-lbl">Questions</div></div>
+        <div class="tn-stat"><div class="tn-stat-val">32</div><div class="tn-stat-lbl">Questions</div></div>
         <div class="tn-stat"><div class="tn-stat-val">~12 min</div><div class="tn-stat-lbl">Time</div></div>
-        <div class="tn-stat"><div class="tn-stat-val">PROC</div><div class="tn-stat-lbl">4 pillars</div></div>
+        <div class="tn-stat"><div class="tn-stat-val">DISC + 4-letter Type</div><div class="tn-stat-lbl">Frameworks</div></div>
       </div>
-      <p class="sub" style="font-size:12.5px"><strong>Be honest.</strong> There are no trick questions — authentic responses fit better with the right team than impressive-sounding ones.</p>
+      <p class="sub" style="font-size:12.5px"><strong>Honest answers fit better.</strong> The profile tells us how you naturally work — every type is welcome at TechNext.</p>
       <button class="tn-btn primary block lg" id="btn-begin">Begin →</button>
     </div>
   </div>
 </div>
 
-<!-- INFO -->
-<div id="screen-info" class="tn-screen">
-  <div class="tn-wrap" id="info-mount"></div>
-</div>
+<div id="screen-info" class="tn-screen"><div class="tn-wrap" id="info-mount"></div></div>
 
-<!-- QUIZ -->
 <div id="screen-quiz" class="tn-screen">
   <div class="tn-quiz-header">
     <div class="tn-quiz-progress">
-      <div class="tn-quiz-progress-lbl" id="qlbl">Question 1 of 24</div>
-      <div class="tn-quiz-progress-bar"><div class="tn-quiz-progress-fill" id="qfill" style="width:4%"></div></div>
+      <div class="tn-quiz-progress-lbl" id="qlbl">Question 1 of 32</div>
+      <div class="tn-quiz-progress-bar"><div class="tn-quiz-progress-fill" id="qfill" style="width:3%"></div></div>
     </div>
     <div class="tn-timer" id="timer">12:00</div>
   </div>
@@ -56,206 +53,233 @@
   </div>
 </div>
 
-<!-- RESULTS -->
-<div id="screen-results" class="tn-screen">
-  <div class="tn-quiz-body" id="results-body"></div>
-</div>
+<div id="screen-results" class="tn-screen"><div class="tn-quiz-body" id="results-body"></div></div>
 
 <footer class="tn-footer">© TechNext · Profiler results are confidential.</footer>
 
 <script src="/technext/tn.js"></script>
 <script>
 (function () {
-  /* TechNext PROC profiler.
-   * P = Practical-first   R = Responsibility   O = Outcomes-over-outputs   C = Curiosity
-   * Likert items use 1..5 (Strongly disagree → Strongly agree).
-   * `reverse: true` flips the score (5 → 1) before adding to the pillar.
-   * `scenario` items are forced-choice; `weight` per option indicates alignment 0..4. */
-  var LIKERT = [
-    { p: 'P', text: "I'd rather ship a working 1-week version of something than spend three months perfecting a plan." },
-    { p: 'P', text: "Polished documents are more important than working systems when starting a new project.", reverse: true },
-    { p: 'P', text: "I tend to learn what I need by trying, breaking, and adjusting — not by exhausting documentation first." },
-    { p: 'P', text: "A 70%-complete solution shipped today often beats a perfect solution shipped in six months." },
-
-    { p: 'R', text: "If a project I lead is at risk, I'd rather act first and explain later than wait for permission." },
-    { p: 'R', text: "I prefer to hand work off as soon as my piece is done, rather than stay involved end-to-end.", reverse: true },
-    { p: 'R', text: "I'm comfortable speaking directly to customers about my work, even technical work." },
-    { p: 'R', text: "If something is broken and nobody owns it, I'm willing to pick it up." },
-
-    { p: 'O', text: "I judge my work primarily by the real customer/business outcome it produced, not by how much I shipped." },
-    { p: 'O', text: "Hours worked and lines of code written are reasonable proxies for impact.", reverse: true },
-    { p: 'O', text: "If a feature isn't moving a real metric, I'd rather kill it than keep polishing it." },
-    { p: 'O', text: "I push back when stakeholders ask for features that won't produce a measurable result." },
-
-    { p: 'C', text: "I spend time most weeks learning a new tool, technique, or framework." },
-    { p: 'C', text: "I prefer to stick with the technologies I already know well rather than try newer ones.", reverse: true },
-    { p: 'C', text: "I use AI tools daily as a productivity multiplier (research, coding, drafting, analysis)." },
-    { p: 'C', text: "When a teammate solves something cleverly, I want to understand exactly how — not just copy it." }
+  // ── DISC items: each option contributes +1 to one dimension (D/I/S/C) ──
+  // Original wording inspired by the public DISC framework (Marston).
+  var DISC = [
+    { text: "At work, you're best described as:", opts: [
+      { dim:'D', text:"Direct and to-the-point. I drive decisions and outcomes." },
+      { dim:'I', text:"Outgoing and enthusiastic. I energise the people around me." },
+      { dim:'S', text:"Patient and team-oriented. I keep the group calm and aligned." },
+      { dim:'C', text:"Analytical and precise. I focus on getting the details right." } ] },
+    { text: "Facing a brand-new project, your instinct is to:", opts: [
+      { dim:'D', text:"Take charge and set the direction quickly." },
+      { dim:'I', text:"Rally everyone around a vision and build excitement." },
+      { dim:'S', text:"Make sure the team feels prepared and ready before starting." },
+      { dim:'C', text:"Map out the plan, risks, and dependencies carefully." } ] },
+    { text: "Under heavy pressure, colleagues would say you:", opts: [
+      { dim:'D', text:"Push harder and demand faster decisions." },
+      { dim:'I', text:"Stay upbeat and keep morale up." },
+      { dim:'S', text:"Stay steady and quietly keep things moving." },
+      { dim:'C', text:"Re-check the data and pick the safest path forward." } ] },
+    { text: "In a disagreement you usually:", opts: [
+      { dim:'D', text:"State your position bluntly and defend it." },
+      { dim:'I', text:"Use stories and warmth to win people over." },
+      { dim:'S', text:"Find common ground and keep the peace." },
+      { dim:'C', text:"Walk through the evidence and logic step by step." } ] },
+    { text: "If a colleague misses an important deadline, you'd most likely:", opts: [
+      { dim:'D', text:"Call it out directly and demand a fix." },
+      { dim:'I', text:"Have a friendly conversation to understand what happened." },
+      { dim:'S', text:"Quietly help them catch up." },
+      { dim:'C', text:"Review the process so it doesn't recur." } ] },
+    { text: "An ideal working day for you involves:", opts: [
+      { dim:'D', text:"Big decisions, fast pace, visible results." },
+      { dim:'I', text:"People, conversations, momentum." },
+      { dim:'S', text:"Steady, predictable, collaborative work." },
+      { dim:'C', text:"Deep focus on technical detail with minimal interruptions." } ] },
+    { text: "When the team is split on a decision, you tend to:", opts: [
+      { dim:'D', text:"Push for a call and move on." },
+      { dim:'I', text:"Reframe positively and re-energise the room." },
+      { dim:'S', text:"Listen to everyone and try to bring people back together." },
+      { dim:'C', text:"Slow things down and look at the data more carefully." } ] },
+    { text: "People who don't know you well might describe you as:", opts: [
+      { dim:'D', text:"Forceful or impatient." },
+      { dim:'I', text:"Talkative or over-optimistic." },
+      { dim:'S', text:"Quiet or non-confrontational." },
+      { dim:'C', text:"Reserved or hard to read." } ] },
+    { text: "You're most energised when you're:", opts: [
+      { dim:'D', text:"Winning, achieving, leading." },
+      { dim:'I', text:"Influencing, presenting, connecting." },
+      { dim:'S', text:"Helping, supporting, mentoring." },
+      { dim:'C', text:"Solving, analysing, perfecting." } ] },
+    { text: "In meetings you usually:", opts: [
+      { dim:'D', text:"Drive the agenda and keep things sharp." },
+      { dim:'I', text:"Liven up the room and lead the discussion." },
+      { dim:'S', text:"Listen carefully and add when it matters." },
+      { dim:'C', text:"Take notes and clarify the details." } ] },
+    { text: "Your most likely weakness at work is:", opts: [
+      { dim:'D', text:"Impatience with slower colleagues." },
+      { dim:'I', text:"Talking more than delivering." },
+      { dim:'S', text:"Avoiding necessary conflict." },
+      { dim:'C', text:"Over-thinking and over-checking." } ] },
+    { text: "When solving a problem you prefer to:", opts: [
+      { dim:'D', text:"Decide fast and adjust as you go." },
+      { dim:'I', text:"Brainstorm with others." },
+      { dim:'S', text:"Stick with what you know works." },
+      { dim:'C', text:"Research thoroughly before deciding." } ] },
+    { text: "The praise that means most to you is being told you're:", opts: [
+      { dim:'D', text:"Decisive and effective." },
+      { dim:'I', text:"Inspiring and well-liked." },
+      { dim:'S', text:"Reliable and easy to work with." },
+      { dim:'C', text:"Thorough and accurate." } ] },
+    { text: "The colleague that frustrates you most is one who:", opts: [
+      { dim:'D', text:"Hesitates and won't commit to a decision." },
+      { dim:'I', text:"Is cold or overly serious." },
+      { dim:'S', text:"Pushes too hard or rushes." },
+      { dim:'C', text:"Is sloppy and skips details." } ] },
+    { text: "Faced with real ambiguity your typical reaction is:", opts: [
+      { dim:'D', text:"Pick a direction and move." },
+      { dim:'I', text:"Talk it through with people." },
+      { dim:'S', text:"Wait until things settle." },
+      { dim:'C', text:"Map out the unknowns and assumptions first." } ] },
+    { text: "When delegating you usually:", opts: [
+      { dim:'D', text:"Give the goal and let people figure out the rest." },
+      { dim:'I', text:"Sell the importance and let them run with energy." },
+      { dim:'S', text:"Walk through it together and stay available." },
+      { dim:'C', text:"Document precise steps and checkpoints." } ] }
   ];
 
-  // Scenario forced-choice items. Each option's `w` is its alignment score (0..4) with the pillar.
-  var SCENARIOS = [
-    {
-      p: 'P',
-      text: "You've been asked to deliver a complex feature. There's a clear quick-and-rough path that ships in 5 days, and a 'proper' path that needs 6–8 weeks. Both could work. Your instinct is:",
-      options: [
-        { w: 4, text: "Ship the 5-day version, gather real feedback, iterate from there." },
-        { w: 3, text: "Ship a quick version now, plan a proper rewrite for next quarter." },
-        { w: 1, text: "Spend a week scoping the 'proper' approach properly before deciding." },
-        { w: 0, text: "Push back — you can't ship something not-quite-right; demand the 6 weeks." }
-      ]
-    },
-    {
-      p: 'R',
-      text: "A customer is unhappy with a deliverable. The PM is on leave. You:",
-      options: [
-        { w: 4, text: "Reach out to the customer directly to understand the issue and propose a fix." },
-        { w: 3, text: "Loop in the PM's backup, but join the call yourself to help." },
-        { w: 1, text: "Wait until the PM returns — they own customer comms." },
-        { w: 0, text: "Send a written response avoiding accountability until the PM is back." }
-      ]
-    },
-    {
-      p: 'O',
-      text: "A senior stakeholder asks for a dashboard with 28 KPIs. You suspect 5 actually drive decisions. What do you do?",
-      options: [
-        { w: 4, text: "Have the conversation, narrow it to the 5 that drive decisions, and build that." },
-        { w: 3, text: "Build a v1 with the 5 most important, propose to add more if asked." },
-        { w: 1, text: "Build all 28 — the stakeholder knows their business better than you." },
-        { w: 0, text: "Build all 28 and prioritise looking thorough over the dashboard being useful." }
-      ]
-    },
-    {
-      p: 'C',
-      text: "A new AI tool launches that could change how you do part of your job. You:",
-      options: [
-        { w: 4, text: "Try it the same week on a real task and form your own view." },
-        { w: 3, text: "Read a couple of solid reviews and try it within a fortnight." },
-        { w: 1, text: "Wait six months for it to settle, then evaluate." },
-        { w: 0, text: "Ignore it — current tools work fine." }
-      ]
-    },
-    {
-      p: 'R',
-      text: "An automated process is failing nightly. It's outside your team's scope, but it's blocking a customer. You:",
-      options: [
-        { w: 4, text: "Investigate, fix it (or patch it), and post a note to the owning team." },
-        { w: 3, text: "Page the owning team and stay online to help if needed." },
-        { w: 1, text: "Email the owning team during business hours tomorrow." },
-        { w: 0, text: "Ignore it — it isn't your job." }
-      ]
-    },
-    {
-      p: 'P',
-      text: "Your manager asks for an estimate on a vague request. You:",
-      options: [
-        { w: 4, text: "Ship a tiny prototype in 1–2 days and use that to estimate properly." },
-        { w: 3, text: "Give a rough range with assumptions, refine after a short spike." },
-        { w: 1, text: "Decline to estimate until the request is fully specified in writing." },
-        { w: 0, text: "Give a single-number estimate to look decisive, even if you're guessing." }
-      ]
-    },
-    {
-      p: 'O',
-      text: "Six months into a project, you realise the original success metric was the wrong one. You:",
-      options: [
-        { w: 4, text: "Raise it explicitly, propose a better metric, and replan around it." },
-        { w: 3, text: "Add a secondary metric while keeping the original to avoid drama." },
-        { w: 1, text: "Keep going with the original — changing now would look bad." },
-        { w: 0, text: "Quietly stop measuring it and hope nobody notices." }
-      ]
-    },
-    {
-      p: 'C',
-      text: "You finish a project successfully. Your honest next move is:",
-      options: [
-        { w: 4, text: "Write a short post-mortem covering what you learned that you didn't know before." },
-        { w: 3, text: "Share a quick win with the team, mention one or two learnings." },
-        { w: 1, text: "Move on to the next project — finished is finished." },
-        { w: 0, text: "Document only what's needed for handover and forget the rest." }
-      ]
-    }
+  // ── 4-letter Type items (E/I, S/N, T/F, J/P) — 4 items per dichotomy ──
+  // Original wording inspired by the public Type / Jungian preferences framework.
+  var TYPE = [
+    // E vs I
+    { axis:'EI', text:"After a busy workday, what restores you is:", opts:[
+      { letter:'E', text:"Going out with friends or being around people." },
+      { letter:'I', text:"Quiet time alone or with one or two close people." } ] },
+    { axis:'EI', text:"In a long meeting you tend to:", opts:[
+      { letter:'E', text:"Speak often and think out loud." },
+      { letter:'I', text:"Listen first, then contribute carefully when you have something to say." } ] },
+    { axis:'EI', text:"To work through a hard problem you'd rather:", opts:[
+      { letter:'E', text:"Talk it through with someone." },
+      { letter:'I', text:"Sit alone and think it through." } ] },
+    { axis:'EI', text:"After a 3-day work retreat with the team, you usually feel:", opts:[
+      { letter:'E', text:"Energised — you could do another week." },
+      { letter:'I', text:"Drained — you need a quiet day to recharge." } ] },
+
+    // S vs N
+    { axis:'SN', text:"When you read something new you focus more on:", opts:[
+      { letter:'S', text:"Concrete facts, examples, and what's actually said." },
+      { letter:'N', text:"Underlying themes and what they imply." } ] },
+    { axis:'SN', text:"Looking at a problem, you trust more:", opts:[
+      { letter:'S', text:"Direct observation and proven practice." },
+      { letter:'N', text:"Pattern-recognition and intuitive leaps." } ] },
+    { axis:'SN', text:"Learning a new tool you'd rather:", opts:[
+      { letter:'S', text:"Follow a step-by-step tutorial first." },
+      { letter:'N', text:"Skim the overview, then explore by experimenting." } ] },
+    { axis:'SN', text:"People who know you well say you:", opts:[
+      { letter:'S', text:"Notice details others miss." },
+      { letter:'N', text:"Connect dots others don't see." } ] },
+
+    // T vs F
+    { axis:'TF', text:"Deciding between two reasonable options, you weight more:", opts:[
+      { letter:'T', text:"Logic, consistency, fairness." },
+      { letter:'F', text:"Impact on the people involved and team harmony." } ] },
+    { axis:'TF', text:"If a teammate is upset by a decision you've made you prefer to:", opts:[
+      { letter:'T', text:"Explain the reasoning clearly and stand by it." },
+      { letter:'F', text:"Sit with them, understand the feeling, and adjust if reasonable." } ] },
+    { axis:'TF', text:"In a tough negotiation you'd rather be:", opts:[
+      { letter:'T', text:"Right and clear." },
+      { letter:'F', text:"Fair and well-liked." } ] },
+    { axis:'TF', text:"Reviewing a colleague's draft, your first comment is more likely to be about:", opts:[
+      { letter:'T', text:"What's incorrect or weakly argued." },
+      { letter:'F', text:"What's strong and where they can grow." } ] },
+
+    // J vs P
+    { axis:'JP', text:"Planning a trip you tend to:", opts:[
+      { letter:'J', text:"Book everything in advance with a tidy itinerary." },
+      { letter:'P', text:"Book the flights and figure out the rest as you go." } ] },
+    { axis:'JP', text:"Your desk or workspace is usually:", opts:[
+      { letter:'J', text:"Tidy and organised." },
+      { letter:'P', text:"A working mess that you know your way around." } ] },
+    { axis:'JP', text:"Given a 6-week project you'd rather:", opts:[
+      { letter:'J', text:"Set milestones early and finish ahead of time." },
+      { letter:'P', text:"Keep things open, then push hard near the end." } ] },
+    { axis:'JP', text:"A free Saturday is better when:", opts:[
+      { letter:'J', text:"You have a plan." },
+      { letter:'P', text:"You keep it loose and see what happens." } ] }
   ];
+
+  // ── Description packs (original, brief) ──
+  var DISC_DESC = {
+    D: { title:'Dominance', short:'Driver', text:'You\'re wired for results — direct, decisive, comfortable taking charge. You move fast and prefer clear ownership. Watch for impatience with slower or more cautious colleagues.' },
+    I: { title:'Influence', short:'Influencer', text:'You\'re energised by people — outgoing, persuasive, optimistic. You inspire teams and bring momentum. Watch for over-promising or losing focus on detail.' },
+    S: { title:'Steadiness', short:'Stabiliser', text:'You\'re patient, supportive, and reliable. You keep teams calm under pressure and excel in steady collaboration. Watch for avoiding necessary conflict or change.' },
+    C: { title:'Conscientiousness', short:'Conscientious', text:'You\'re analytical, careful, and precise. You raise the bar on quality and accuracy. Watch for over-thinking or perfection-blocking shipping.' }
+  };
+
+  var TYPE_DESC = {
+    // Brief, original descriptors for the 16 types.
+    ISTJ:'The Inspector — practical, dependable, organised. Loves structure and follow-through.',
+    ISFJ:'The Protector — quietly supportive, loyal, attentive to people\'s needs.',
+    INFJ:'The Counsellor — insightful, principled, values-driven.',
+    INTJ:'The Strategist — independent, big-picture, drives long-term plans.',
+    ISTP:'The Craftsperson — hands-on, calm, problem-solver in the moment.',
+    ISFP:'The Composer — gentle, observant, brings quiet creativity.',
+    INFP:'The Idealist — thoughtful, values-led, looks for meaning.',
+    INTP:'The Architect — curious, analytical, loves first-principles thinking.',
+    ESTP:'The Doer — energetic, pragmatic, thrives on action and feedback.',
+    ESFP:'The Performer — playful, present, brings energy and connection.',
+    ENFP:'The Champion — enthusiastic, future-focused, inspires people.',
+    ENTP:'The Visionary — inventive, debating, generator of new ideas.',
+    ESTJ:'The Supervisor — organised, decisive, runs things efficiently.',
+    ESFJ:'The Provider — warm, organised, builds team harmony.',
+    ENFJ:'The Teacher — charismatic, growth-focused, develops others.',
+    ENTJ:'The Commander — strategic, decisive, leads from the front.'
+  };
 
   var ROLE = (new URLSearchParams(window.location.search).get('role')) || localStorage.getItem(TN.STORAGE.role) || '';
   if (ROLE) localStorage.setItem(TN.STORAGE.role, ROLE);
 
+  // Compose item list
   var ITEMS = [];
-  LIKERT.forEach(function (q, i) { ITEMS.push({ kind: 'likert', p: q.p, text: q.text, reverse: !!q.reverse, id: 'L' + (i+1) }); });
-  SCENARIOS.forEach(function (q, i) { ITEMS.push({ kind: 'scenario', p: q.p, text: q.text, options: q.options, id: 'S' + (i+1) }); });
-  // ITEMS length = 16 + 8 = 24
+  DISC.forEach(function (q, i) { ITEMS.push({ kind:'disc', text:q.text, opts:q.opts, id:'D'+(i+1) }); });
+  TYPE.forEach(function (q, i) { ITEMS.push({ kind:'type', axis:q.axis, text:q.text, opts:q.opts, id:'T'+(i+1) }); });
+  // 16 + 16 = 32
 
-  var current = 0;
-  var answers = {}; // id -> 1..5 (likert) | option index (scenario)
-  var startTime, endTime, timerInt, elapsed = 0;
-  var TIME_LIMIT = 12 * 60; // 12 min advisory
-  var timeOver = false;
+  var current = 0, answers = {}, startTime, endTime, timerInt, elapsed = 0;
+  var TIME_LIMIT = 12 * 60, timeOver = false;
 
   document.getElementById('btn-begin').onclick = function () {
-    // If candidate info already on file, skip directly to quiz.
-    var hasEmail = !!localStorage.getItem(TN.STORAGE.email);
-    var hasPhone = !!localStorage.getItem(TN.STORAGE.phone);
-    if (hasEmail && hasPhone) startQuiz();
-    else showInfo();
+    if (localStorage.getItem(TN.STORAGE.email) && localStorage.getItem(TN.STORAGE.phone)) startQuiz();
+    else { TN.renderInfoForm(document.getElementById('info-mount'), { role: ROLE, onSuccess: startQuiz }); TN.showScreen('screen-info'); }
   };
 
-  function showInfo() {
-    TN.renderInfoForm(document.getElementById('info-mount'), {
-      role: ROLE,
-      onSuccess: function () { startQuiz(); }
-    });
-    TN.showScreen('screen-info');
-  }
-
   function startQuiz() {
-    current = 0;
-    startTime = new Date();
-    TN.showScreen('screen-quiz');
-    render();
+    current = 0; answers = {}; startTime = new Date();
+    TN.showScreen('screen-quiz'); render();
     timerInt = setInterval(tick, 1000);
   }
-
   function tick() {
     elapsed++;
-    var rem = TIME_LIMIT - elapsed;
-    var el = document.getElementById('timer');
-    var abs = Math.abs(rem), m = Math.floor(abs/60), s = abs%60;
-    el.textContent = rem >= 0 ? (String(m).padStart(2,'0') + ':' + String(s).padStart(2,'0')) : 'Over';
+    var rem = TIME_LIMIT - elapsed, el = document.getElementById('timer'), abs = Math.abs(rem);
+    el.textContent = rem >= 0 ? (String(Math.floor(abs/60)).padStart(2,'0') + ':' + String(abs%60).padStart(2,'0')) : 'Over';
     el.className = 'tn-timer' + (rem <= 0 ? ' red' : rem <= 120 ? ' red' : rem <= 240 ? ' amber' : '');
     if (rem <= 0) timeOver = true;
   }
 
   function render() {
     var q = ITEMS[current];
-    document.getElementById('qlbl').textContent = 'Question ' + (current+1) + ' of ' + ITEMS.length;
+    document.getElementById('qlbl').textContent = 'Question ' + (current+1) + ' of ' + ITEMS.length + (q.kind === 'disc' ? ' — Work style' : ' — Preference');
     document.getElementById('qfill').style.width = (((current+1)/ITEMS.length)*100) + '%';
     document.getElementById('btn-prev').style.visibility = current > 0 ? 'visible' : 'hidden';
     document.getElementById('btn-next').textContent = current === ITEMS.length - 1 ? 'Submit →' : 'Next →';
     document.getElementById('warn').classList.remove('show');
 
-    var html = '<div class="tn-q-card"><div class="tn-q-num">Question ' + (current+1) + ' / ' + ITEMS.length + ' · Pillar ' + q.p + '</div>' +
-      '<div class="tn-q-text">' + TN.esc(q.text) + '</div>';
-
-    if (q.kind === 'likert') {
-      var labels = ['Strongly disagree','Disagree','Neutral','Agree','Strongly agree'];
-      html += '<div class="tn-options">';
-      for (var i = 1; i <= 5; i++) {
-        var sel = answers[q.id] === i ? ' selected' : '';
-        html += '<div class="tn-opt' + sel + '" data-v="' + i + '"><div class="tn-opt-label">' + i + '</div><div class="tn-opt-text">' + labels[i-1] + '</div></div>';
-      }
-      html += '</div>';
-    } else {
-      var letters = ['A','B','C','D'];
-      html += '<div class="tn-options">';
-      q.options.forEach(function (o, idx) {
-        var sel = answers[q.id] === idx ? ' selected' : '';
-        html += '<div class="tn-opt' + sel + '" data-v="' + idx + '"><div class="tn-opt-label">' + letters[idx] + '</div><div class="tn-opt-text">' + TN.esc(o.text) + '</div></div>';
-      });
-      html += '</div>';
-    }
-    html += '</div>';
+    var html = '<div class="tn-q-card"><div class="tn-q-num">Question ' + (current+1) + ' / ' + ITEMS.length + ' · ' + (q.kind === 'disc' ? 'Work style' : 'Preference') + '</div>' +
+      '<div class="tn-q-text">' + TN.esc(q.text) + '</div><div class="tn-options">';
+    var letters = ['A','B','C','D'];
+    q.opts.forEach(function (o, i) {
+      var sel = answers[q.id] === i ? ' selected' : '';
+      html += '<div class="tn-opt' + sel + '" data-v="' + i + '"><div class="tn-opt-label">' + letters[i] + '</div><div class="tn-opt-text">' + TN.esc(o.text) + '</div></div>';
+    });
+    html += '</div></div>';
     document.getElementById('qcard').innerHTML = html;
-
     document.querySelectorAll('.tn-opt').forEach(function (el) {
       el.addEventListener('click', function () {
         var v = parseInt(el.getAttribute('data-v'), 10);
@@ -266,44 +290,39 @@
     });
   }
 
-  document.getElementById('btn-prev').onclick = function () {
-    if (current > 0) { current--; render(); window.scrollTo(0,0); }
-  };
+  document.getElementById('btn-prev').onclick = function () { if (current > 0) { current--; render(); window.scrollTo(0,0); } };
   document.getElementById('btn-next').onclick = function () {
     var q = ITEMS[current];
-    if (answers[q.id] === undefined || answers[q.id] === null) {
-      document.getElementById('warn').classList.add('show');
-      return;
-    }
+    if (answers[q.id] === undefined) { document.getElementById('warn').classList.add('show'); return; }
     if (current < ITEMS.length - 1) { current++; render(); window.scrollTo(0,0); }
     else { finish(); }
   };
 
   function score() {
-    var sum = { P:0, R:0, O:0, C:0 }, max = { P:0, R:0, O:0, C:0 };
-    ITEMS.forEach(function (q) {
-      var v = answers[q.id];
-      if (q.kind === 'likert') {
-        var raw = q.reverse ? (6 - v) : v; // 1..5
-        sum[q.p] += (raw - 1);             // 0..4
-        max[q.p] += 4;
-      } else {
-        sum[q.p] += q.options[v].w; // 0..4
-        max[q.p] += 4;
-      }
+    var disc = { D:0, I:0, S:0, C:0 };
+    DISC.forEach(function (q, i) {
+      var v = answers['D'+(i+1)];
+      if (v != null) disc[q.opts[v].dim]++;
     });
-    var pct = { P: Math.round(sum.P/max.P*100), R: Math.round(sum.R/max.R*100), O: Math.round(sum.O/max.O*100), C: Math.round(sum.C/max.C*100) };
-    var raw = sum.P + sum.R + sum.O + sum.C;
-    var mx  = max.P + max.R + max.O + max.C;
-    var overall = Math.round(raw/mx*100);
-    return { pct: pct, overall: overall, raw: raw, mx: mx };
-  }
-
-  function level(pct) {
-    if (pct >= 80) return { label: 'Strong fit', desc: 'Strong alignment with how TechNext works — practical, ownership-driven, outcomes-focused, curious.' };
-    if (pct >= 65) return { label: 'Good fit',   desc: 'Good cultural alignment with minor gaps. Generally a positive signal.' };
-    if (pct >= 50) return { label: 'Mixed fit',  desc: 'Some pillars align, others may need development or open discussion in interview.' };
-    return            { label: 'Low fit',    desc: 'Limited alignment in current responses. Worth exploring in interview to understand fit.' };
+    var counts = { EI:{E:0,I:0}, SN:{S:0,N:0}, TF:{T:0,F:0}, JP:{J:0,P:0} };
+    TYPE.forEach(function (q, i) {
+      var v = answers['T'+(i+1)];
+      if (v != null) counts[q.axis][q.opts[v].letter]++;
+    });
+    var letters = (counts.EI.E >= counts.EI.I ? 'E' : 'I')
+                + (counts.SN.S >= counts.SN.N ? 'S' : 'N')
+                + (counts.TF.T >= counts.TF.F ? 'T' : 'F')
+                + (counts.JP.J >= counts.JP.P ? 'J' : 'P');
+    var total = disc.D + disc.I + disc.S + disc.C;
+    var pct = {
+      D: total ? Math.round(disc.D/total*100) : 0,
+      I: total ? Math.round(disc.I/total*100) : 0,
+      S: total ? Math.round(disc.S/total*100) : 0,
+      C: total ? Math.round(disc.C/total*100) : 0
+    };
+    // Primary DISC letter = highest count, secondary = next
+    var ordered = Object.keys(disc).sort(function (a, b) { return disc[b] - disc[a]; });
+    return { disc:disc, pct:pct, primary:ordered[0], secondary:ordered[1], type:letters, axisCounts:counts };
   }
 
   function finish() {
@@ -311,53 +330,48 @@
     endTime = new Date();
     var timeTaken = Math.round((endTime - startTime) / 1000);
     var s = score();
-    var lvl = level(s.overall);
+    var d = DISC_DESC[s.primary], d2 = DISC_DESC[s.secondary];
+    var t = TYPE_DESC[s.type] || '';
 
     var html =
-      '<div class="tn-result-hero">' +
-        '<div class="icon">🧩</div>' +
-        '<h2>TechNext Profiler</h2>' +
-        '<div class="tn-result-pct">' + s.overall + '%</div>' +
-        '<div class="tn-result-label">' + lvl.label + '</div>' +
-        '<div class="tn-result-sub">' + s.raw + ' / ' + s.mx + ' points</div>' +
+      '<div class="tn-result-hero"><div class="icon">🧩</div><h2>TechNext Profiler</h2>' +
+        '<div class="tn-result-pct" style="font-size:42px">' + s.primary + s.secondary.toLowerCase() + ' · ' + s.type + '</div>' +
+        '<div class="tn-result-label">' + d.short + (d2 ? ' / ' + d2.short : '') + ' · ' + s.type + '</div>' +
+        '<div class="tn-result-sub">Primary: ' + d.title + ' · Secondary: ' + d2.title + '</div>' +
       '</div>' +
-      '<div class="tn-stats-grid">' +
-        '<div class="tn-stat"><div class="tn-stat-val">' + s.pct.P + '%</div><div class="tn-stat-lbl">Practical-first</div></div>' +
-        '<div class="tn-stat"><div class="tn-stat-val">' + s.pct.R + '%</div><div class="tn-stat-lbl">Responsibility</div></div>' +
-        '<div class="tn-stat"><div class="tn-stat-val">' + s.pct.O + '%</div><div class="tn-stat-lbl">Outcomes</div></div>' +
+      '<div class="tn-stats-grid" style="grid-template-columns:repeat(4,1fr)">' +
+        '<div class="tn-stat"><div class="tn-stat-val">' + s.pct.D + '%</div><div class="tn-stat-lbl">D · Drive</div></div>' +
+        '<div class="tn-stat"><div class="tn-stat-val">' + s.pct.I + '%</div><div class="tn-stat-lbl">I · Influence</div></div>' +
+        '<div class="tn-stat"><div class="tn-stat-val">' + s.pct.S + '%</div><div class="tn-stat-lbl">S · Steady</div></div>' +
+        '<div class="tn-stat"><div class="tn-stat-val">' + s.pct.C + '%</div><div class="tn-stat-lbl">C · Careful</div></div>' +
       '</div>' +
-      '<div class="tn-stats-grid" style="grid-template-columns:1fr">' +
-        '<div class="tn-stat"><div class="tn-stat-val">' + s.pct.C + '%</div><div class="tn-stat-lbl">Curiosity</div></div>' +
-      '</div>' +
-      '<div class="tn-q-card"><div class="tn-q-num">What this means</div><div style="font-size:14px;color:#374151;line-height:1.6">' + lvl.desc + '</div></div>' +
-      '<div class="tn-q-card" id="submit-status" style="display:flex;align-items:center;gap:10px;font-size:14px"><span id="ss-icon">⏳</span><span id="ss-text">Saving your results…</span></div>' +
+      '<div class="tn-q-card"><div class="tn-q-num">Primary DISC: ' + d.title + '</div>' +
+        '<div style="font-size:14px;color:#374151;line-height:1.6">' + d.text + '</div></div>' +
+      '<div class="tn-q-card"><div class="tn-q-num">4-letter type: ' + s.type + '</div>' +
+        '<div style="font-size:14px;color:#374151;line-height:1.6">' + TN.esc(t) + '</div></div>' +
+      '<div class="tn-q-card" id="ss" style="display:flex;align-items:center;gap:10px;font-size:14px"><span id="ss-icon">⏳</span><span id="ss-text">Saving your results…</span></div>' +
       '<div style="display:flex;gap:10px;flex-wrap:wrap">' +
         (ROLE ? '<a class="tn-btn primary" href="/technext/' + TN.esc(ROLE) + '">Continue to next test →</a>' : '<a class="tn-btn primary" href="/technext/">← Back to portal</a>') +
-        '<button class="tn-btn outline" onclick="window.print()">🖨 Print / Save PDF</button>' +
       '</div>';
 
     document.getElementById('results-body').innerHTML = html;
     TN.showScreen('screen-results');
-
-    // Mark complete + submit
     if (ROLE) TN.markDone(ROLE, 'profiler');
 
     TN.submitTest({
       test_type: 'tn_profiler',
-      start_time: startTime.toISOString(),
-      end_time: endTime.toISOString(),
+      start_time: startTime.toISOString(), end_time: endTime.toISOString(),
       time_taken_seconds: timeTaken,
-      score_raw: s.raw,
-      score_max: s.mx,
-      score_pct: s.overall,
-      result_label: lvl.label,
-      section_scores: { Practical: s.pct.P, Responsibility: s.pct.R, Outcomes: s.pct.O, Curiosity: s.pct.C },
-      answers: answers,
-      flags: { time_over: timeOver }
+      score_raw: s.disc.D + s.disc.I + s.disc.S + s.disc.C,
+      score_max: 16,
+      score_pct: null,
+      result_label: d.short + ' / ' + s.type,
+      section_scores: { D: s.pct.D, I: s.pct.I, S: s.pct.S, C: s.pct.C, MBTI: s.type },
+      answers: answers, flags: { time_over: timeOver, primary: s.primary, secondary: s.secondary, type: s.type }
     }).then(function (out) {
       var icon = document.getElementById('ss-icon'), text = document.getElementById('ss-text');
       if (out.ok) { icon.textContent = '✅'; text.textContent = 'Results saved.'; }
-      else        { icon.textContent = '⚠️'; text.textContent = 'Could not save results: ' + (out.body && out.body.error ? out.body.error : 'server error'); }
+      else { icon.textContent = '⚠️'; text.textContent = 'Could not save results: ' + (out.body && out.body.error ? out.body.error : 'server error'); }
     }).catch(function () {
       document.getElementById('ss-icon').textContent = '⚠️';
       document.getElementById('ss-text').textContent = 'Could not reach server. Please screenshot this page.';

@@ -3,14 +3,14 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>IQ Assessment — TechNext</title>
+<title>Reasoning Test — TechNext</title>
 <link rel="stylesheet" href="/technext/tn.css">
 </head>
 <body>
 
 <header class="tn-header">
   <div class="tn-logo">T</div>
-  <div class="tn-brand"><h1>IQ Assessment</h1><p>Logical reasoning · 20 questions · 25 min</p></div>
+  <div class="tn-brand"><h1>Reasoning Test</h1><p>Numerical · Verbal · Logical · 25 questions · 35 min</p></div>
   <span class="tn-pill">Test 2 of 3</span>
 </header>
 
@@ -18,13 +18,14 @@
   <div class="tn-wrap">
     <div class="tn-card">
       <div style="text-align:center;font-size:48px;margin-bottom:10px">🧠</div>
-      <h2 style="text-align:center">IQ Assessment</h2>
-      <p class="sub" style="text-align:center">Mixed numerical, verbal, and logical reasoning. The timer is advisory — you may still submit after time is up.</p>
+      <h2 style="text-align:center">Reasoning Test</h2>
+      <p class="sub" style="text-align:center">A mixed reasoning screen covering number sequences, logical deduction, verbal analogies, word problems, and critical reasoning. Difficulty is graduate-level — read each question carefully.</p>
       <div class="tn-stats-grid" style="margin:18px 0 20px">
-        <div class="tn-stat"><div class="tn-stat-val">20</div><div class="tn-stat-lbl">Questions</div></div>
-        <div class="tn-stat"><div class="tn-stat-val">25 min</div><div class="tn-stat-lbl">Time limit</div></div>
-        <div class="tn-stat"><div class="tn-stat-val">MCQ</div><div class="tn-stat-lbl">Format</div></div>
+        <div class="tn-stat"><div class="tn-stat-val">25</div><div class="tn-stat-lbl">Questions</div></div>
+        <div class="tn-stat"><div class="tn-stat-val">35 min</div><div class="tn-stat-lbl">Time limit</div></div>
+        <div class="tn-stat"><div class="tn-stat-val">Hard</div><div class="tn-stat-lbl">Difficulty</div></div>
       </div>
+      <p class="sub" style="font-size:12.5px">Time limit is advisory — you may still submit after time is up.</p>
       <button class="tn-btn primary block lg" id="btn-begin">Begin →</button>
     </div>
   </div>
@@ -35,10 +36,10 @@
 <div id="screen-quiz" class="tn-screen">
   <div class="tn-quiz-header">
     <div class="tn-quiz-progress">
-      <div class="tn-quiz-progress-lbl" id="qlbl">Question 1 of 20</div>
-      <div class="tn-quiz-progress-bar"><div class="tn-quiz-progress-fill" id="qfill" style="width:5%"></div></div>
+      <div class="tn-quiz-progress-lbl" id="qlbl">Question 1 of 25</div>
+      <div class="tn-quiz-progress-bar"><div class="tn-quiz-progress-fill" id="qfill" style="width:4%"></div></div>
     </div>
-    <div class="tn-timer" id="timer">25:00</div>
+    <div class="tn-timer" id="timer">35:00</div>
   </div>
   <div class="tn-quiz-body">
     <div id="qcard"></div>
@@ -57,69 +58,100 @@
 <script src="/technext/tn.js"></script>
 <script>
 (function () {
+  // 25 original reasoning questions — graduate / aptitude level.
   var QUESTIONS = [
-    { ctx:'2, 4, 8, 16, ___', text:'What number comes next in the sequence?', opts:['24','32','28','18'], ans:1 },
-    { ctx:'1, 4, 9, 16, ___', text:'What number comes next in the sequence?', opts:['20','24','25','36'], ans:2 },
-    { text:'A man has 2 daughters. Each daughter has exactly 1 brother. How many children does the man have?', opts:['2','3','4','5'], ans:1 },
-    { text:'Which word is most opposite in meaning to EXPAND?', opts:['Grow','Contract','Inflate','Scatter'], ans:1 },
-    { text:'Hot is to Cold as Fast is to ___', opts:['Quick','Rapid','Slow','Speed'], ans:2 },
-    { text:'3 is to 12 as 5 is to ___', opts:['15','20','25','10'], ans:1 },
-    { text:'Which number is the odd one out?', opts:['17','23','35','41'], ans:2 },
-    { text:'A train travels at 60 km/h for 2.5 hours. How far does it travel?', opts:['120 km','150 km','180 km','200 km'], ans:1 },
-    { text:'All Wibbles are Wobbles. No Wobbles are Wubbles. Which statement must be true?', opts:['No Wibbles are Wubbles','Some Wibbles are Wubbles','All Wubbles are Wibbles','Some Wobbles are Wibbles'], ans:0 },
-    { ctx:'7, 14, 21, ___, 35', text:'What is the missing number?', opts:['24','28','25','30'], ans:1 },
-    { text:'Book is to Library as Painting is to ___', opts:['Artist','Canvas','Gallery','Brush'], ans:2 },
-    { text:'15% of 200 is equal to ___% of 50', opts:['30','45','60','75'], ans:2 },
-    { text:'Rearrange the letters "CIFAICP" to form the name of a(n):', opts:['Country','Ocean','City','Animal'], ans:1 },
-    { text:'A square field has an area of 144 m². What is its perimeter?', opts:['36 m','48 m','72 m','96 m'], ans:1 },
-    { text:'Which of the following is different from the rest?', opts:['1/2','0.50','50%','5/100'], ans:3 },
-    { ctx:'AB, BC, CD, ___', text:'What comes next in the pattern?', opts:['DE','EF','DF','CE'], ans:0 },
-    { text:'A shop sells 3 items at $25 each and 2 items at $15 each. What is the total cost?', opts:['$100','$105','$110','$115'], ans:1 },
-    { text:'If yesterday was Wednesday, what day will the day after tomorrow be?', opts:['Friday','Saturday','Sunday','Monday'], ans:1 },
-    { text:'A car uses 8 litres of fuel per 100 km. How many litres are needed for a 350 km journey?', opts:['24 L','26 L','28 L','32 L'], ans:2 },
-    { text:'All Blips are Bleeps. Some Bleeps are Bloops. Which statement is most accurate?', opts:['All Blips are Bloops','No Blips are Bloops','Some Blips may be Bloops','All Bleeps are Blips'], ans:2 }
+    // ─── Number sequences (5) ───
+    { ctx:'2, 6, 12, 20, 30, ___', text:'What is the next number?',
+      opts:['38','42','40','36'], ans:1 },
+    { ctx:'1, 4, 27, 256, ___', text:'What is the next number?',
+      opts:['1024','3125','625','2401'], ans:1 },
+    { ctx:'1, 11, 21, 1211, 111221, ___', text:'What is the next term?',
+      opts:['1112221','312211','11112211','21112221'], ans:1 },
+    { ctx:'13, 17, 22, 28, 35, ___', text:'What is the next number?',
+      opts:['41','43','44','45'], ans:2 },
+    { ctx:'4, 9, 16, 25, 36, ___', text:'What is the next number in this sequence of perfect squares plus three (which one breaks the pattern)?',
+      opts:['49','48','50','42'], ans:0 },
+
+    // ─── Logical deduction (5) ───
+    { text:'All managers are professionals. No professionals are amateurs. Some amateurs are athletes. Which statement MUST be true?',
+      opts:['No managers are athletes','Some managers are athletes','No managers are amateurs','Some athletes are professionals'], ans:2 },
+    { ctx:'Five friends — A, B, C, D, E — sit in a row of 5. A is immediately right of B. D is at one end. C is between A and D. E is on the other end. The order from left to right is:',
+      text:'Who is in the centre?',
+      opts:['A','B','C','D'], ans:0 },
+    { ctx:'On an island everyone is either a Truth-teller (always true) or a Liar (always false). You meet two locals, X and Y. X says "We are both Liars."',
+      text:'What can you infer?',
+      opts:['X is a Truth-teller and Y is a Liar','X is a Liar and Y is a Truth-teller','Both are Liars','It cannot be determined'], ans:1 },
+    { text:'Premise: "If a candidate has a degree, they have studied at university." A candidate who has NOT studied at university — what must be true?',
+      opts:['They do not have a degree','They could still have a degree','They have not graduated','They have not been hired'], ans:0 },
+    { text:'Three siblings: the oldest is twice as old as the youngest. The middle is 5 years older than the youngest. The sum of their ages is 33. How old is the oldest?',
+      opts:['12','14','16','18'], ans:1 },
+
+    // ─── Verbal analogies / vocabulary (5) ───
+    { text:'EPHEMERAL is to LASTING as FRUGAL is to:',
+      opts:['Wasteful','Thrifty','Modest','Plain'], ans:0 },
+    { text:'CARDIOLOGIST is to HEART as OPHTHALMOLOGIST is to:',
+      opts:['Brain','Skin','Eye','Bone'], ans:2 },
+    { text:'Which word does NOT belong with the others?',
+      opts:['Lethargic','Indolent','Vivacious','Sluggish'], ans:2 },
+    { text:'PROLIX is to CONCISE as TACITURN is to:',
+      opts:['Talkative','Silent','Honest','Reserved'], ans:0 },
+    { text:'SCULPTOR is to CHISEL as CALLIGRAPHER is to:',
+      opts:['Paper','Brush','Ink','Easel'], ans:1 },
+
+    // ─── Word problems (5) ───
+    { text:'A 50 ml solution is 40% acid. How much pure acid must be added to make the solution 60% acid?',
+      opts:['10 ml','15 ml','20 ml','25 ml'], ans:3 },
+    { text:'A 4×4×4 cube has all 6 outer faces painted, then is cut into 64 unit cubes. How many unit cubes have exactly 2 faces painted?',
+      opts:['8','12','24','36'], ans:2 },
+    { text:'In how many distinct ways can the letters in the word "REASON" be arranged so that the two vowels are always together?',
+      opts:['120','240','360','720'], ans:1 },
+    { text:'Train A leaves station X at 09:00 heading east at 60 km/h. Train B leaves station Y — 300 km east of X — at 10:00 heading west at 80 km/h. At approximately what time do they meet?',
+      opts:['11:00','11:30','11:43','12:00'], ans:2 },
+    { text:'A fair coin is flipped 4 times. What is the probability of getting exactly 2 heads?',
+      opts:['1/4','3/8','1/2','5/16'], ans:1 },
+
+    // ─── Critical reasoning (5) ───
+    { text:'"After Country X lowered tariffs in 2020, its GDP grew by 5%. Therefore, lowering tariffs causes GDP growth." The argument is weakest because:',
+      opts:['It uses precise numbers','It infers causation from a single correlation, ignoring confounders',
+            'It is about economics','It does not give a deadline'], ans:1 },
+    { text:'Premise: "If the price of oil rises, airline profits fall." Last quarter, airline profits fell. The conclusion "Therefore, the price of oil rose" is an example of:',
+      opts:['Modus ponens','Modus tollens','Affirming the consequent','Denying the antecedent'], ans:2 },
+    { text:'A survey on workplace stress was conducted on people who voluntarily replied to a wellness newsletter. The most serious methodological issue is:',
+      opts:['Sample size','Question wording','Self-selection bias','Time of day'], ans:2 },
+    { text:'"All four employees we interviewed prefer remote work, so most employees in the company prefer remote work." The flaw is best described as:',
+      opts:['False analogy','Hasty generalisation','Begging the question','Slippery slope'], ans:1 },
+    { text:'A study reports that people who eat breakfast weigh less than those who skip it. Which of the following, if true, would MOST weaken the claim that "eating breakfast causes weight loss"?',
+      opts:['Breakfast contains more sugar than other meals',
+            'People who exercise regularly are also more likely to eat breakfast',
+            'Some people skip breakfast unintentionally',
+            'The study lasted only 6 months'], ans:1 }
   ];
 
   var LEVELS = [
-    { min:90, label:'Exceptional',   desc:'Outstanding analytical ability. Strong reasoning across all dimensions.' },
-    { min:70, label:'Above Average', desc:'Good reasoning skills. Meets most analytical requirements for this role.' },
-    { min:50, label:'Average',       desc:'Meets baseline requirements. Some areas show room for development.' },
-    { min:30, label:'Below Average', desc:'Limited analytical reasoning demonstrated. Further assessment recommended.' },
-    { min:0,  label:'Insufficient',  desc:'Does not meet minimum analytical requirements for this role at this time.' }
+    { min:80, label:'Exceptional',   desc:'Outstanding analytical ability across numerical, verbal, and logical reasoning.' },
+    { min:65, label:'Above Average', desc:'Strong reasoning skills. Meets the bar for most cognitively demanding work.' },
+    { min:50, label:'Average',       desc:'Meets baseline reasoning requirements. Some areas show room for development.' },
+    { min:35, label:'Below Average', desc:'Limited reasoning fluency demonstrated. Further assessment recommended.' },
+    { min:0,  label:'Insufficient',  desc:'Does not meet minimum reasoning requirements for this role at this time.' }
   ];
 
   var ROLE = (new URLSearchParams(window.location.search).get('role')) || localStorage.getItem(TN.STORAGE.role) || '';
   if (ROLE) localStorage.setItem(TN.STORAGE.role, ROLE);
 
-  var current = 0, answers = {}, startTime, endTime, timerInt, elapsed = 0, TIME = 25*60, timeOver = false;
+  var current=0, answers={}, startTime, endTime, timerInt, elapsed=0, TIME=35*60, timeOver=false;
 
   document.getElementById('btn-begin').onclick = function () {
     if (localStorage.getItem(TN.STORAGE.email) && localStorage.getItem(TN.STORAGE.phone)) startQuiz();
-    else showInfo();
+    else { TN.renderInfoForm(document.getElementById('info-mount'), { role: ROLE, onSuccess: startQuiz }); TN.showScreen('screen-info'); }
   };
-
-  function showInfo() {
-    TN.renderInfoForm(document.getElementById('info-mount'), { role: ROLE, onSuccess: function () { startQuiz(); } });
-    TN.showScreen('screen-info');
-  }
-
-  function startQuiz() {
-    current = 0; answers = {}; startTime = new Date();
-    TN.showScreen('screen-quiz');
-    render();
-    timerInt = setInterval(tick, 1000);
-  }
-
+  function startQuiz() { current=0; answers={}; startTime=new Date(); TN.showScreen('screen-quiz'); render(); timerInt=setInterval(tick,1000); }
   function tick() {
     elapsed++;
-    var rem = TIME - elapsed;
-    var el = document.getElementById('timer');
-    var abs = Math.abs(rem), m = Math.floor(abs/60), s = abs%60;
-    el.textContent = rem >= 0 ? (String(m).padStart(2,'0') + ':' + String(s).padStart(2,'0')) : 'Over';
-    el.className = 'tn-timer' + (rem <= 0 ? ' red' : rem <= 120 ? ' red' : rem <= 300 ? ' amber' : '');
-    if (rem <= 0) timeOver = true;
+    var rem=TIME-elapsed, el=document.getElementById('timer'), abs=Math.abs(rem);
+    el.textContent = rem >= 0 ? (String(Math.floor(abs/60)).padStart(2,'0')+':'+String(abs%60).padStart(2,'0')) : 'Over';
+    el.className = 'tn-timer' + (rem<=0?' red':rem<=120?' red':rem<=300?' amber':'');
+    if (rem<=0) timeOver=true;
   }
-
   function render() {
     var q = QUESTIONS[current];
     document.getElementById('qlbl').textContent = 'Question ' + (current+1) + ' of ' + QUESTIONS.length;
@@ -127,7 +159,6 @@
     document.getElementById('btn-prev').style.visibility = current > 0 ? 'visible' : 'hidden';
     document.getElementById('btn-next').textContent = current === QUESTIONS.length - 1 ? 'Submit →' : 'Next →';
     document.getElementById('warn').classList.remove('show');
-
     var html = '<div class="tn-q-card"><div class="tn-q-num">Question ' + (current+1) + ' / ' + QUESTIONS.length + '</div>';
     if (q.ctx) html += '<div class="tn-q-context">' + TN.esc(q.ctx) + '</div>';
     html += '<div class="tn-q-text">' + TN.esc(q.text) + '</div><div class="tn-options">';
@@ -147,7 +178,6 @@
       });
     });
   }
-
   document.getElementById('btn-prev').onclick = function () { if (current > 0) { current--; render(); window.scrollTo(0,0); } };
   document.getElementById('btn-next').onclick = function () {
     if (answers[current] === undefined) { document.getElementById('warn').classList.add('show'); return; }
@@ -163,43 +193,29 @@
     QUESTIONS.forEach(function (q, i) { if (answers[i] === q.ans) correct++; });
     var pct = Math.round((correct / QUESTIONS.length) * 100);
     var level = LEVELS.find(function (l) { return pct >= l.min; });
-
-    var html =
-      '<div class="tn-result-hero"><div class="icon">🧠</div><h2>IQ Assessment</h2>' +
-        '<div class="tn-result-pct">' + pct + '%</div>' +
-        '<div class="tn-result-label">' + level.label + '</div>' +
-        '<div class="tn-result-sub">' + correct + ' / ' + QUESTIONS.length + ' correct</div>' +
-      '</div>' +
+    document.getElementById('results-body').innerHTML =
+      '<div class="tn-result-hero"><div class="icon">🧠</div><h2>Reasoning Test</h2>' +
+        '<div class="tn-result-pct">' + pct + '%</div><div class="tn-result-label">' + level.label + '</div>' +
+        '<div class="tn-result-sub">' + correct + ' / ' + QUESTIONS.length + ' correct</div></div>' +
       '<div class="tn-stats-grid">' +
         '<div class="tn-stat"><div class="tn-stat-val">' + correct + '</div><div class="tn-stat-lbl">Correct</div></div>' +
         '<div class="tn-stat"><div class="tn-stat-val">' + (QUESTIONS.length - correct) + '</div><div class="tn-stat-lbl">Incorrect</div></div>' +
-        '<div class="tn-stat"><div class="tn-stat-val">' + fmtTime(timeTaken) + '</div><div class="tn-stat-lbl">Time</div></div>' +
+        '<div class="tn-stat"><div class="tn-stat-val">' + (Math.floor(timeTaken/60)) + 'm ' + (timeTaken%60) + 's</div><div class="tn-stat-lbl">Time</div></div>' +
       '</div>' +
       '<div class="tn-q-card"><div class="tn-q-num">Result interpretation</div><div style="font-size:14px;color:#374151;line-height:1.6">' + level.desc + '</div></div>' +
-      '<div class="tn-q-card" id="submit-status" style="display:flex;align-items:center;gap:10px;font-size:14px"><span id="ss-icon">⏳</span><span id="ss-text">Saving your results…</span></div>' +
+      '<div class="tn-q-card" id="ss" style="display:flex;align-items:center;gap:10px;font-size:14px"><span id="ss-icon">⏳</span><span id="ss-text">Saving your results…</span></div>' +
       '<div style="display:flex;gap:10px;flex-wrap:wrap">' +
         (ROLE ? '<a class="tn-btn primary" href="/technext/' + TN.esc(ROLE) + '">Continue to next test →</a>' : '<a class="tn-btn primary" href="/technext/">← Back to portal</a>') +
-        '<button class="tn-btn outline" onclick="window.print()">🖨 Print / Save PDF</button>' +
       '</div>';
-
-    document.getElementById('results-body').innerHTML = html;
     TN.showScreen('screen-results');
-
     if (ROLE) TN.markDone(ROLE, 'iq');
-
     TN.submitTest({
       test_type: 'tn_iq',
-      start_time: startTime.toISOString(),
-      end_time: endTime.toISOString(),
-      time_taken_seconds: timeTaken,
-      score_raw: correct,
-      score_max: QUESTIONS.length,
-      score_pct: pct,
-      result_label: level.label,
-      answers: answers,
-      flags: { time_over: timeOver }
+      start_time: startTime.toISOString(), end_time: endTime.toISOString(),
+      time_taken_seconds: timeTaken, score_raw: correct, score_max: QUESTIONS.length,
+      score_pct: pct, result_label: level.label, answers: answers, flags: { time_over: timeOver }
     }).then(function (out) {
-      var icon = document.getElementById('ss-icon'), text = document.getElementById('ss-text');
+      var icon=document.getElementById('ss-icon'), text=document.getElementById('ss-text');
       if (out.ok) { icon.textContent = '✅'; text.textContent = 'Results saved.'; }
       else { icon.textContent = '⚠️'; text.textContent = 'Could not save results: ' + (out.body && out.body.error ? out.body.error : 'server error'); }
     }).catch(function () {
@@ -207,8 +223,6 @@
       document.getElementById('ss-text').textContent = 'Could not reach server. Please screenshot this page.';
     });
   }
-
-  function fmtTime(sec) { var m = Math.floor(sec/60), s = sec%60; return m + 'm ' + s + 's'; }
 })();
 </script>
 

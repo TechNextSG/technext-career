@@ -6,33 +6,108 @@
 <title>Book your interview — TechNext</title>
 <link rel="stylesheet" href="/technext/tn.css">
 <style>
-.hero{background:linear-gradient(135deg,#0f3a52 0%,#155670 100%);color:#fff;padding:32px 20px 24px;text-align:center}
-.hero .icon{font-size:42px;margin-bottom:6px}
+.hero{background:linear-gradient(135deg,#0f3a52 0%,#155670 100%);color:#fff;padding:30px 20px 22px;text-align:center}
+.hero .icon{font-size:40px;margin-bottom:4px;line-height:1}
 .hero h2{font-size:22px;font-weight:900;margin-bottom:6px;line-height:1.2}
-.hero p{font-size:13.5px;opacity:.82;max-width:520px;margin:0 auto;line-height:1.55}
-main{max-width:720px;margin:0 auto;padding:24px 16px 60px}
-.card-section{background:#fff;border-radius:14px;padding:22px 24px;box-shadow:0 4px 24px rgba(15,58,82,.08);margin-bottom:16px}
-.card-section h3{font-size:14px;color:#0f3a52;font-weight:800;margin-bottom:10px;text-transform:uppercase;letter-spacing:.6px}
-.summary-row{display:flex;justify-content:space-between;padding:7px 0;border-bottom:1px solid #f1f4f8;font-size:13.5px}
+.hero p{font-size:13px;opacity:.82;max-width:520px;margin:0 auto;line-height:1.55}
+.tz-pill{display:inline-block;background:rgba(255,255,255,.15);border:1px solid rgba(255,255,255,.3);border-radius:99px;padding:3px 12px;font-size:11.5px;margin-top:8px}
+
+main{max-width:780px;margin:0 auto;padding:22px 16px 120px}
+.section{background:#fff;border-radius:14px;padding:20px 22px;box-shadow:0 4px 24px rgba(15,58,82,.08);margin-bottom:14px}
+.section h3{font-size:11.5px;color:#6b7a8d;font-weight:800;text-transform:uppercase;letter-spacing:.7px;margin-bottom:14px;display:flex;align-items:center;gap:8px}
+.section h3 .step-pill{background:#0f3a52;color:#fff;width:20px;height:20px;border-radius:50%;display:inline-flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;letter-spacing:0}
+.section.done h3 .step-pill{background:#16a34a}
+.section.disabled{opacity:.5;pointer-events:none}
+
+/* Day cards */
+.day-row{display:flex;gap:10px;overflow-x:auto;padding-bottom:6px;scroll-snap-type:x mandatory;scrollbar-width:thin}
+.day-row::-webkit-scrollbar{height:6px}
+.day-row::-webkit-scrollbar-thumb{background:#dce3ea;border-radius:3px}
+.day-card{
+  flex:0 0 86px;scroll-snap-align:start;
+  background:#f8fbfc;border:1.5px solid #dce3ea;border-radius:11px;
+  padding:11px 8px 12px;text-align:center;cursor:pointer;transition:all .15s;
+}
+.day-card:hover{border-color:#19c2a6;background:#f0fdfa}
+.day-card.selected{border-color:#19c2a6;background:#19c2a6;color:#fff}
+.day-card.selected .day-num,.day-card.selected .day-mon,.day-card.selected .day-dow{color:#fff}
+.day-dow{font-size:10.5px;color:#6b7a8d;font-weight:700;letter-spacing:.6px;text-transform:uppercase}
+.day-num{font-size:22px;font-weight:900;color:#0f3a52;line-height:1.1;margin:3px 0 1px}
+.day-mon{font-size:10.5px;color:#6b7a8d;font-weight:700;text-transform:uppercase;letter-spacing:.4px}
+
+/* Time pills */
+.time-row{display:grid;grid-template-columns:repeat(4,1fr);gap:10px}
+.time-pill{
+  border:1.5px solid #dce3ea;background:#fff;border-radius:11px;
+  padding:14px 10px;text-align:center;cursor:pointer;transition:all .15s;
+}
+.time-pill:hover{border-color:#19c2a6;background:#f0fdfa}
+.time-pill.selected{border-color:#19c2a6;background:#19c2a6;color:#fff}
+.time-pill .t{font-size:17px;font-weight:800;color:#0f3a52;line-height:1.1}
+.time-pill.selected .t{color:#fff}
+.time-pill .d{font-size:10.5px;color:#6b7a8d;font-weight:600;margin-top:3px}
+.time-pill.selected .d{color:rgba(255,255,255,.85)}
+.placeholder{color:#9ca3af;font-size:13px;text-align:center;padding:18px}
+
+/* Preview */
+.preview{
+  background:linear-gradient(135deg,#0f3a52,#155670);color:#fff;
+  border-radius:14px;padding:18px 22px;margin-bottom:14px;
+  display:flex;gap:14px;align-items:center;
+}
+.preview .pi{font-size:32px;line-height:1;flex-shrink:0}
+.preview .pm{flex:1;min-width:0}
+.preview .pt{font-size:11.5px;opacity:.7;text-transform:uppercase;letter-spacing:.7px;font-weight:700;margin-bottom:3px}
+.preview h4{font-size:19px;font-weight:800;line-height:1.25;margin-bottom:3px}
+.preview .pd{font-size:12.5px;opacity:.85}
+
+/* Summary */
+.summary-row{display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px solid #f1f4f8;font-size:13.5px;gap:14px}
 .summary-row:last-child{border-bottom:none}
-.summary-row .l{color:#6b7a8d}
-.summary-row .v{color:#0f3a52;font-weight:600;text-align:right;max-width:65%;word-break:break-word}
-.confirm-bar{position:sticky;bottom:0;background:#fff;padding:14px 20px;box-shadow:0 -4px 20px rgba(0,0,0,.08);display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;border-radius:12px 12px 0 0;margin:14px -16px -60px}
-.confirm-meta{font-size:13px;color:#374151}
-.confirm-meta strong{color:#0f3a52}
-.locked-msg{background:#fef2f2;border:1px solid #fecaca;color:#991b1b;padding:14px 18px;border-radius:12px;font-size:14px;margin-bottom:18px}
-.success-card{background:linear-gradient(135deg,#19c2a6,#0f3a52);color:#fff;border-radius:14px;padding:24px;text-align:center;margin-bottom:18px;display:none}
+.summary-row .l{color:#6b7a8d;flex-shrink:0}
+.summary-row .v{color:#0f3a52;font-weight:600;text-align:right;word-break:break-word}
+.summary-row .v a{color:#0f3a52}
+
+/* Confirm bar */
+.confirm-bar{
+  position:fixed;bottom:0;left:0;right:0;
+  background:#fff;padding:14px 18px;
+  box-shadow:0 -4px 24px rgba(0,0,0,.08);border-top:1px solid #e5e7eb;
+  display:flex;justify-content:space-between;align-items:center;gap:14px;z-index:50;
+}
+.confirm-info{font-size:12.5px;color:#374151;flex:1;min-width:0}
+.confirm-info strong{color:#0f3a52;font-size:13.5px;display:block;margin-bottom:1px}
+.confirm-bar .tn-btn{flex-shrink:0;padding:13px 22px}
+
+/* Locked */
+.locked-msg{background:#fef2f2;border:1px solid #fecaca;color:#991b1b;padding:14px 18px;border-radius:12px;font-size:13.5px;margin-bottom:14px}
+.locked-msg a{color:#991b1b;font-weight:700}
+
+/* Success */
+.success-card{
+  background:linear-gradient(135deg,#19c2a6,#0f3a52);color:#fff;
+  border-radius:14px;padding:24px 22px;margin-bottom:14px;
+  display:none;
+}
 .success-card.show{display:block}
-.success-card .ic{font-size:38px;margin-bottom:6px}
+.success-card .ic{font-size:36px;line-height:1;margin-bottom:6px}
 .success-card h3{font-size:18px;font-weight:800;margin-bottom:4px}
 .success-card p{font-size:13.5px;opacity:.95;line-height:1.55}
 .success-card a{color:#fff;font-weight:800;text-decoration:underline}
+
 @media(max-width:640px){
-  main{padding:18px 14px 90px}
-  .card-section{padding:18px}
+  .hero{padding:24px 16px 18px}
   .hero h2{font-size:19px}
-  .confirm-bar{flex-direction:column;align-items:stretch;text-align:center}
+  .section{padding:16px 18px}
+  .preview{padding:16px;flex-direction:row}
+  .preview h4{font-size:17px}
+  .day-card{flex:0 0 76px;padding:9px 6px 10px}
+  .day-num{font-size:19px}
+  .time-row{grid-template-columns:1fr 1fr}
+  .time-pill .t{font-size:16px}
+  .confirm-bar{flex-direction:column;align-items:stretch;text-align:center;padding:12px 14px}
   .confirm-bar .tn-btn{width:100%}
+  main{padding:18px 14px 160px}
 }
 </style>
 </head>
@@ -40,137 +115,227 @@ main{max-width:720px;margin:0 auto;padding:24px 16px 60px}
 
 <header class="tn-header">
   <div class="tn-logo">T</div>
-  <div class="tn-brand"><h1>Interview Booking</h1><p>Final step · Schedule a slot</p></div>
-  <span class="tn-pill">Step 4 of 4</span>
+  <div class="tn-brand"><h1>Interview Booking</h1><p>Final step · Pick a slot</p></div>
+  <span class="tn-pill">Step 4 / 4</span>
 </header>
 
 <section class="hero">
   <div class="icon">🗓️</div>
   <h2>Book your TechNext interview</h2>
-  <p>Pick a 45-minute slot that works for you. Clicking <strong>Confirm</strong> opens Google Calendar with the event pre-filled, inviting our hiring address.</p>
+  <p>Pick a day, then a time. 45 minutes. When you confirm, we'll open Google Calendar with the invite pre-filled — you just press <strong>Save</strong>.</p>
+  <div class="tz-pill" id="tz-pill">Times shown in your local timezone</div>
 </section>
 
 <main>
-  <div class="locked-msg" id="locked-msg" style="display:none">
-    You haven't completed all three assessments yet. <a href="/technext/" style="color:#991b1b;font-weight:700">Return to portal</a>.
-  </div>
+  <div class="locked-msg" id="locked-msg" style="display:none"></div>
 
   <div class="success-card" id="success-card">
     <div class="ic">✅</div>
     <h3>You're all set</h3>
-    <p>We've opened Google Calendar in a new tab — finish there to send the invite. If it didn't open, <a href="#" id="gcal-fallback" target="_blank" rel="noopener">click here</a>.</p>
+    <p>We opened Google Calendar in a new tab — finish there to send the invite. If it didn't open, <a href="#" id="gcal-fallback" target="_blank" rel="noopener">click here</a>.</p>
   </div>
 
-  <div class="card-section">
-    <h3>Your application</h3>
-    <div id="summary"></div>
-  </div>
-
-  <div class="card-section">
-    <h3>Pick a time slot</h3>
-    <p style="font-size:12.5px;color:#6b7a8d;margin-bottom:14px">Times are shown in your local timezone. Weekdays only · 09:00, 11:00, 14:00, 16:00.</p>
-    <div id="slots" class="tn-slots-grid"></div>
-  </div>
-
-  <div class="confirm-bar">
-    <div class="confirm-meta">
-      <div id="confirm-when">Select a slot above</div>
-      <div style="font-size:11.5px;color:#9ca3af;margin-top:2px">Invites <strong id="invite-addr">sky@technext.asia</strong></div>
+  <!-- Selected slot preview -->
+  <div class="preview" id="preview" style="display:none">
+    <div class="pi">📅</div>
+    <div class="pm">
+      <div class="pt">You're booking</div>
+      <h4 id="preview-title">—</h4>
+      <div class="pd" id="preview-sub">—</div>
     </div>
-    <button class="tn-btn gold lg" id="confirm-btn" disabled>Confirm &amp; open calendar →</button>
+  </div>
+
+  <!-- Step 1: Pick a day -->
+  <div class="section" id="sec-day">
+    <h3><span class="step-pill" id="pill-day">1</span> Pick a day</h3>
+    <div class="day-row" id="day-row"></div>
+    <div style="font-size:11px;color:#9ca3af;margin-top:8px">Weekdays only · scroll for more dates →</div>
+  </div>
+
+  <!-- Step 2: Pick a time -->
+  <div class="section disabled" id="sec-time">
+    <h3><span class="step-pill" id="pill-time">2</span> Pick a time</h3>
+    <div class="time-row" id="time-row"><div class="placeholder">Pick a day first</div></div>
+  </div>
+
+  <!-- Step 3: Confirm what's in the invite -->
+  <div class="section" id="sec-summary">
+    <h3><span class="step-pill">3</span> What's in the invite</h3>
+    <div id="summary"></div>
   </div>
 </main>
 
-<footer class="tn-footer">© TechNext · Candidate Assessment Portal</footer>
+<div class="confirm-bar" id="confirm-bar">
+  <div class="confirm-info" id="confirm-info">Pick a day and time above</div>
+  <button class="tn-btn gold" id="confirm-btn" disabled>Send invite →</button>
+</div>
+
+<footer class="tn-footer">© TechNext · You can always re-book from your role dashboard</footer>
 
 <script src="/technext/tn.js"></script>
 <script>
 (function () {
   function getRole() {
     var q = new URLSearchParams(window.location.search).get('role');
-    if (q) return q;
-    return localStorage.getItem(TN.STORAGE.role) || '';
+    return q || localStorage.getItem(TN.STORAGE.role) || '';
   }
   var ROLE = getRole();
   var spec = TN.ROLES[ROLE];
 
-  // Lock if tests not done
+  // Gate access
   if (!ROLE || !spec) {
-    document.getElementById('locked-msg').textContent = 'Could not detect which role you\'re applying for. ';
+    document.getElementById('locked-msg').textContent = 'No role detected. ';
+    var a = document.createElement('a'); a.href = '/technext/'; a.textContent = 'Return to portal'; a.style.fontWeight = '700';
+    document.getElementById('locked-msg').appendChild(a);
     document.getElementById('locked-msg').style.display = 'block';
   } else if (!TN.allDone(ROLE)) {
     document.getElementById('locked-msg').innerHTML =
-      'You haven\'t completed all three assessments for <strong>' + TN.esc(spec.label) + '</strong> yet. ' +
-      '<a href="/technext/' + TN.esc(ROLE) + '" style="color:#991b1b;font-weight:700">Return to your dashboard</a>.';
+      'You haven\'t finished all three assessments for <strong>' + TN.esc(spec.label) + '</strong> yet. ' +
+      '<a href="/technext/' + TN.esc(ROLE) + '">Back to role dashboard</a>';
     document.getElementById('locked-msg').style.display = 'block';
   }
 
-  document.getElementById('invite-addr').textContent = TN.INTERVIEW_EMAIL;
+  // Timezone pill
+  try {
+    var tz = Intl.DateTimeFormat().resolvedOptions().timeZone || 'local time';
+    var tzAbbr = new Date().toLocaleTimeString('en-GB', { timeZoneName: 'short' }).split(' ').pop();
+    document.getElementById('tz-pill').textContent = 'Times shown in ' + tz + ' (' + tzAbbr + ')';
+  } catch (e) {}
 
-  // Summary
-  var name     = localStorage.getItem(TN.STORAGE.name) || '';
-  var email    = localStorage.getItem(TN.STORAGE.email) || '';
-  var phone    = localStorage.getItem(TN.STORAGE.phone) || '';
-  var linkedin = localStorage.getItem(TN.STORAGE.linkedin) || '';
-  var resume   = localStorage.getItem(TN.STORAGE.resumeUrl) || '';
-  var summary = document.getElementById('summary');
-  function row(l, v, isLink) {
-    var val = v ? (isLink ? '<a href="' + TN.esc(v) + '" target="_blank" rel="noopener" style="color:#0f3a52">' + TN.esc(v) + '</a>' : TN.esc(v)) : '<span style="color:#9ca3af">—</span>';
-    return '<div class="summary-row"><span class="l">' + l + '</span><span class="v">' + val + '</span></div>';
+  // ── Slots: 10 weekdays × 4 times ──
+  var TIMES = ['09:00','11:00','14:00','16:00'];
+  var DURATION_MIN = 45;
+  var days = [];
+  var now = new Date();
+  for (var i = 1; days.length < 10 && i < 30; i++) {
+    var d = new Date(now.getFullYear(), now.getMonth(), now.getDate() + i);
+    var dow = d.getDay();
+    if (dow === 0 || dow === 6) continue;
+    days.push(d);
   }
-  summary.innerHTML =
-    row('Role', spec ? spec.label : '—') +
-    row('Name', name) +
-    row('Email', email) +
-    row('Handphone', phone) +
-    row('LinkedIn', linkedin, true) +
-    row('Resume', resume, true);
 
-  // Slots
-  var slots = TN.generateSlots(10, ['09:00','11:00','14:00','16:00']);
-  var chosenIndex = -1;
-  var slotsEl = document.getElementById('slots');
-  slotsEl.innerHTML = '';
-  slots.forEach(function (s, i) {
-    var div = document.createElement('div');
-    div.className = 'tn-slot';
-    div.innerHTML =
-      '<div class="tn-slot-day">' + TN.fmtSlotDay(s) + '</div>' +
-      '<div class="tn-slot-date">' + TN.fmtSlotDate(s) + '</div>' +
-      '<div class="tn-slot-time">' + TN.fmtSlotTime(s) + '</div>';
-    div.addEventListener('click', function () {
-      chosenIndex = i;
-      Array.prototype.forEach.call(slotsEl.children, function (c) { c.classList.remove('selected'); });
-      div.classList.add('selected');
-      document.getElementById('confirm-when').innerHTML =
-        '<strong>' + TN.fmtSlotDay(s) + ' ' + TN.fmtSlotDate(s) + ' · ' + TN.fmtSlotTime(s) + '</strong> · 45 min';
-      document.getElementById('confirm-btn').disabled = false;
-    });
-    slotsEl.appendChild(div);
+  var dayRow = document.getElementById('day-row');
+  var dayEls = [];
+  days.forEach(function (d, idx) {
+    var el = document.createElement('div');
+    el.className = 'day-card';
+    el.innerHTML =
+      '<div class="day-dow">' + d.toLocaleDateString('en-GB', { weekday: 'short' }) + '</div>' +
+      '<div class="day-num">' + d.getDate() + '</div>' +
+      '<div class="day-mon">' + d.toLocaleDateString('en-GB', { month: 'short' }) + '</div>';
+    el.addEventListener('click', function () { pickDay(idx); });
+    dayEls.push(el);
+    dayRow.appendChild(el);
   });
 
-  document.getElementById('confirm-btn').onclick = function () {
-    if (chosenIndex < 0) return;
-    var slot = slots[chosenIndex];
-    var candidate = { name: name, email: email, phone: phone, linkedin: linkedin, resume_url: resume };
-    var url = TN.buildGcalLink(slot, 45, ROLE, candidate);
+  var dayIdx = -1, timeIdx = -1;
 
-    // Record the booking attempt
+  function pickDay(idx) {
+    dayIdx = idx; timeIdx = -1;
+    dayEls.forEach(function (e, i) { e.classList.toggle('selected', i === idx); });
+    renderTimes();
+    updatePreview();
+    document.getElementById('sec-day').classList.add('done');
+    document.getElementById('sec-time').classList.remove('disabled');
+  }
+
+  function renderTimes() {
+    var row = document.getElementById('time-row');
+    row.innerHTML = '';
+    TIMES.forEach(function (hhmm, i) {
+      var parts = hhmm.split(':');
+      var d = days[dayIdx];
+      var start = new Date(d.getFullYear(), d.getMonth(), d.getDate(), parseInt(parts[0],10), parseInt(parts[1],10));
+      var end = new Date(start.getTime() + DURATION_MIN * 60000);
+      var el = document.createElement('div');
+      el.className = 'time-pill' + (timeIdx === i ? ' selected' : '');
+      el.innerHTML =
+        '<div class="t">' + hhmm + '</div>' +
+        '<div class="d">→ ' + end.toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit', hour12: false }) + '</div>';
+      el.addEventListener('click', function () {
+        timeIdx = i;
+        Array.prototype.forEach.call(row.children, function (c, j) { c.classList.toggle('selected', j === i); });
+        updatePreview();
+        document.getElementById('sec-time').classList.add('done');
+      });
+      row.appendChild(el);
+    });
+  }
+
+  function selectedStart() {
+    if (dayIdx < 0 || timeIdx < 0) return null;
+    var d = days[dayIdx];
+    var parts = TIMES[timeIdx].split(':');
+    return new Date(d.getFullYear(), d.getMonth(), d.getDate(), parseInt(parts[0],10), parseInt(parts[1],10));
+  }
+
+  function fmtFullDay(d) {
+    return d.toLocaleDateString('en-GB', { weekday: 'long', day: '2-digit', month: 'long', year: 'numeric' });
+  }
+  function fmtRange(start) {
+    var end = new Date(start.getTime() + DURATION_MIN * 60000);
+    return start.toLocaleTimeString('en-GB',{hour:'2-digit',minute:'2-digit',hour12:false}) + ' – ' +
+           end.toLocaleTimeString('en-GB',{hour:'2-digit',minute:'2-digit',hour12:false});
+  }
+
+  function updatePreview() {
+    var start = selectedStart();
+    var preview = document.getElementById('preview');
+    if (!start) {
+      preview.style.display = 'none';
+      document.getElementById('confirm-info').textContent = 'Pick a day and time above';
+      document.getElementById('confirm-btn').disabled = true;
+      return;
+    }
+    preview.style.display = 'flex';
+    document.getElementById('preview-title').textContent = fmtFullDay(start);
+    document.getElementById('preview-sub').textContent = fmtRange(start) + ' · 45 min · with TechNext';
+
+    document.getElementById('confirm-info').innerHTML =
+      '<strong>' + fmtFullDay(start) + '</strong>' + fmtRange(start) + ' · 45 min';
+    document.getElementById('confirm-btn').disabled = false;
+  }
+
+  // ── Invite summary ──
+  function row(l, v, isLink) {
+    var val = v ? (isLink ? '<a href="' + TN.esc(v) + '" target="_blank" rel="noopener">' + TN.esc(v) + '</a>' : TN.esc(v)) : '<span style="color:#9ca3af">—</span>';
+    return '<div class="summary-row"><span class="l">' + l + '</span><span class="v">' + val + '</span></div>';
+  }
+  document.getElementById('summary').innerHTML =
+    row('Title', 'TechNext Interview — ' + (spec ? spec.label : '')) +
+    row('Duration', '45 minutes') +
+    row('Invite goes to', TN.INTERVIEW_EMAIL) +
+    row('Your name', localStorage.getItem(TN.STORAGE.name) || '') +
+    row('Email', localStorage.getItem(TN.STORAGE.email) || '') +
+    row('Handphone', localStorage.getItem(TN.STORAGE.phone) || '') +
+    row('LinkedIn', localStorage.getItem(TN.STORAGE.linkedin) || '', true) +
+    row('Resume', localStorage.getItem(TN.STORAGE.resumeUrl) || '', true);
+
+  // ── Confirm ──
+  document.getElementById('confirm-btn').onclick = function () {
+    var slot = selectedStart();
+    if (!slot) return;
+    var candidate = {
+      name: localStorage.getItem(TN.STORAGE.name) || '',
+      email: localStorage.getItem(TN.STORAGE.email) || '',
+      phone: localStorage.getItem(TN.STORAGE.phone) || '',
+      linkedin: localStorage.getItem(TN.STORAGE.linkedin) || '',
+      resume_url: localStorage.getItem(TN.STORAGE.resumeUrl) || ''
+    };
+    var url = TN.buildGcalLink(slot, DURATION_MIN, ROLE, candidate);
+
     TN.submitTest({
       test_type: 'tn_booking',
       candidate_name: candidate.name || candidate.email,
       start_time: slot.toISOString(),
-      end_time: new Date(slot.getTime() + 45*60000).toISOString(),
-      time_taken_seconds: 0,
-      score_raw: null, score_max: null, score_pct: null,
+      end_time: new Date(slot.getTime() + DURATION_MIN * 60000).toISOString(),
+      time_taken_seconds: 0, score_raw: null, score_max: null, score_pct: null,
       result_label: 'Booking requested',
       answers: { interviewer: TN.INTERVIEW_EMAIL, slot_iso: slot.toISOString() },
       flags: {}
     }).catch(function () { /* non-fatal */ });
 
-    // Open Google Calendar
-    var fallback = document.getElementById('gcal-fallback');
-    fallback.href = url;
+    document.getElementById('gcal-fallback').href = url;
     var win = window.open(url, '_blank');
     document.getElementById('success-card').classList.add('show');
     document.getElementById('confirm-btn').disabled = true;
