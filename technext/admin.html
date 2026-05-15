@@ -45,6 +45,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
 .stat-card.ai_technical{border-color:#7c3aed}
 .stat-card.fc_technical{border-color:#d97706}
 .stat-card.odoo_technical{border-color:#059669}
+.stat-card.cyber_technical{border-color:#dc2626}
 .stat-card.booking{border-color:#19c2a6}
 .stat-num{font-size:26px;font-weight:900;color:#0f3a52}
 .stat-lbl{font-size:11.5px;color:#6b7280;margin-top:4px;font-weight:600;text-transform:uppercase;letter-spacing:.3px}
@@ -188,15 +189,17 @@ tr:hover td{background:#fafafa}
         <option value="ai-engineer">AI Engineer</option>
         <option value="functional-consultant">Functional Consultant / BA</option>
         <option value="odoo-developer">Odoo Developer</option>
+        <option value="cyber-security">Cyber Security</option>
       </select>
       <span class="filter-label">Test:</span>
       <select id="filter-type" onchange="applyFilters()">
         <option value="all">All tests</option>
         <option value="tn_profiler">TechNext Profiler</option>
-        <option value="tn_iq">IQ Assessment</option>
+        <option value="tn_iq">Reasoning Test</option>
         <option value="tn_ai_technical">AI Engineer — Technical</option>
         <option value="tn_fc_technical">FC / BA — Technical</option>
         <option value="tn_odoo_technical">Odoo Dev — Technical</option>
+        <option value="tn_cyber_technical">Cyber Security — Technical</option>
         <option value="tn_booking">Interview Booking</option>
       </select>
       <span class="filter-label">From:</span>
@@ -226,13 +229,14 @@ tr:hover td{background:#fafafa}
 <div class="toast" id="toast"></div>
 
 <script>
-const TN_TYPES = ['tn_profiler','tn_iq','tn_ai_technical','tn_fc_technical','tn_odoo_technical','tn_booking'];
+const TN_TYPES = ['tn_profiler','tn_iq','tn_ai_technical','tn_fc_technical','tn_odoo_technical','tn_cyber_technical','tn_booking'];
 const TYPE_LABEL = {
   tn_profiler:'TechNext Profiler',
-  tn_iq:'IQ Assessment',
+  tn_iq:'Reasoning Test',
   tn_ai_technical:'AI Engineer — Technical',
   tn_fc_technical:'FC / BA — Technical',
   tn_odoo_technical:'Odoo Dev — Technical',
+  tn_cyber_technical:'Cyber Security — Technical',
   tn_booking:'Interview Booking'
 };
 const TYPE_COLOR = {
@@ -241,12 +245,14 @@ const TYPE_COLOR = {
   tn_ai_technical:'#7c3aed',
   tn_fc_technical:'#d97706',
   tn_odoo_technical:'#059669',
+  tn_cyber_technical:'#dc2626',
   tn_booking:'#19c2a6'
 };
 const ROLE_LABEL = {
   'ai-engineer':'AI Engineer',
   'functional-consultant':'Functional Consultant / BA',
-  'odoo-developer':'Odoo Developer'
+  'odoo-developer':'Odoo Developer',
+  'cyber-security':'Cyber Security'
 };
 
 let allData = [];

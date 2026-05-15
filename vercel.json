@@ -12,10 +12,12 @@
     { "source": "/technext/ai-engineer",            "destination": "/technext/role?role=ai-engineer" },
     { "source": "/technext/functional-consultant",  "destination": "/technext/role?role=functional-consultant" },
     { "source": "/technext/odoo-developer",         "destination": "/technext/role?role=odoo-developer" },
+    { "source": "/technext/cyber-security",         "destination": "/technext/role?role=cyber-security" },
 
     { "source": "/technext/iq",                     "destination": "/technext/iq_test" },
     { "source": "/technext/ai-technical",           "destination": "/technext/ai_technical" },
     { "source": "/technext/fc-technical",           "destination": "/technext/fc_technical" },
-    { "source": "/technext/odoo-technical",         "destination": "/technext/odoo_technical" }
+    { "source": "/technext/odoo-technical",         "destination": "/technext/odoo_technical" },
+    { "source": "/technext/cyber-technical",        "destination": "/technext/cyber_technical" }
   ]
 }

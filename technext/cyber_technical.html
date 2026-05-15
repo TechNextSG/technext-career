@@ -1,0 +1,308 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Cyber Security Technical — TechNext</title>
+<link rel="stylesheet" href="/technext/tn.css">
+</head>
+<body>
+
+<header class="tn-header">
+  <div class="tn-logo">T</div>
+  <div class="tn-brand"><h1>Cyber Security — Technical</h1><p>Crypto · Network · Web · IAM · IR · 26 questions · 40 min</p></div>
+  <span class="tn-pill">Test 3 of 3</span>
+</header>
+
+<div id="screen-landing" class="tn-screen active">
+  <div class="tn-wrap">
+    <div class="tn-card">
+      <div style="text-align:center;font-size:48px;margin-bottom:10px">🛡️</div>
+      <h2 style="text-align:center">Cyber Security — Technical</h2>
+      <p class="sub" style="text-align:center">A practitioner-level screen across cryptography, network security, application security (OWASP-style attacks), identity and access, detection &amp; response, cloud security, and risk frameworks.</p>
+      <div class="tn-stats-grid" style="margin:18px 0 20px">
+        <div class="tn-stat"><div class="tn-stat-val">26</div><div class="tn-stat-lbl">Questions</div></div>
+        <div class="tn-stat"><div class="tn-stat-val">40 min</div><div class="tn-stat-lbl">Time limit</div></div>
+        <div class="tn-stat"><div class="tn-stat-val">Hard</div><div class="tn-stat-lbl">Difficulty</div></div>
+      </div>
+      <button class="tn-btn primary block lg" id="btn-begin">Begin →</button>
+    </div>
+  </div>
+</div>
+
+<div id="screen-info" class="tn-screen"><div class="tn-wrap" id="info-mount"></div></div>
+
+<div id="screen-quiz" class="tn-screen">
+  <div class="tn-quiz-header">
+    <div class="tn-quiz-progress">
+      <div class="tn-quiz-progress-lbl" id="qlbl">Question 1 of 26</div>
+      <div class="tn-quiz-progress-bar"><div class="tn-quiz-progress-fill" id="qfill" style="width:4%"></div></div>
+    </div>
+    <div class="tn-timer" id="timer">40:00</div>
+  </div>
+  <div class="tn-quiz-body">
+    <div id="qcard"></div>
+    <div class="tn-warn" id="warn">Please select an answer to continue.</div>
+    <div class="tn-q-nav">
+      <button class="tn-btn outline" id="btn-prev" style="visibility:hidden">← Previous</button>
+      <button class="tn-btn primary" id="btn-next">Next →</button>
+    </div>
+  </div>
+</div>
+
+<div id="screen-results" class="tn-screen"><div class="tn-quiz-body" id="results-body"></div></div>
+
+<footer class="tn-footer">© TechNext · Results are confidential.</footer>
+
+<script src="/technext/tn.js"></script>
+<script>
+(function () {
+  // 25 original cyber-security questions across crypto, network, web/app sec, IAM, detection & response, cloud, risk.
+  var QUESTIONS = [
+    // ─── Cryptography (4) ───
+    { text:'Fundamentally, symmetric vs asymmetric cryptography:',
+      opts:['Symmetric is older, asymmetric is newer — that\'s the only difference',
+            'Symmetric uses one shared secret key for both encrypt and decrypt; asymmetric uses a key pair (public + private), enabling exchange/signature without a pre-shared secret',
+            'Symmetric is always more secure',
+            'Asymmetric requires no keys'], ans:1 },
+    { text:'Storing user passwords as `SHA-256(password)` is weak today primarily because:',
+      opts:['SHA-256 is reversible',
+            'Fast unsalted hashes enable cheap brute-force / rainbow-table attacks; passwords should use slow, salted, tunable-cost KDFs like bcrypt, scrypt, or Argon2',
+            'SHA-256 outputs are too long',
+            'SHA-256 requires internet access'], ans:1 },
+    { text:'In modern TLS, "forward secrecy" means:',
+      opts:['Past traffic remains unreadable even if the server\'s long-term private key is later compromised, because ephemeral keys are negotiated per session',
+            'The session expires after one minute',
+            'Both endpoints share a static key',
+            'TLS rotates IP addresses'], ans:0 },
+    { text:'Hashing vs encryption — when should you HASH rather than encrypt?',
+      opts:['When you need to recover the original value later',
+            'When you need a one-way fingerprint for integrity, password verification, or de-duplication — i.e. you do NOT need to recover the original value',
+            'Always — encryption is obsolete',
+            'Only on Linux systems'], ans:1 },
+
+    // ─── Network security (3) ───
+    { text:'The default ports for SSH and HTTPS are:',
+      opts:['21 and 80', '22 and 443', '25 and 110', '53 and 8080'], ans:1 },
+    { text:'A "stateful" firewall vs "stateless":',
+      opts:['They are the same',
+            'Stateful tracks active connections and permits return traffic for them; stateless evaluates each packet in isolation against rules',
+            'Stateful only blocks ICMP',
+            'Stateless is always more secure'], ans:1 },
+    { text:'Network segmentation reduces blast radius primarily because:',
+      opts:['It encrypts every packet',
+            'A compromise in one segment doesn\'t automatically yield east-west access to others — attackers must cross additional controls to pivot',
+            'Segments share the same broadcast domain',
+            'It removes the need for firewalls'], ans:1 },
+
+    // ─── Web / Application security (6) ───
+    { text:'The most reliable mitigation for SQL injection in application code is:',
+      opts:['Strip apostrophes from user input',
+            'Use parameterised queries / prepared statements (and run the DB user with least privilege); add input validation as defence-in-depth',
+            'Move to a NoSQL database',
+            'HTML-encode all output'], ans:1 },
+    { text:'DOM-based XSS is best described as:',
+      opts:['A payload stored server-side and returned to all users',
+            'A payload reflected from the request and returned directly in the response',
+            'Client-side JavaScript that reads attacker-controlled input (e.g., location.hash, document.referrer) and writes it unsafely into the DOM',
+            'A payload sent to /etc/passwd'], ans:2 },
+    { text:'A robust Cross-Site Request Forgery (CSRF) defence:',
+      opts:['SameSite=Lax/Strict cookies + a per-request anti-CSRF token bound to the session',
+            'Same-origin policy alone',
+            'HTTPS alone',
+            'A CAPTCHA on the home page'], ans:0 },
+    { ctx:'A server-side application accepts a user-supplied URL, fetches it, and returns the response body back to the client.',
+      text:'What attack class does this enable, and how is it best mitigated?',
+      opts:['Cross-Site Scripting; mitigate with HTML-encoding',
+            'Server-Side Request Forgery (SSRF) — attackers can probe internal networks or cloud metadata endpoints; mitigate with strict URL allowlists, blocking private/link-local IPs, disabling redirects, and requiring authentication on internal services',
+            'SQL injection; mitigate with prepared statements',
+            'Open redirect; mitigate with HSTS'], ans:1 },
+    { text:'A web application uses URL paths like /account?id=12345. A logged-in user can view ANY other account by changing the id. This is an example of:',
+      opts:['Reflected XSS',
+            'Insecure Direct Object Reference (IDOR) — every request must authorise the authenticated principal against the requested object, not just authenticate them',
+            'CSRF',
+            'SSRF'], ans:1 },
+    { text:'A JWT library accepts whatever algorithm the token header declares. The well-known vulnerability and the correct fix:',
+      opts:['JWTs cannot be tampered with — no fix needed',
+            'Accepting "alg: none" or letting the token dictate the algorithm allows forgery — the server must enforce a single fixed expected algorithm and validate signature with a server-controlled key',
+            'JWTs should be base64-decoded but not validated',
+            'JWTs must always be stored in localStorage'], ans:1 },
+
+    // ─── Identity & access (3) ───
+    { text:'The "Principle of Least Privilege" means:',
+      opts:['Every user gets admin by default for convenience',
+            'Each identity (human or service) is granted only the permissions strictly required to perform its function, and no more — reducing blast radius if it is compromised',
+            'Disable logging',
+            'Use one shared root account'], ans:1 },
+    { text:'Multi-factor authentication factor categories are commonly summarised as:',
+      opts:['Two passwords (e.g., short PIN + long password)',
+            'Something you know · something you have · something you are',
+            'Username, password, email address',
+            'PIN, OTP, CAPTCHA'], ans:1 },
+    { text:'OAuth 2.0 vs SAML 2.0:',
+      opts:['They are the same protocol',
+            'OAuth 2.0 is primarily an authorisation framework (delegated access tokens, often used for API access and increasingly with OIDC for auth); SAML 2.0 is primarily a federated authentication / SSO protocol using XML assertions',
+            'SAML is newer than OAuth',
+            'OAuth uses XML'], ans:1 },
+
+    // ─── Detection & response (4) ───
+    { text:'A SIEM is primarily used to:',
+      opts:['Train ML models',
+            'Centralise security telemetry from many sources (endpoints, network, IAM, apps) for correlation, alerting, and investigation',
+            'Encrypt files at rest',
+            'Block IP addresses at the firewall'], ans:1 },
+    { text:'An EDR complements traditional antivirus by:',
+      opts:['Replacing the firewall',
+            'Adding rich endpoint telemetry, behaviour-based detection, and the ability to investigate, contain, and remediate active threats — not just signature-matching',
+            'Encrypting the disk',
+            'Updating drivers'], ans:1 },
+    { text:'The typical NIST 800-61 incident response phases are:',
+      opts:['Buy, deploy, forget',
+            'Preparation → Detection &amp; Analysis → Containment → Eradication → Recovery → Post-incident lessons-learned',
+            'Patch, restart, ignore',
+            'Detect, eradicate, patch (in that order)'], ans:1 },
+    { text:'A "zero-day" vulnerability is best defined as:',
+      opts:['Any new CVE published this year',
+            'A vulnerability for which no public patch exists at the time of discovery or exploitation — defenders have had "zero days" to mitigate',
+            'A vulnerability with CVSS score 0',
+            'A vulnerability that requires zero authentication'], ans:1 },
+
+    // ─── Cloud & secrets (2) ───
+    { ctx:'You discover an S3 bucket with `public-read` ACL containing customer PII, in production.',
+      text:'The CORRECT first response is:',
+      opts:['Tweet about it',
+            'Immediately remove public access, audit access logs to determine who downloaded what, rotate any leaked credentials, engage your security/IR team, and follow your breach-notification policy',
+            'Wait for the bucket lifecycle policy to expire',
+            'Move the bucket to a different region'], ans:1 },
+    { text:'A developer commits an AWS access key to a public GitHub repository. The correct response is to:',
+      opts:['Edit the commit silently and hope nobody saw',
+            'Treat the key as compromised: rotate / revoke it immediately, audit CloudTrail for unauthorised use, scrub the secret from history (force-push or BFG repo-cleaner), add pre-commit secret scanning, and post-mortem the root cause',
+            'Delete the file in a new commit (the key is now safe)',
+            'Tell the developer not to do it again and move on'], ans:1 },
+
+    // ─── Risk, threat modelling, attacks (3) ───
+    { text:'A CVSS base score of 9.8 (Critical) primarily indicates:',
+      opts:['The vulnerability is already exploited in your environment',
+            'A standardised estimate of impact and exploitability — but it does NOT reflect your specific environment, exposure, or compensating controls; you should still prioritise alongside business context',
+            'The vulnerability will be patched by the vendor soon',
+            'The finding is likely a false positive'], ans:1 },
+    { text:'STRIDE — a classic threat-modelling mnemonic — stands for:',
+      opts:['Spoofing, Tampering, Repudiation, Information disclosure, Denial of service, Elevation of privilege',
+            'A six-step incident response process',
+            'A type of firewall',
+            'A SIEM product'], ans:0 },
+    { ctx:'A phishing email links to https://paypaI.com (the "I" is a capital "i", not lowercase "L"), which looks identical to https://paypal.com at a glance.',
+      text:'This is an example of:',
+      opts:['SQL injection',
+            'A homograph / typosquatting attack — visually similar characters trick users; mitigations include URL preview, browser warnings, MFA, and DNS / link rewriting at the email gateway',
+            'SSRF',
+            'Privilege escalation via setuid'], ans:1 },
+
+    // ─── Defence-in-depth (1) ───
+    { text:'"Defence-in-depth" means:',
+      opts:['One strong control is enough if it\'s configured perfectly',
+            'Multiple independent layers of controls — network, host, identity, application, data — so the failure of any one layer does not lead to compromise',
+            'Encrypt everything and stop',
+            'Only buy firewalls'], ans:1 }
+  ];
+
+  var LEVELS = [
+    { min:80, label:'Proficient',  desc:'Strong cyber security fundamentals across crypto, network, app, IAM, and IR. Ready for senior contribution.' },
+    { min:65, label:'Capable',     desc:'Good grasp of key security concepts with minor gaps. Ready for mid-level work with mentorship.' },
+    { min:50, label:'Developing',  desc:'Foundational knowledge in place. Targeted development needed before owning security-critical work unsupervised.' },
+    { min:0,  label:'Insufficient',desc:'Below threshold for a Cyber Security role at this stage. Re-screen after further study.' }
+  ];
+
+  var ROLE = (new URLSearchParams(window.location.search).get('role')) || localStorage.getItem(TN.STORAGE.role) || 'cyber-security';
+  if (ROLE) localStorage.setItem(TN.STORAGE.role, ROLE);
+
+  var current=0, answers={}, startTime, endTime, timerInt, elapsed=0, TIME=40*60, timeOver=false;
+
+  document.getElementById('btn-begin').onclick = function () {
+    if (localStorage.getItem(TN.STORAGE.email) && localStorage.getItem(TN.STORAGE.phone)) startQuiz();
+    else { TN.renderInfoForm(document.getElementById('info-mount'), { role: ROLE, onSuccess: startQuiz }); TN.showScreen('screen-info'); }
+  };
+  function startQuiz() { current=0; answers={}; startTime=new Date(); TN.showScreen('screen-quiz'); render(); timerInt=setInterval(tick,1000); }
+  function tick() {
+    elapsed++;
+    var rem=TIME-elapsed, el=document.getElementById('timer'), abs=Math.abs(rem);
+    el.textContent = rem >= 0 ? (String(Math.floor(abs/60)).padStart(2,'0')+':'+String(abs%60).padStart(2,'0')) : 'Over';
+    el.className = 'tn-timer' + (rem<=0?' red':rem<=120?' red':rem<=300?' amber':'');
+    if (rem<=0) timeOver=true;
+  }
+  function render() {
+    var q = QUESTIONS[current];
+    document.getElementById('qlbl').textContent = 'Question ' + (current+1) + ' of ' + QUESTIONS.length;
+    document.getElementById('qfill').style.width = (((current+1)/QUESTIONS.length)*100) + '%';
+    document.getElementById('btn-prev').style.visibility = current > 0 ? 'visible' : 'hidden';
+    document.getElementById('btn-next').textContent = current === QUESTIONS.length - 1 ? 'Submit →' : 'Next →';
+    document.getElementById('warn').classList.remove('show');
+    var html = '<div class="tn-q-card"><div class="tn-q-num">Question ' + (current+1) + ' / ' + QUESTIONS.length + '</div>';
+    if (q.ctx) html += '<div class="tn-q-context">' + TN.esc(q.ctx) + '</div>';
+    html += '<div class="tn-q-text">' + TN.esc(q.text) + '</div><div class="tn-options">';
+    var letters = ['A','B','C','D'];
+    q.opts.forEach(function (o, i) {
+      var sel = answers[current] === i ? ' selected' : '';
+      html += '<div class="tn-opt' + sel + '" data-v="' + i + '"><div class="tn-opt-label">' + letters[i] + '</div><div class="tn-opt-text">' + TN.esc(o) + '</div></div>';
+    });
+    html += '</div></div>';
+    document.getElementById('qcard').innerHTML = html;
+    document.querySelectorAll('.tn-opt').forEach(function (el) {
+      el.addEventListener('click', function () {
+        var v = parseInt(el.getAttribute('data-v'), 10);
+        answers[current] = v;
+        document.querySelectorAll('.tn-opt').forEach(function (e) { e.classList.remove('selected'); });
+        el.classList.add('selected');
+      });
+    });
+  }
+  document.getElementById('btn-prev').onclick = function () { if (current > 0) { current--; render(); window.scrollTo(0,0); } };
+  document.getElementById('btn-next').onclick = function () {
+    if (answers[current] === undefined) { document.getElementById('warn').classList.add('show'); return; }
+    if (current < QUESTIONS.length - 1) { current++; render(); window.scrollTo(0,0); }
+    else { finish(); }
+  };
+
+  function finish() {
+    clearInterval(timerInt);
+    endTime = new Date();
+    var timeTaken = Math.round((endTime - startTime) / 1000);
+    var correct = 0;
+    QUESTIONS.forEach(function (q, i) { if (answers[i] === q.ans) correct++; });
+    var pct = Math.round((correct / QUESTIONS.length) * 100);
+    var level = LEVELS.find(function (l) { return pct >= l.min; });
+    document.getElementById('results-body').innerHTML =
+      '<div class="tn-result-hero"><div class="icon">🛡️</div><h2>Cyber Security — Technical</h2>' +
+        '<div class="tn-result-pct">' + pct + '%</div><div class="tn-result-label">' + level.label + '</div>' +
+        '<div class="tn-result-sub">' + correct + ' / ' + QUESTIONS.length + ' correct</div></div>' +
+      '<div class="tn-stats-grid">' +
+        '<div class="tn-stat"><div class="tn-stat-val">' + correct + '</div><div class="tn-stat-lbl">Correct</div></div>' +
+        '<div class="tn-stat"><div class="tn-stat-val">' + (QUESTIONS.length - correct) + '</div><div class="tn-stat-lbl">Incorrect</div></div>' +
+        '<div class="tn-stat"><div class="tn-stat-val">' + (Math.floor(timeTaken/60)) + 'm ' + (timeTaken%60) + 's</div><div class="tn-stat-lbl">Time</div></div>' +
+      '</div>' +
+      '<div class="tn-q-card"><div class="tn-q-num">Result interpretation</div><div style="font-size:14px;color:#374151;line-height:1.6">' + level.desc + '</div></div>' +
+      '<div class="tn-q-card" id="ss" style="display:flex;align-items:center;gap:10px;font-size:14px"><span id="ss-icon">⏳</span><span id="ss-text">Saving your results…</span></div>' +
+      '<div style="display:flex;gap:10px;flex-wrap:wrap">' +
+        '<a class="tn-btn primary" href="/technext/' + TN.esc(ROLE) + '">← Back to role dashboard</a>' +
+      '</div>';
+    TN.showScreen('screen-results');
+    if (ROLE) TN.markDone(ROLE, 'cyber-technical');
+    TN.submitTest({
+      test_type: 'tn_cyber_technical',
+      start_time: startTime.toISOString(), end_time: endTime.toISOString(),
+      time_taken_seconds: timeTaken, score_raw: correct, score_max: QUESTIONS.length,
+      score_pct: pct, result_label: level.label, answers: answers, flags: { time_over: timeOver }
+    }).then(function (out) {
+      var icon=document.getElementById('ss-icon'), text=document.getElementById('ss-text');
+      if (out.ok) { icon.textContent = '✅'; text.textContent = 'Results saved.'; }
+      else { icon.textContent = '⚠️'; text.textContent = 'Could not save results: ' + (out.body && out.body.error ? out.body.error : 'server error'); }
+    }).catch(function () {
+      document.getElementById('ss-icon').textContent = '⚠️';
+      document.getElementById('ss-text').textContent = 'Could not reach server. Please screenshot this page.';
+    });
+  }
+})();
+</script>
+
+</body>
+</html>

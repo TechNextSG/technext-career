@@ -9,9 +9,9 @@
       icon: '🤖',
       blurb: 'Design, build, and deploy LLM-powered systems — RAG, agents, evaluation, fine-tuning.',
       tests: [
-        { slug: 'profiler',     test_type: 'tn_profiler',     label: 'TechNext Profiler',         path: '/technext/profiler',       desc: 'Cultural fit · 24 questions · ~12 min' },
-        { slug: 'iq',           test_type: 'tn_iq',           label: 'IQ Assessment',             path: '/technext/iq',             desc: 'Logical reasoning · 20 questions · 25 min' },
-        { slug: 'ai-technical', test_type: 'tn_ai_technical', label: 'AI Engineer — Technical',   path: '/technext/ai-technical',   desc: 'Transformers, RAG, agents · 20 questions · 30 min' }
+        { slug: 'profiler',     test_type: 'tn_profiler',     label: 'TechNext Profiler',         path: '/technext/profiler',       desc: 'Personality · DISC + Type · 32 questions · ~12 min' },
+        { slug: 'iq',           test_type: 'tn_iq',           label: 'Reasoning Test',            path: '/technext/iq',             desc: 'Numerical, verbal, logical · 25 questions · 35 min' },
+        { slug: 'ai-technical', test_type: 'tn_ai_technical', label: 'AI Engineer — Technical',   path: '/technext/ai-technical',   desc: 'Transformers, RAG, agents · 25 questions · 40 min' }
       ]
     },
     'functional-consultant': {
@@ -19,8 +19,8 @@
       icon: '🧭',
       blurb: 'Translate business needs into working ERP solutions — discovery, modelling, configuration, UAT.',
       tests: [
-        { slug: 'profiler',     test_type: 'tn_profiler',     label: 'TechNext Profiler',                  path: '/technext/profiler',     desc: 'Cultural fit · 24 questions · ~12 min' },
-        { slug: 'iq',           test_type: 'tn_iq',           label: 'IQ Assessment',                      path: '/technext/iq',           desc: 'Logical reasoning · 20 questions · 25 min' },
+        { slug: 'profiler',     test_type: 'tn_profiler',     label: 'TechNext Profiler',                  path: '/technext/profiler',     desc: 'Personality · DISC + Type · 32 questions · ~12 min' },
+        { slug: 'iq',           test_type: 'tn_iq',           label: 'Reasoning Test',                     path: '/technext/iq',           desc: 'Numerical, verbal, logical · 25 questions · 35 min' },
         { slug: 'fc-technical', test_type: 'tn_fc_technical', label: 'Functional Consultant — Technical',  path: '/technext/fc-technical', desc: 'Requirements, BPMN, ERP · 20 questions · 30 min' }
       ]
     },
@@ -29,9 +29,19 @@
       icon: '🧰',
       blurb: 'Build Odoo modules — Python, ORM, views, security, QWeb, integration.',
       tests: [
-        { slug: 'profiler',       test_type: 'tn_profiler',       label: 'TechNext Profiler',         path: '/technext/profiler',       desc: 'Cultural fit · 24 questions · ~12 min' },
-        { slug: 'iq',             test_type: 'tn_iq',             label: 'IQ Assessment',             path: '/technext/iq',             desc: 'Logical reasoning · 20 questions · 25 min' },
+        { slug: 'profiler',       test_type: 'tn_profiler',       label: 'TechNext Profiler',          path: '/technext/profiler',       desc: 'Personality · DISC + Type · 32 questions · ~12 min' },
+        { slug: 'iq',             test_type: 'tn_iq',             label: 'Reasoning Test',             path: '/technext/iq',             desc: 'Numerical, verbal, logical · 25 questions · 35 min' },
         { slug: 'odoo-technical', test_type: 'tn_odoo_technical', label: 'Odoo Developer — Technical', path: '/technext/odoo-technical', desc: 'Python, ORM, views, security · 20 questions · 35 min' }
+      ]
+    },
+    'cyber-security': {
+      label: 'Cyber Security',
+      icon: '🛡️',
+      blurb: 'Protect systems and data — cryptography, network security, web/app security, identity, detection & response.',
+      tests: [
+        { slug: 'profiler',        test_type: 'tn_profiler',        label: 'TechNext Profiler',         path: '/technext/profiler',        desc: 'Personality · DISC + Type · 32 questions · ~12 min' },
+        { slug: 'iq',              test_type: 'tn_iq',              label: 'Reasoning Test',            path: '/technext/iq',              desc: 'Numerical, verbal, logical · 25 questions · 35 min' },
+        { slug: 'cyber-technical', test_type: 'tn_cyber_technical', label: 'Cyber Security — Technical', path: '/technext/cyber-technical', desc: 'Crypto, network, web, IAM, IR · 26 questions · 40 min' }
       ]
     }
   };
