@@ -5,9 +5,9 @@
     { "source": "/.netlify/functions/submit-test", "destination": "/api/submit-test" },
     { "source": "/.netlify/functions/get-results", "destination": "/api/get-results" },
 
-    { "source": "/",                                "destination": "/technext/index.html" },
-    { "source": "/technext",                        "destination": "/technext/index.html" },
-    { "source": "/technext/",                       "destination": "/technext/index.html" },
+    { "source": "/",                                "destination": "/technext/index" },
+    { "source": "/technext",                        "destination": "/technext/index" },
+    { "source": "/technext/",                       "destination": "/technext/index" },
 
     { "source": "/technext/ai-engineer",            "destination": "/technext/role?role=ai-engineer" },
     { "source": "/technext/functional-consultant",  "destination": "/technext/role?role=functional-consultant" },
