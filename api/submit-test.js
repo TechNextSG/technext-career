@@ -1,10 +1,15 @@
 'use strict';
 const https = require('https');
+const { odooSync, isConfigured: odooConfigured } = require('./_odoo');
 
 const SUPABASE_URL  = process.env.SUPABASE_URL  || 'https://ndaydueegykjvliblbly.supabase.co';
 const SUPABASE_KEY  = process.env.SUPABASE_SERVICE_ROLE_KEY
                    || process.env.SUPABASE_ANON_KEY
                    || 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im5kYXlkdWVlZ3lranZsaWJsYmx5Iiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc3MjEwNDEyMiwiZXhwIjoyMDg3NjgwMTIyfQ.EalKqjd3OAMLPocKvyatpvbyBxXn73uNErSs55OmZho';
+
+// Hard deadline on the Odoo sync from the submit handler. The candidate's UX
+// must not wait longer than this even if Odoo hangs.
+const ODOO_SYNC_TIMEOUT_MS = parseInt(process.env.ODOO_SYNC_TIMEOUT_MS || '3500', 10);
 
 module.exports = async (req, res) => {
   res.setHeader('Access-Control-Allow-Origin', '*');
@@ -25,14 +30,42 @@ module.exports = async (req, res) => {
     }
   }
 
+  let row;
   try {
-    const row = await supabaseInsert(payload);
-    return res.status(200).json({ success: true, id: row.id || null });
+    row = await supabaseInsert(payload);
   } catch (err) {
     console.error('Supabase insert error:', err);
     return res.status(500).json({ error: 'Database error', detail: err.message });
   }
+
+  // Best-effort Odoo mirror. Bounded by a hard timeout. NEVER fails the
+  // candidate's submission — Supabase is the source of truth.
+  if (odooConfigured()) {
+    try {
+      await runWithTimeout(odooSync(payload, row.id), ODOO_SYNC_TIMEOUT_MS);
+    } catch (err) {
+      console.log(JSON.stringify({
+        evt: 'odoo_sync_fail',
+        t: new Date().toISOString(),
+        supabase_id: row.id || null,
+        test_type: payload.test_type,
+        err: (err && err.message) ? String(err.message).slice(0, 240) : 'unknown',
+      }));
+    }
+  }
+
+  return res.status(200).json({ success: true, id: row.id || null });
 };
+
+function runWithTimeout(promise, ms) {
+  return new Promise((resolve, reject) => {
+    const timer = setTimeout(() => reject(new Error('Odoo sync timeout after ' + ms + 'ms')), ms);
+    Promise.resolve(promise).then(
+      v => { clearTimeout(timer); resolve(v); },
+      e => { clearTimeout(timer); reject(e); }
+    );
+  });
+}
 
 function supabaseInsert(data) {
   return new Promise((resolve, reject) => {
