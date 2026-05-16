@@ -49,7 +49,7 @@ module.exports = async (req, res) => {
         t: new Date().toISOString(),
         supabase_id: row.id || null,
         test_type: payload.test_type,
-        err: (err && err.message) ? String(err.message).slice(0, 240) : 'unknown',
+        err: (err && err.message) ? String(err.message).slice(0, 3000) : 'unknown',
       }));
     }
   }

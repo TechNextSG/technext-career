@@ -403,7 +403,7 @@ function toOdooDatetime(d) {
 
 function shortErr(e) {
   const m = (e && e.message) || String(e);
-  return m.length > 200 ? m.slice(0, 200) + '…' : m;
+  return m.length > 2000 ? m.slice(0, 2000) + '…' : m;
 }
 
 function fmt(v) { return v == null || v === '' ? '—' : String(v); }
@@ -497,8 +497,7 @@ async function createApplicant(payload) {
   const vals = {
     partner_name: displayName,
     email_from: payload.candidate_email,
-    phone: payload.candidate_phone || false,
-    description: '<p>Created from TechNext candidate portal.</p>',
+    partner_phone: payload.candidate_phone || false,
   };
   const jobId = JOB_ID_BY_ROLE[role];
   if (jobId) {
