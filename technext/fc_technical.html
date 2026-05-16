@@ -10,7 +10,7 @@
 
 <header class="tn-header">
   <div class="tn-logo">T</div>
-  <div class="tn-brand"><h1>Functional Consultant / BA</h1><p>Requirements · BPMN · ERP · 20 questions · 30 min</p></div>
+  <div class="tn-brand"><h1>Functional Consultant / BA</h1><p>Requirements · BPMN · ERP · 20 questions · 15 min</p></div>
   <span class="tn-pill">Test 3 of 3</span>
 </header>
 
@@ -22,7 +22,7 @@
       <p class="sub" style="text-align:center">Mixed scenarios on requirements gathering, stakeholder management, process modelling, ERP fundamentals, gap analysis, and UAT.</p>
       <div class="tn-stats-grid" style="margin:18px 0 20px">
         <div class="tn-stat"><div class="tn-stat-val">20</div><div class="tn-stat-lbl">Questions</div></div>
-        <div class="tn-stat"><div class="tn-stat-val">30 min</div><div class="tn-stat-lbl">Time limit</div></div>
+        <div class="tn-stat"><div class="tn-stat-val">15 min</div><div class="tn-stat-lbl">Time limit</div></div>
         <div class="tn-stat"><div class="tn-stat-val">MCQ</div><div class="tn-stat-lbl">Format</div></div>
       </div>
       <button class="tn-btn primary block lg" id="btn-begin">Begin →</button>
@@ -38,7 +38,7 @@
       <div class="tn-quiz-progress-lbl" id="qlbl">Question 1 of 20</div>
       <div class="tn-quiz-progress-bar"><div class="tn-quiz-progress-fill" id="qfill" style="width:5%"></div></div>
     </div>
-    <div class="tn-timer" id="timer">30:00</div>
+    <div class="tn-timer" id="timer">15:00</div>
   </div>
   <div class="tn-quiz-body">
     <div id="qcard"></div>
@@ -171,7 +171,7 @@
   var ROLE = (new URLSearchParams(window.location.search).get('role')) || localStorage.getItem(TN.STORAGE.role) || 'functional-consultant';
   if (ROLE) localStorage.setItem(TN.STORAGE.role, ROLE);
 
-  var current=0, answers={}, startTime, endTime, timerInt, elapsed=0, TIME=30*60, timeOver=false;
+  var current=0, answers={}, startTime, endTime, timerInt, elapsed=0, TIME=15*60, timeOver=false;
 
   document.getElementById('btn-begin').onclick = function () {
     if (localStorage.getItem(TN.STORAGE.email) && localStorage.getItem(TN.STORAGE.phone)) startQuiz();

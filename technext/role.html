@@ -27,6 +27,9 @@ main{max-width:720px;margin:0 auto;padding:28px 16px 60px}
 .back-link:hover{color:#0f3a52}
 .reset-link{font-size:11px;color:#9ca3af;text-decoration:underline;cursor:pointer;margin-top:14px;display:inline-block}
 .reset-link:hover{color:#dc2626}
+.opt-badge{display:inline-block;background:#f0f4f8;color:#6b7a8d;font-size:9.5px;font-weight:800;padding:2px 7px;border-radius:99px;letter-spacing:.5px;text-transform:uppercase;margin-left:6px;vertical-align:middle}
+.tn-role-step.optional{background:#fafbfc}
+.tn-role-step.optional .tn-step-status{color:#9ca3af}
 @media(max-width:640px){
   .hero{padding:28px 16px 22px}
   .hero h2{font-size:20px}
@@ -70,7 +73,7 @@ main{max-width:720px;margin:0 auto;padding:28px 16px 60px}
       <div class="b-icon">🗓️</div>
       <div class="b-info">
         <h4>Book your interview</h4>
-        <p id="book-sub">Finish all four steps above to unlock interview booking.</p>
+        <p id="book-sub">Finish the required steps above to unlock interview booking. Optional steps help us get to know you but aren't required.</p>
       </div>
     </div>
   </div>
@@ -132,18 +135,28 @@ main{max-width:720px;margin:0 auto;padding:28px 16px 60px}
   function render() {
     var stepsEl = document.getElementById('steps');
     stepsEl.innerHTML = '';
-    var firstPendingIdx = -1;
+
+    // Find the first pending REQUIRED step. Only later required steps get
+    // locked behind it; optional steps are always open.
+    var firstPendingReqIdx = -1;
+    spec.tests.forEach(function (t, i) {
+      if (t.optional) return;
+      if (!TN.isDone(role, t.slug) && firstPendingReqIdx < 0) firstPendingReqIdx = i;
+    });
+
     spec.tests.forEach(function (t, i) {
       var done = TN.isDone(role, t.slug);
-      if (!done && firstPendingIdx < 0) firstPendingIdx = i;
-      var locked = !done && firstPendingIdx >= 0 && firstPendingIdx !== i; // earlier pending blocks later
+      var locked = !done && !t.optional && firstPendingReqIdx >= 0 && i > firstPendingReqIdx;
       var row = document.createElement('a');
-      row.className = 'tn-role-step' + (done ? ' done' : '') + (locked ? ' locked' : '');
+      row.className = 'tn-role-step' + (done ? ' done' : '') + (locked ? ' locked' : '') + (t.optional ? ' optional' : '');
       row.href = (done || !locked) ? (t.path + '?role=' + encodeURIComponent(role)) : 'javascript:void(0)';
+      var statusLabel = done ? 'Completed'
+                       : locked ? 'Locked'
+                       : (t.optional ? 'Optional' : 'Start');
       row.innerHTML =
         '<div class="tn-step-num">' + (done ? '✓' : (i+1)) + '</div>' +
-        '<div class="tn-step-info"><h4>' + TN.esc(t.label) + '</h4><p>' + TN.esc(t.desc) + '</p></div>' +
-        '<div class="tn-step-status ' + (done ? '' : 'pending') + '">' + (done ? 'Completed' : (locked ? 'Locked' : 'Start')) + '</div>';
+        '<div class="tn-step-info"><h4>' + TN.esc(t.label) + (t.optional && !done ? ' <span class="opt-badge">Optional</span>' : '') + '</h4><p>' + TN.esc(t.desc) + '</p></div>' +
+        '<div class="tn-step-status ' + (done ? '' : 'pending') + '">' + statusLabel + '</div>';
       if (locked) row.style.pointerEvents = 'none';
       stepsEl.appendChild(row);
     });
@@ -153,7 +166,7 @@ main{max-width:720px;margin:0 auto;padding:28px 16px 60px}
     if (TN.allDone(role)) {
       bookEl.classList.remove('disabled');
       bookEl.style.cursor = 'pointer';
-      bookSub.textContent = 'All assessments complete. Pick a time slot to confirm your interview.';
+      bookSub.textContent = 'All required steps complete. Pick a time slot to express interest in an interview.';
       bookEl.onclick = function () { window.location.href = '/technext/booking?role=' + encodeURIComponent(role); };
     } else {
       bookEl.classList.add('disabled');

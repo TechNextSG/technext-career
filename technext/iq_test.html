@@ -10,7 +10,7 @@
 
 <header class="tn-header">
   <div class="tn-logo">T</div>
-  <div class="tn-brand"><h1>Reasoning Test</h1><p>Numerical · Verbal · Logical · 25 questions · 35 min</p></div>
+  <div class="tn-brand"><h1>Reasoning Test</h1><p>Numerical · Verbal · Logical · 25 questions · 18 min</p></div>
   <span class="tn-pill">Test 2 of 3</span>
 </header>
 
@@ -22,7 +22,7 @@
       <p class="sub" style="text-align:center">A mixed reasoning screen covering number sequences, logical deduction, verbal analogies, word problems, and critical reasoning. Difficulty is graduate-level — read each question carefully.</p>
       <div class="tn-stats-grid" style="margin:18px 0 20px">
         <div class="tn-stat"><div class="tn-stat-val">25</div><div class="tn-stat-lbl">Questions</div></div>
-        <div class="tn-stat"><div class="tn-stat-val">35 min</div><div class="tn-stat-lbl">Time limit</div></div>
+        <div class="tn-stat"><div class="tn-stat-val">18 min</div><div class="tn-stat-lbl">Time limit</div></div>
         <div class="tn-stat"><div class="tn-stat-val">Hard</div><div class="tn-stat-lbl">Difficulty</div></div>
       </div>
       <p class="sub" style="font-size:12.5px">Time limit is advisory — you may still submit after time is up.</p>
@@ -39,7 +39,7 @@
       <div class="tn-quiz-progress-lbl" id="qlbl">Question 1 of 25</div>
       <div class="tn-quiz-progress-bar"><div class="tn-quiz-progress-fill" id="qfill" style="width:4%"></div></div>
     </div>
-    <div class="tn-timer" id="timer">35:00</div>
+    <div class="tn-timer" id="timer">18:00</div>
   </div>
   <div class="tn-quiz-body">
     <div id="qcard"></div>
@@ -138,7 +138,7 @@
   var ROLE = (new URLSearchParams(window.location.search).get('role')) || localStorage.getItem(TN.STORAGE.role) || '';
   if (ROLE) localStorage.setItem(TN.STORAGE.role, ROLE);
 
-  var current=0, answers={}, startTime, endTime, timerInt, elapsed=0, TIME=35*60, timeOver=false;
+  var current=0, answers={}, startTime, endTime, timerInt, elapsed=0, TIME=18*60, timeOver=false;
 
   document.getElementById('btn-begin').onclick = function () {
     if (localStorage.getItem(TN.STORAGE.email) && localStorage.getItem(TN.STORAGE.phone)) startQuiz();

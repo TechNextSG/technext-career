@@ -176,6 +176,13 @@ main{max-width:780px;margin:0 auto;padding:22px 16px 120px}
       <p><strong>You'll only be contacted if confirmed.</strong> Confirmation is sent <strong>by email or handphone</strong> — and only to shortlisted candidates. Not all bookings will result in an interview.</p>
     </div>
   </div>
+
+  <!-- In-flow confirm CTA (mirrors the sticky bar so it's always reachable) -->
+  <div class="section" id="sec-confirm" style="text-align:center">
+    <div id="confirm-info-inline" style="font-size:13.5px;color:#374151;margin-bottom:14px">Pick a day and time above to enable the button.</div>
+    <button class="tn-btn gold lg" id="confirm-btn-inline" disabled style="min-width:240px">Send my interest →</button>
+    <div style="font-size:11.5px;color:#9ca3af;margin-top:10px">Sends a Google Calendar invite to <strong id="invite-addr-inline">career@technext.asia</strong>.</div>
+  </div>
 </main>
 
 <div class="confirm-bar" id="confirm-bar">
@@ -285,10 +292,14 @@ main{max-width:780px;margin:0 auto;padding:22px 16px 120px}
   function updatePreview() {
     var start = selectedStart();
     var preview = document.getElementById('preview');
+    var inlineInfo = document.getElementById('confirm-info-inline');
+    var inlineBtn = document.getElementById('confirm-btn-inline');
     if (!start) {
       preview.style.display = 'none';
       document.getElementById('confirm-info').textContent = 'Pick a day and time above';
       document.getElementById('confirm-btn').disabled = true;
+      if (inlineInfo) inlineInfo.textContent = 'Pick a day and time above to enable the button.';
+      if (inlineBtn) inlineBtn.disabled = true;
       return;
     }
     preview.style.display = 'flex';
@@ -298,6 +309,9 @@ main{max-width:780px;margin:0 auto;padding:22px 16px 120px}
     document.getElementById('confirm-info').innerHTML =
       '<strong>' + fmtFullDay(start) + '</strong>' + fmtRange(start) + ' · 45 min';
     document.getElementById('confirm-btn').disabled = false;
+
+    if (inlineInfo) inlineInfo.innerHTML = '<strong>' + fmtFullDay(start) + '</strong> · ' + fmtRange(start) + ' · 45 min';
+    if (inlineBtn) inlineBtn.disabled = false;
   }
 
   // ── Invite summary ──
@@ -315,8 +329,12 @@ main{max-width:780px;margin:0 auto;padding:22px 16px 120px}
     row('LinkedIn', localStorage.getItem(TN.STORAGE.linkedin) || '', true) +
     row('Resume', localStorage.getItem(TN.STORAGE.resumeUrl) || '', true);
 
-  // ── Confirm ──
-  document.getElementById('confirm-btn').onclick = function () {
+  // Reflect the live INTERVIEW_EMAIL in the inline footnote
+  var inlineAddrEl = document.getElementById('invite-addr-inline');
+  if (inlineAddrEl) inlineAddrEl.textContent = TN.INTERVIEW_EMAIL;
+
+  // ── Confirm — wire both the sticky button and the in-flow inline button ──
+  function onConfirm() {
     var slot = selectedStart();
     if (!slot) return;
     var candidate = {
@@ -342,11 +360,16 @@ main{max-width:780px;margin:0 auto;padding:22px 16px 120px}
     document.getElementById('gcal-fallback').href = url;
     var win = window.open(url, '_blank');
     document.getElementById('success-card').classList.add('show');
-    document.getElementById('confirm-btn').disabled = true;
-    document.getElementById('confirm-btn').textContent = '✓ Calendar opened';
+    ['confirm-btn','confirm-btn-inline'].forEach(function (id) {
+      var b = document.getElementById(id);
+      if (b) { b.disabled = true; b.textContent = '✓ Calendar opened'; }
+    });
     if (!win) TN.toast('Pop-up blocked — click the link in the green card to open your calendar', 'error');
     window.scrollTo({ top: 0, behavior: 'smooth' });
-  };
+  }
+  document.getElementById('confirm-btn').onclick = onConfirm;
+  var inlineConfirm = document.getElementById('confirm-btn-inline');
+  if (inlineConfirm) inlineConfirm.onclick = onConfirm;
 })();
 </script>
 

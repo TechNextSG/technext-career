@@ -10,7 +10,7 @@
 
 <header class="tn-header">
   <div class="tn-logo">T</div>
-  <div class="tn-brand"><h1>Odoo Developer — Technical</h1><p>Python · ORM · Views · Security · 20 questions · 35 min</p></div>
+  <div class="tn-brand"><h1>Odoo Developer — Technical</h1><p>Python · ORM · Views · Security · 20 questions · 18 min</p></div>
   <span class="tn-pill">Test 3 of 3</span>
 </header>
 
@@ -22,7 +22,7 @@
       <p class="sub" style="text-align:center">Hands-on Odoo development: Python, ORM, views, inheritance, security, QWeb, and integration patterns.</p>
       <div class="tn-stats-grid" style="margin:18px 0 20px">
         <div class="tn-stat"><div class="tn-stat-val">20</div><div class="tn-stat-lbl">Questions</div></div>
-        <div class="tn-stat"><div class="tn-stat-val">35 min</div><div class="tn-stat-lbl">Time limit</div></div>
+        <div class="tn-stat"><div class="tn-stat-val">18 min</div><div class="tn-stat-lbl">Time limit</div></div>
         <div class="tn-stat"><div class="tn-stat-val">Hard</div><div class="tn-stat-lbl">Difficulty</div></div>
       </div>
       <button class="tn-btn primary block lg" id="btn-begin">Begin →</button>
@@ -38,7 +38,7 @@
       <div class="tn-quiz-progress-lbl" id="qlbl">Question 1 of 20</div>
       <div class="tn-quiz-progress-bar"><div class="tn-quiz-progress-fill" id="qfill" style="width:5%"></div></div>
     </div>
-    <div class="tn-timer" id="timer">35:00</div>
+    <div class="tn-timer" id="timer">18:00</div>
   </div>
   <div class="tn-quiz-body">
     <div id="qcard"></div>
@@ -159,7 +159,7 @@
   var ROLE = (new URLSearchParams(window.location.search).get('role')) || localStorage.getItem(TN.STORAGE.role) || 'odoo-developer';
   if (ROLE) localStorage.setItem(TN.STORAGE.role, ROLE);
 
-  var current=0, answers={}, startTime, endTime, timerInt, elapsed=0, TIME=35*60, timeOver=false;
+  var current=0, answers={}, startTime, endTime, timerInt, elapsed=0, TIME=18*60, timeOver=false;
 
   document.getElementById('btn-begin').onclick = function () {
     if (localStorage.getItem(TN.STORAGE.email) && localStorage.getItem(TN.STORAGE.phone)) startQuiz();

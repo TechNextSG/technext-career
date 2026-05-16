@@ -24,7 +24,7 @@
         (your 4-letter Type). There are no right or wrong answers — pick the choice that's most like you most of the time.</p>
       <div class="tn-stats-grid" style="margin:18px 0 20px">
         <div class="tn-stat"><div class="tn-stat-val">32</div><div class="tn-stat-lbl">Questions</div></div>
-        <div class="tn-stat"><div class="tn-stat-val">~12 min</div><div class="tn-stat-lbl">Time</div></div>
+        <div class="tn-stat"><div class="tn-stat-val">~6 min</div><div class="tn-stat-lbl">Time</div></div>
         <div class="tn-stat"><div class="tn-stat-val">DISC + 4-letter Type</div><div class="tn-stat-lbl">Frameworks</div></div>
       </div>
       <p class="sub" style="font-size:12.5px"><strong>Honest answers fit better.</strong> The profile tells us how you naturally work — every type is welcome at TechNext.</p>
@@ -41,7 +41,7 @@
       <div class="tn-quiz-progress-lbl" id="qlbl">Question 1 of 32</div>
       <div class="tn-quiz-progress-bar"><div class="tn-quiz-progress-fill" id="qfill" style="width:3%"></div></div>
     </div>
-    <div class="tn-timer" id="timer">12:00</div>
+    <div class="tn-timer" id="timer">06:00</div>
   </div>
   <div class="tn-quiz-body">
     <div id="qcard"></div>
@@ -243,7 +243,7 @@
   // 16 + 16 = 32
 
   var current = 0, answers = {}, startTime, endTime, timerInt, elapsed = 0;
-  var TIME_LIMIT = 12 * 60, timeOver = false;
+  var TIME_LIMIT = 6 * 60, timeOver = false;
 
   document.getElementById('btn-begin').onclick = function () {
     if (localStorage.getItem(TN.STORAGE.email) && localStorage.getItem(TN.STORAGE.phone)) startQuiz();
