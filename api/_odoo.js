@@ -484,7 +484,7 @@ async function findApplicant(email) {
     'hr.applicant',
     'search_read',
     [[['email_from', '=ilike', email]]],
-    { fields: ['id', 'name', 'attachment_ids'], limit: 1 },
+    { fields: ['id', 'partner_name', 'attachment_ids'], limit: 1 },
     5000
   );
   return (rows && rows[0]) || null;
@@ -494,12 +494,10 @@ async function createApplicant(payload) {
   const role = payload.candidate_role || '';
   const roleLabel = ROLE_LABEL[role] || role || 'TechNext';
   const displayName = payload.candidate_name || payload.candidate_email || 'Anonymous';
-  const name = displayName + ' — ' + roleLabel;
   const vals = {
-    name: name,
+    partner_name: displayName,
     email_from: payload.candidate_email,
     phone: payload.candidate_phone || false,
-    partner_name: displayName,
     description: '<p>Created from TechNext candidate portal.</p>',
   };
   const jobId = JOB_ID_BY_ROLE[role];
