@@ -51,7 +51,15 @@ main{max-width:720px;margin:0 auto;padding:28px 16px 60px}
   <p id="role-blurb"></p>
 </section>
 
-<main>
+<!-- Candidate info — shown FIRST, before any test, the first time someone arrives. -->
+<main id="screen-info" style="display:none">
+  <a class="back-link" href="/technext/">← Change role</a>
+  <div class="section-label">First — your details</div>
+  <div id="info-mount"></div>
+</main>
+
+<!-- Assessment plan + booking CTA — shown after info is on file. -->
+<main id="screen-dash" style="display:none">
   <a class="back-link" href="/technext/">← Change role</a>
 
   <div class="section-label">Your assessment plan</div>
@@ -62,12 +70,13 @@ main{max-width:720px;margin:0 auto;padding:28px 16px 60px}
       <div class="b-icon">🗓️</div>
       <div class="b-info">
         <h4>Book your interview</h4>
-        <p id="book-sub">Finish all three assessments above to unlock interview booking.</p>
+        <p id="book-sub">Finish all four steps above to unlock interview booking.</p>
       </div>
     </div>
   </div>
 
   <span class="reset-link" onclick="resetProgress()">Reset progress for this role</span>
+  <span class="reset-link" style="margin-left:14px" onclick="editDetails()">Edit my details</span>
 </main>
 
 <footer class="tn-footer">© TechNext · Candidate Assessment Portal</footer>
@@ -99,6 +108,26 @@ main{max-width:720px;margin:0 auto;padding:28px 16px 60px}
   document.getElementById('role-blurb').textContent = spec.blurb;
   document.getElementById('role-pill').textContent = spec.label;
   document.title = spec.label + ' — TechNext Careers';
+
+  // ── Gate: show candidate-info form first if we don't yet have email + phone ──
+  function hasIdentity() {
+    return !!(localStorage.getItem(TN.STORAGE.email) && localStorage.getItem(TN.STORAGE.phone));
+  }
+  function showDashboard() {
+    document.getElementById('screen-info').style.display = 'none';
+    document.getElementById('screen-dash').style.display = 'block';
+    render();
+  }
+  function showInfo() {
+    document.getElementById('screen-dash').style.display = 'none';
+    document.getElementById('screen-info').style.display = 'block';
+    TN.renderInfoForm(document.getElementById('info-mount'), {
+      role: role,
+      onSuccess: function () { showDashboard(); }
+    });
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
+  window.editDetails = function () { showInfo(); };
 
   function render() {
     var stepsEl = document.getElementById('steps');
@@ -132,10 +161,14 @@ main{max-width:720px;margin:0 auto;padding:28px 16px 60px}
       bookEl.onclick = null;
     }
   }
-  render();
+  // First load: show info form if details aren't on file yet, else jump straight to the dashboard.
+  if (hasIdentity()) showDashboard(); else showInfo();
 
-  // Re-check when user returns to this tab (e.g. after finishing a test)
-  document.addEventListener('visibilitychange', function () { if (!document.hidden) render(); });
+  // Re-check progress when the user returns to this tab (e.g. after finishing a test in another window).
+  document.addEventListener('visibilitychange', function () {
+    if (document.hidden) return;
+    if (hasIdentity()) showDashboard();
+  });
 
   window.resetProgress = function () {
     if (!confirm('Clear progress for this role? Your test results in the database are kept; this only resets your local "done" markers.')) return;
