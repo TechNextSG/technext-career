@@ -266,22 +266,50 @@ let allData = [];
 let filtered = [];
 const charts = {};
 
-function doLogin() {
+async function doLogin() {
   const pwd = document.getElementById('inp-password').value;
-  if (pwd !== 'Admin01!') {
-    document.getElementById('login-error').style.display = 'block';
-    return;
+  const errEl = document.getElementById('login-error');
+  errEl.style.display = 'none';
+  if (!pwd) { errEl.textContent = '⚠ Please enter your password.'; errEl.style.display = 'block'; return; }
+  try {
+    const r = await fetch('/api/admin-login', {
+      method:  'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body:    JSON.stringify({ password: pwd }),
+    });
+    const data = await r.json().catch(() => ({}));
+    if (!r.ok || !data.token) {
+      errEl.textContent = '⚠ ' + (data.error || 'Sign-in failed. Try again.');
+      errEl.style.display = 'block';
+      return;
+    }
+    sessionStorage.setItem('tn_admin_token', data.token);
+    sessionStorage.setItem('tn_admin_expires', data.expires_at || '');
+    showScreen('screen-dash');
+    loadData();
+  } catch (e) {
+    errEl.textContent = '⚠ Could not reach the server.';
+    errEl.style.display = 'block';
   }
-  sessionStorage.setItem('tn_admin_ok', '1');
-  showScreen('screen-dash');
-  loadData();
 }
 
 function doLogout() {
-  sessionStorage.removeItem('tn_admin_ok');
+  sessionStorage.removeItem('tn_admin_token');
+  sessionStorage.removeItem('tn_admin_expires');
   allData = []; filtered = [];
   showScreen('screen-login');
   document.getElementById('inp-password').value = '';
+}
+
+function _adminToken() {
+  const tok = sessionStorage.getItem('tn_admin_token') || '';
+  const exp = sessionStorage.getItem('tn_admin_expires') || '';
+  if (exp && new Date(exp) < new Date()) {
+    sessionStorage.removeItem('tn_admin_token');
+    sessionStorage.removeItem('tn_admin_expires');
+    return '';
+  }
+  return tok;
 }
 
 function showScreen(id) {
@@ -293,10 +321,15 @@ async function loadData() {
   const area = document.getElementById('table-area');
   area.innerHTML = '<div class="empty-state"><div class="icon">⏳</div><p>Loading candidates…</p></div>';
   try {
-    const r = await fetch('/.netlify/functions/get-results?limit=1000&type=all', { headers: { 'x-admin-password': 'mustjobs2025' } });
+    const token = _adminToken();
+    if (!token) { doLogout(); return; }
+    const r = await fetch('/api/get-results?limit=1000&type=all', {
+      headers: { 'Authorization': 'Bearer ' + token },
+    });
+    if (r.status === 401) { showToast('⚠ Session expired — please sign in again.'); doLogout(); return; }
     if (!r.ok) {
-      const err = await r.json().catch(()=>({}));
-      area.innerHTML = `<div class="empty-state"><div class="icon">⚠️</div><p>${err.error||'Failed to load.'}</p><p style="font-size:12px;margin-top:6px">${err.detail||''}</p></div>`;
+      const err = await r.json().catch(() => ({}));
+      area.innerHTML = `<div class="empty-state"><div class="icon">⚠️</div><p>${esc(err.error||'Failed to load.')}</p></div>`;
       return;
     }
     const data = await r.json();
@@ -578,7 +611,7 @@ function csv(s) { const v=String(s||''); return /[,"\n]/.test(v) ? `"${v.replace
 function showToast(msg) { const t=document.getElementById('toast'); t.textContent=msg; t.classList.add('show'); setTimeout(()=>t.classList.remove('show'), 2800); }
 
 window.addEventListener('load', () => {
-  if (sessionStorage.getItem('tn_admin_ok') === '1') { showScreen('screen-dash'); loadData(); }
+  if (_adminToken()) { showScreen('screen-dash'); loadData(); }
 });
 
 /* ═══════════════════════════════════════════════════════════════

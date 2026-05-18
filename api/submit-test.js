@@ -2,10 +2,21 @@
 const https = require('https');
 const { odooSync, isConfigured: odooConfigured } = require('./_odoo');
 
-const SUPABASE_URL  = process.env.SUPABASE_URL  || 'https://ndaydueegykjvliblbly.supabase.co';
-const SUPABASE_KEY  = process.env.SUPABASE_SERVICE_ROLE_KEY
-                   || process.env.SUPABASE_ANON_KEY
-                   || 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im5kYXlkdWVlZ3lranZsaWJsYmx5Iiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc3MjEwNDEyMiwiZXhwIjoyMDg3NjgwMTIyfQ.EalKqjd3OAMLPocKvyatpvbyBxXn73uNErSs55OmZho';
+const SUPABASE_URL = process.env.SUPABASE_URL || '';
+const SUPABASE_KEY = process.env.SUPABASE_SERVICE_ROLE_KEY
+                  || process.env.SUPABASE_ANON_KEY
+                  || '';
+
+const MAX_PAYLOAD_BYTES = 256 * 1024;        // 256 KB — generous for a test submission
+const MAX_FIELD_LEN     = 500;               // truncate any silly long string field
+const VALID_TEST_TYPES  = new Set([
+  'tn_company_quiz', 'tn_profiler', 'tn_iq',
+  'tn_ai_technical', 'tn_fc_technical', 'tn_odoo_technical', 'tn_cyber_technical',
+  'tn_booking',
+]);
+const VALID_ROLES = new Set([
+  'ai-engineer', 'functional-consultant', 'odoo-developer', 'cyber-security', '',
+]);
 
 // Hard deadline on the Odoo sync from the submit handler. The candidate's UX
 // must not wait longer than this even if Odoo hangs.
@@ -18,24 +29,56 @@ module.exports = async (req, res) => {
   if (req.method === 'OPTIONS') return res.status(200).end();
   if (req.method !== 'POST') return res.status(405).json({ error: 'Method not allowed' });
 
+  if (!SUPABASE_URL || !SUPABASE_KEY) {
+    return res.status(500).json({ error: 'Server misconfigured' });
+  }
+
   // Vercel parses JSON body automatically when content-type is application/json
   let payload = req.body;
-  if (typeof payload === 'string') { try { payload = JSON.parse(payload); } catch { return res.status(400).json({ error: 'Invalid JSON' }); } }
-  if (!payload) return res.status(400).json({ error: 'Empty body' });
+  if (typeof payload === 'string') {
+    if (payload.length > MAX_PAYLOAD_BYTES) return res.status(413).json({ error: 'Payload too large' });
+    try { payload = JSON.parse(payload); }
+    catch { return res.status(400).json({ error: 'Invalid JSON' }); }
+  }
+  if (!payload || typeof payload !== 'object' || Array.isArray(payload)) return res.status(400).json({ error: 'Empty body' });
 
-  const required = ['test_type','candidate_name','start_time','end_time','time_taken_seconds'];
+  // Enforce a payload size ceiling even for already-parsed bodies.
+  try {
+    const approx = JSON.stringify(payload).length;
+    if (approx > MAX_PAYLOAD_BYTES) return res.status(413).json({ error: 'Payload too large' });
+  } catch { return res.status(400).json({ error: 'Unserializable body' }); }
+
+  const required = ['test_type', 'candidate_name', 'start_time', 'end_time', 'time_taken_seconds'];
   for (const f of required) {
     if (payload[f] === undefined || payload[f] === null || payload[f] === '') {
       return res.status(400).json({ error: `Missing field: ${f}` });
     }
   }
+  if (!VALID_TEST_TYPES.has(String(payload.test_type))) {
+    return res.status(400).json({ error: 'Invalid test_type' });
+  }
+  if (payload.candidate_role != null && !VALID_ROLES.has(String(payload.candidate_role))) {
+    return res.status(400).json({ error: 'Invalid candidate_role' });
+  }
+  // Truncate top-level string fields to defuse log-flooding / oversized writes.
+  for (const k of Object.keys(payload)) {
+    if (typeof payload[k] === 'string' && payload[k].length > MAX_FIELD_LEN) {
+      payload[k] = payload[k].slice(0, MAX_FIELD_LEN);
+    }
+  }
+  // time_taken_seconds must be a reasonable integer.
+  const tts = Number(payload.time_taken_seconds);
+  if (!Number.isFinite(tts) || tts < 0 || tts > 24 * 3600) {
+    return res.status(400).json({ error: 'Invalid time_taken_seconds' });
+  }
+  payload.time_taken_seconds = Math.round(tts);
 
   let row;
   try {
     row = await supabaseInsert(payload);
   } catch (err) {
-    console.error('Supabase insert error:', err);
-    return res.status(500).json({ error: 'Database error', detail: err.message });
+    console.error('Supabase insert error:', err.message);
+    return res.status(500).json({ error: 'Database error' }); // no detail leaked
   }
 
   // Best-effort Odoo mirror. Bounded by a hard timeout. NEVER fails the
