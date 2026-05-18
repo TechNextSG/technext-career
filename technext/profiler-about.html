@@ -1,0 +1,873 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>About the Profiler — TechNext</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    html { scroll-behavior: smooth; }
+
+    :root {
+      --navy:   #0f3a52;
+      --navy2:  #082a3a;
+      --teal:   #19c2a6;
+      --teal2:  #149a83;
+      --bg:     #f0f4f8;
+      --text:   #1e2d3d;
+      --muted:  #6b7a8d;
+      --border: #dce3ea;
+      --radius: 14px;
+      --shadow: 0 4px 24px rgba(15,58,82,.10);
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
+      font-size: 16px;
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.6;
+    }
+
+    /* ── Header ─────────────────────────────────────────────────── */
+    .tn-header {
+      background: var(--navy);
+      padding: 0 24px;
+      height: 64px;
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      position: sticky;
+      top: 0;
+      z-index: 50;
+      box-shadow: 0 2px 12px rgba(0,0,0,.25);
+    }
+    .tn-logo {
+      width: 36px; height: 36px;
+      background: var(--teal);
+      border-radius: 9px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 18px; font-weight: 900;
+      color: var(--navy);
+      flex-shrink: 0;
+    }
+    .tn-brand h1 { font-size: 16px; font-weight: 800; color: #fff; line-height: 1.2; }
+    .tn-brand p  { font-size: 11.5px; color: rgba(255,255,255,.7); }
+
+    /* ── Hero ───────────────────────────────────────────────────── */
+    .hero {
+      background: linear-gradient(135deg, var(--navy) 0%, var(--navy2) 60%, #0a3347 100%);
+      color: #fff;
+      padding: 72px 24px 80px;
+      text-align: center;
+      position: relative;
+      overflow: hidden;
+    }
+    .hero::before {
+      content: '';
+      position: absolute; inset: 0;
+      background: radial-gradient(ellipse 80% 60% at 50% 110%, rgba(25,194,166,.18) 0%, transparent 70%);
+      pointer-events: none;
+    }
+    .hero-badge {
+      display: inline-flex; align-items: center; gap: 8px;
+      background: rgba(25,194,166,.18);
+      border: 1px solid rgba(25,194,166,.35);
+      border-radius: 100px;
+      padding: 6px 16px;
+      font-size: 12.5px; font-weight: 600; color: var(--teal);
+      letter-spacing: .04em;
+      margin-bottom: 24px;
+    }
+    .hero h2 {
+      font-size: clamp(28px, 5vw, 46px);
+      font-weight: 900;
+      line-height: 1.15;
+      margin-bottom: 18px;
+      letter-spacing: -.02em;
+    }
+    .hero h2 span { color: var(--teal); }
+    .hero p {
+      font-size: 16px; color: rgba(255,255,255,.78);
+      max-width: 600px; margin: 0 auto 32px;
+    }
+    .hero-stats {
+      display: flex; justify-content: center; gap: 40px;
+      flex-wrap: wrap;
+      margin-top: 40px;
+    }
+    .hero-stat { text-align: center; }
+    .hero-stat .num {
+      font-size: 32px; font-weight: 900; color: var(--teal);
+      line-height: 1;
+    }
+    .hero-stat .lbl {
+      font-size: 12.5px; color: rgba(255,255,255,.6);
+      margin-top: 4px; font-weight: 500;
+    }
+
+    /* ── Container ──────────────────────────────────────────────── */
+    .container { max-width: 1000px; margin: 0 auto; padding: 0 20px; }
+
+    /* ── Section ────────────────────────────────────────────────── */
+    .section { padding: 64px 0; }
+    .section-header { text-align: center; margin-bottom: 44px; }
+    .section-header .tag {
+      display: inline-block;
+      background: rgba(25,194,166,.12);
+      color: var(--teal2);
+      border-radius: 100px;
+      padding: 4px 14px;
+      font-size: 12px; font-weight: 700;
+      letter-spacing: .06em; text-transform: uppercase;
+      margin-bottom: 12px;
+    }
+    .section-header h3 {
+      font-size: clamp(20px, 3.5vw, 30px);
+      font-weight: 800; color: var(--navy);
+      margin-bottom: 10px;
+      letter-spacing: -.01em;
+    }
+    .section-header p { color: var(--muted); font-size: 15px; max-width: 540px; margin: 0 auto; }
+
+    /* ── Cards ──────────────────────────────────────────────────── */
+    .card {
+      background: #fff;
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      padding: 28px;
+      border: 1px solid var(--border);
+      transition: transform .2s, box-shadow .2s;
+    }
+    .card:hover { transform: translateY(-2px); box-shadow: 0 8px 32px rgba(15,58,82,.14); }
+
+    /* ── How it works steps ─────────────────────────────────────── */
+    .steps { display: flex; flex-direction: column; gap: 20px; }
+    .step {
+      background: #fff;
+      border-radius: var(--radius);
+      border: 1px solid var(--border);
+      box-shadow: var(--shadow);
+      padding: 24px 28px;
+      display: flex; align-items: flex-start; gap: 20px;
+      transition: transform .2s, box-shadow .2s;
+    }
+    .step:hover { transform: translateY(-2px); box-shadow: 0 8px 32px rgba(15,58,82,.14); }
+    .step-num {
+      width: 40px; height: 40px; border-radius: 50%;
+      background: var(--navy);
+      color: #fff;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 15px; font-weight: 800;
+      flex-shrink: 0;
+    }
+    .step-body h4 { font-size: 15px; font-weight: 700; color: var(--navy); margin-bottom: 4px; }
+    .step-body p  { font-size: 14px; color: var(--muted); line-height: 1.55; }
+
+    /* ── DISC grid ──────────────────────────────────────────────── */
+    .disc-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 18px; }
+    @media (max-width: 600px) { .disc-grid { grid-template-columns: 1fr; } }
+
+    .disc-card {
+      border-radius: var(--radius);
+      padding: 24px;
+      border-left: 5px solid transparent;
+    }
+    .disc-card.d { background: #fef2f2; border-color: #ef4444; }
+    .disc-card.i { background: #fff7ed; border-color: #f97316; }
+    .disc-card.s { background: #f0fdf4; border-color: #22c55e; }
+    .disc-card.c { background: #eff6ff; border-color: #3b82f6; }
+
+    .disc-letter {
+      font-size: 36px; font-weight: 900;
+      line-height: 1; margin-bottom: 4px;
+    }
+    .disc-card.d .disc-letter { color: #ef4444; }
+    .disc-card.i .disc-letter { color: #f97316; }
+    .disc-card.s .disc-letter { color: #22c55e; }
+    .disc-card.c .disc-letter { color: #3b82f6; }
+
+    .disc-card h4 { font-size: 14px; font-weight: 700; color: var(--navy); margin-bottom: 6px; }
+    .disc-card p  { font-size: 13.5px; color: #475569; line-height: 1.55; }
+
+    .disc-trait {
+      display: flex; gap: 6px; flex-wrap: wrap; margin-top: 10px;
+    }
+    .trait-chip {
+      font-size: 11px; font-weight: 600;
+      padding: 3px 10px; border-radius: 100px;
+    }
+    .disc-card.d .trait-chip { background: #fee2e2; color: #991b1b; }
+    .disc-card.i .trait-chip { background: #ffedd5; color: #9a3412; }
+    .disc-card.s .trait-chip { background: #dcfce7; color: #166534; }
+    .disc-card.c .trait-chip { background: #dbeafe; color: #1e40af; }
+
+    /* ── Type dichotomy ─────────────────────────────────────────── */
+    .type-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 18px; }
+    @media (max-width: 640px) { .type-grid { grid-template-columns: 1fr; } }
+
+    .type-card {
+      background: #fff;
+      border-radius: var(--radius);
+      border: 1px solid var(--border);
+      padding: 22px;
+      box-shadow: var(--shadow);
+      transition: transform .2s, box-shadow .2s;
+    }
+    .type-card:hover { transform: translateY(-2px); box-shadow: 0 8px 32px rgba(15,58,82,.14); }
+    .type-pair {
+      display: flex; align-items: center; gap: 10px; margin-bottom: 12px;
+    }
+    .type-letter {
+      width: 38px; height: 38px; border-radius: 9px;
+      background: var(--navy);
+      color: #fff;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 18px; font-weight: 900;
+      flex-shrink: 0;
+    }
+    .type-letter.alt { background: var(--teal); color: var(--navy); }
+    .type-vs { font-size: 11px; font-weight: 700; color: var(--muted); letter-spacing: .06em; }
+    .type-card h4 { font-size: 13px; font-weight: 700; color: var(--navy); margin-bottom: 4px; }
+    .type-card p  { font-size: 13px; color: var(--muted); }
+
+    /* ── Result sample ──────────────────────────────────────────── */
+    .result-sample {
+      background: var(--navy);
+      color: #fff;
+      border-radius: var(--radius);
+      padding: 32px;
+      box-shadow: var(--shadow);
+    }
+    .result-sample .rs-label {
+      font-size: 11px; text-transform: uppercase; letter-spacing: .08em;
+      color: rgba(255,255,255,.5); font-weight: 600; margin-bottom: 10px;
+    }
+    .rs-badges { display: flex; gap: 10px; flex-wrap: wrap; margin-bottom: 24px; }
+    .rs-badge {
+      padding: 6px 18px; border-radius: 100px;
+      font-weight: 800; font-size: 14px;
+    }
+    .rs-badge.primary   { background: var(--teal); color: var(--navy); }
+    .rs-badge.secondary { background: rgba(25,194,166,.18); color: var(--teal); border: 1px solid rgba(25,194,166,.35); }
+    .rs-badge.type-code { background: rgba(255,255,255,.12); color: #fff; }
+
+    .rs-bars { display: grid; grid-template-columns: repeat(4, 1fr); gap: 14px; margin-bottom: 24px; }
+    @media (max-width: 560px) { .rs-bars { grid-template-columns: repeat(2, 1fr); } }
+    .rs-bar { text-align: center; }
+    .rs-bar .bar-wrap {
+      height: 6px; background: rgba(255,255,255,.15);
+      border-radius: 100px; margin-bottom: 6px; overflow: hidden;
+    }
+    .rs-bar .bar-fill {
+      height: 100%; border-radius: 100px;
+      background: var(--teal);
+      transition: width .6s;
+    }
+    .rs-bar .bar-letter { font-size: 13px; font-weight: 700; color: rgba(255,255,255,.5); margin-bottom: 2px; }
+    .rs-bar .bar-pct    { font-size: 15px; font-weight: 800; }
+
+    .rs-desc {
+      background: rgba(255,255,255,.08);
+      border-radius: 10px;
+      padding: 14px 16px;
+      font-size: 13.5px;
+      color: rgba(255,255,255,.75);
+      line-height: 1.55;
+    }
+    .rs-desc strong { color: #fff; }
+
+    /* ── Odoo integration ───────────────────────────────────────── */
+    .odoo-section { background: var(--navy); padding: 72px 0; }
+    .odoo-section .section-header .tag  { background: rgba(25,194,166,.2); color: var(--teal); }
+    .odoo-section .section-header h3    { color: #fff; }
+    .odoo-section .section-header p     { color: rgba(255,255,255,.65); }
+
+    .odoo-flow {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 20px;
+      position: relative;
+    }
+    @media (max-width: 700px) { .odoo-flow { grid-template-columns: 1fr; } }
+
+    .odoo-flow-card {
+      background: rgba(255,255,255,.07);
+      border: 1px solid rgba(255,255,255,.12);
+      border-radius: var(--radius);
+      padding: 26px 22px;
+      text-align: center;
+      position: relative;
+    }
+    .odoo-flow-card .icon {
+      font-size: 30px; margin-bottom: 14px;
+      display: block;
+    }
+    .odoo-flow-card h4 { font-size: 14px; font-weight: 700; color: #fff; margin-bottom: 6px; }
+    .odoo-flow-card p  { font-size: 13px; color: rgba(255,255,255,.6); line-height: 1.5; }
+
+    .odoo-arrow {
+      position: absolute;
+      right: -14px; top: 50%;
+      transform: translateY(-50%);
+      color: var(--teal);
+      font-size: 20px;
+      z-index: 2;
+    }
+    @media (max-width: 700px) { .odoo-arrow { display: none; } }
+
+    .odoo-details {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 20px;
+      margin-top: 40px;
+    }
+    @media (max-width: 640px) { .odoo-details { grid-template-columns: 1fr; } }
+
+    .odoo-detail-card {
+      background: rgba(255,255,255,.07);
+      border: 1px solid rgba(255,255,255,.12);
+      border-radius: var(--radius);
+      padding: 24px;
+    }
+    .odoo-detail-card h4 {
+      font-size: 13.5px; font-weight: 700; color: var(--teal);
+      margin-bottom: 12px;
+      display: flex; align-items: center; gap: 8px;
+    }
+    .odoo-detail-card ul {
+      list-style: none; display: flex; flex-direction: column; gap: 8px;
+    }
+    .odoo-detail-card li {
+      font-size: 13px; color: rgba(255,255,255,.7);
+      display: flex; align-items: flex-start; gap: 8px;
+      line-height: 1.45;
+    }
+    .odoo-detail-card li::before {
+      content: '✓';
+      color: var(--teal);
+      font-weight: 700;
+      flex-shrink: 0;
+      margin-top: 1px;
+    }
+
+    .chatter-preview {
+      background: rgba(255,255,255,.06);
+      border: 1px solid rgba(255,255,255,.12);
+      border-radius: 10px;
+      padding: 18px;
+      font-size: 12.5px;
+      margin-top: 20px;
+    }
+    .chatter-preview .cp-header {
+      font-weight: 700; color: #fff; margin-bottom: 8px; font-size: 13px;
+    }
+    .chatter-preview table { border-collapse: collapse; width: 100%; }
+    .chatter-preview td {
+      padding: 3px 12px 3px 0;
+      color: rgba(255,255,255,.65);
+      vertical-align: top;
+    }
+    .chatter-preview td:first-child {
+      color: rgba(255,255,255,.4);
+      white-space: nowrap;
+      font-weight: 600;
+      width: 100px;
+    }
+    .chatter-preview .cp-note {
+      margin-top: 12px;
+      font-size: 11.5px;
+      color: rgba(255,255,255,.4);
+      border-top: 1px solid rgba(255,255,255,.1);
+      padding-top: 10px;
+    }
+
+    /* ── Why it matters ─────────────────────────────────────────── */
+    .why-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 18px;
+    }
+    @media (max-width: 700px) { .why-grid { grid-template-columns: 1fr; } }
+
+    .why-card {
+      background: #fff;
+      border-radius: var(--radius);
+      border: 1px solid var(--border);
+      box-shadow: var(--shadow);
+      padding: 26px 22px;
+      transition: transform .2s, box-shadow .2s;
+    }
+    .why-card:hover { transform: translateY(-2px); box-shadow: 0 8px 32px rgba(15,58,82,.14); }
+    .why-icon { font-size: 26px; margin-bottom: 12px; }
+    .why-card h4 { font-size: 14px; font-weight: 700; color: var(--navy); margin-bottom: 6px; }
+    .why-card p  { font-size: 13.5px; color: var(--muted); line-height: 1.55; }
+
+    /* ── CTA ────────────────────────────────────────────────────── */
+    .cta {
+      background: linear-gradient(135deg, var(--teal2), var(--teal));
+      padding: 60px 24px;
+      text-align: center;
+    }
+    .cta h3 { font-size: 26px; font-weight: 900; color: var(--navy); margin-bottom: 10px; }
+    .cta p  { font-size: 15px; color: rgba(8,42,58,.75); margin-bottom: 28px; }
+    .cta-btn {
+      display: inline-flex; align-items: center; gap: 8px;
+      background: var(--navy);
+      color: #fff;
+      font-size: 14px; font-weight: 700;
+      padding: 14px 30px;
+      border-radius: 10px;
+      text-decoration: none;
+      transition: background .2s, transform .15s;
+    }
+    .cta-btn:hover { background: var(--navy2); transform: translateY(-1px); }
+
+    /* ── Footer ─────────────────────────────────────────────────── */
+    footer {
+      background: var(--navy2);
+      color: rgba(255,255,255,.45);
+      text-align: center;
+      padding: 28px 24px;
+      font-size: 12.5px;
+    }
+
+    /* ── Chatter table overflow ─────────────────────────────────── */
+    .chatter-preview { overflow-x: auto; }
+    .chatter-preview table { min-width: 480px; }
+
+    /* ── 768px — tablet ─────────────────────────────────────────── */
+    @media (max-width: 768px) {
+      .hero { padding: 52px 20px 60px; }
+      .hero-stats { gap: 24px; }
+
+      .section { padding: 48px 0; }
+      .section-header { margin-bottom: 32px; }
+      .container { padding: 0 16px; }
+
+      .steps .step { padding: 20px; gap: 14px; }
+
+      .disc-grid  { grid-template-columns: 1fr; }
+      .type-grid  { grid-template-columns: 1fr; }
+      .why-grid   { grid-template-columns: 1fr 1fr; }
+      .odoo-flow  { grid-template-columns: 1fr; }
+      .odoo-details { grid-template-columns: 1fr; }
+
+      .odoo-section { padding: 52px 0; }
+
+      .rs-bars { grid-template-columns: repeat(2, 1fr); }
+    }
+
+    /* ── 480px — small phone ────────────────────────────────────── */
+    @media (max-width: 480px) {
+      .tn-header { padding: 0 16px; gap: 10px; }
+      .tn-brand h1 { font-size: 14px; }
+
+      .hero { padding: 40px 16px 48px; }
+      .hero h2 { font-size: 26px; }
+      .hero p  { font-size: 14.5px; }
+      .hero-stats { gap: 20px; }
+      .hero-stat .num { font-size: 26px; }
+
+      .section { padding: 40px 0; }
+      .container { padding: 0 14px; }
+
+      .step { flex-direction: column; gap: 10px; }
+      .step-num { width: 34px; height: 34px; font-size: 13px; }
+
+      .why-grid { grid-template-columns: 1fr; }
+      .rs-bars  { grid-template-columns: repeat(2, 1fr); }
+
+      .result-sample { padding: 22px 18px; }
+
+      .cta h3 { font-size: 20px; }
+      .cta p  { font-size: 14px; }
+      .cta-btn { padding: 14px 22px; font-size: 13.5px; width: 100%; justify-content: center; min-height: 44px; }
+
+      .hero-badge { font-size: 11.5px; padding: 5px 12px; }
+      .disc-card { padding: 20px; }
+      .odoo-flow-card { padding: 20px 18px; }
+      .odoo-detail-card { padding: 20px; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Header -->
+  <header class="tn-header">
+    <div class="tn-logo">T</div>
+    <div class="tn-brand">
+      <h1>TechNext Singapore</h1>
+      <p>Smart Hiring for Tech Professionals</p>
+    </div>
+  </header>
+
+  <!-- Hero -->
+  <section class="hero">
+    <div class="hero-badge">🧩 Assessment Suite</div>
+    <h2>The <span>TechNext Profiler</span><br>Know Your People — Before Day One</h2>
+    <p>A validated 32-question behavioural assessment that maps every candidate's DISC work style and 4-letter personality type — automatically synced into your Odoo recruitment pipeline.</p>
+
+    <div class="hero-stats">
+      <div class="hero-stat">
+        <div class="num">32</div>
+        <div class="lbl">Questions</div>
+      </div>
+      <div class="hero-stat">
+        <div class="num">~6</div>
+        <div class="lbl">Minutes</div>
+      </div>
+      <div class="hero-stat">
+        <div class="num">2</div>
+        <div class="lbl">Frameworks (DISC + Type)</div>
+      </div>
+      <div class="hero-stat">
+        <div class="num">Live</div>
+        <div class="lbl">Odoo Sync</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- How it works -->
+  <section class="section">
+    <div class="container">
+      <div class="section-header">
+        <div class="tag">How It Works</div>
+        <h3>Four steps from link to insight</h3>
+        <p>Candidates complete the profiler in minutes. Results land in Odoo before the recruiter finishes their coffee.</p>
+      </div>
+
+      <div class="steps">
+        <div class="step">
+          <div class="step-num">1</div>
+          <div class="step-body">
+            <h4>Candidate receives their assessment link</h4>
+            <p>HR shares the personalised role URL (e.g. <code>/technext/ai-engineer</code>). The profiler is embedded in the multi-step test sequence alongside the company quiz and technical assessment — no separate login required.</p>
+          </div>
+        </div>
+        <div class="step">
+          <div class="step-num">2</div>
+          <div class="step-body">
+            <h4>32 adaptive questions — DISC then 4-letter Type</h4>
+            <p>The first 16 questions measure work-style dominance across four behavioural dimensions (D, I, S, C). The next 16 map four personality dichotomies to produce a 4-letter type code (e.g. ENTJ). A 6-minute timer is shown — most candidates finish in 4–5 minutes.</p>
+          </div>
+        </div>
+        <div class="step">
+          <div class="step-num">3</div>
+          <div class="step-body">
+            <h4>Instant results page — candidate sees their profile</h4>
+            <p>Primary + secondary DISC letter, four percentage bars, and a plain-English description of the personality type are shown immediately. The candidate can review and continue to the next assessment without refreshing.</p>
+          </div>
+        </div>
+        <div class="step">
+          <div class="step-num">4</div>
+          <div class="step-body">
+            <h4>Automatic sync to Odoo — no manual entry</h4>
+            <p>The moment the candidate clicks Continue, the result is written to Supabase and mirrored to Odoo as a structured chatter note on the candidate's <em>hr.applicant</em> record. DISC scores, type code, primary/secondary letters, and resume link are all captured.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- DISC Framework -->
+  <section class="section" style="background:#fff; padding-top:60px; padding-bottom:60px;">
+    <div class="container">
+      <div class="section-header">
+        <div class="tag">Framework 1 — DISC</div>
+        <h3>Work-style DNA across four dimensions</h3>
+        <p>DISC measures <em>how</em> a person behaves at work — not what they know. Every candidate receives a primary and secondary letter with a percentage score for each dimension.</p>
+      </div>
+
+      <div class="disc-grid">
+        <div class="disc-card d">
+          <div class="disc-letter">D</div>
+          <h4>Dominance — The Driver</h4>
+          <p>Results-focused and direct. Thrives on challenge, makes decisions quickly, and pushes hard for outcomes. Can be impatient with slow processes or indecision.</p>
+          <div class="disc-trait">
+            <span class="trait-chip">Decisive</span>
+            <span class="trait-chip">Bold</span>
+            <span class="trait-chip">Competitive</span>
+            <span class="trait-chip">Assertive</span>
+          </div>
+        </div>
+
+        <div class="disc-card i">
+          <div class="disc-letter">I</div>
+          <h4>Influence — The Energiser</h4>
+          <p>Outgoing, enthusiastic, and persuasive. Energises teams, builds relationships fast, and excels at pitching ideas. Can lose focus on details or follow-through.</p>
+          <div class="disc-trait">
+            <span class="trait-chip">Optimistic</span>
+            <span class="trait-chip">Collaborative</span>
+            <span class="trait-chip">Persuasive</span>
+            <span class="trait-chip">Spontaneous</span>
+          </div>
+        </div>
+
+        <div class="disc-card s">
+          <div class="disc-letter">S</div>
+          <h4>Steadiness — The Stabiliser</h4>
+          <p>Patient, dependable, and team-oriented. Provides the calm backbone of any group, listens deeply, and builds long-term trust. May resist rapid change or conflict.</p>
+          <div class="disc-trait">
+            <span class="trait-chip">Reliable</span>
+            <span class="trait-chip">Empathetic</span>
+            <span class="trait-chip">Patient</span>
+            <span class="trait-chip">Supportive</span>
+          </div>
+        </div>
+
+        <div class="disc-card c">
+          <div class="disc-letter">C</div>
+          <h4>Conscientiousness — The Analyst</h4>
+          <p>Detail-oriented, systematic, and quality-driven. Asks the right questions, follows processes rigorously, and produces accurate work. Can over-analyse or become perfectionistic.</p>
+          <div class="disc-trait">
+            <span class="trait-chip">Precise</span>
+            <span class="trait-chip">Analytical</span>
+            <span class="trait-chip">Systematic</span>
+            <span class="trait-chip">Quality-focused</span>
+          </div>
+        </div>
+      </div>
+
+      <p style="text-align:center; font-size:13.5px; color:var(--muted); margin-top:24px;">
+        Each candidate also receives a <strong>combined label</strong> — e.g. <em>"Di: The Driver-Influencer"</em> — capturing their primary work style with the secondary dimension as a modifier.
+      </p>
+    </div>
+  </section>
+
+  <!-- 4-Letter Type Framework -->
+  <section class="section">
+    <div class="container">
+      <div class="section-header">
+        <div class="tag">Framework 2 — 4-Letter Type</div>
+        <h3>Cognitive style across four spectrums</h3>
+        <p>The second half of the assessment maps how a person thinks, communicates, and structures their world — producing a 4-letter code from 16 possible types.</p>
+      </div>
+
+      <div class="type-grid">
+        <div class="type-card">
+          <div class="type-pair">
+            <div class="type-letter">E</div>
+            <div class="type-vs">VS</div>
+            <div class="type-letter alt">I</div>
+          </div>
+          <h4>Extraversion vs Introversion</h4>
+          <p>Does the candidate recharge through people and conversation (E) or through solitude and reflection (I)? Critical for remote vs office-fit.</p>
+        </div>
+
+        <div class="type-card">
+          <div class="type-pair">
+            <div class="type-letter">S</div>
+            <div class="type-vs">VS</div>
+            <div class="type-letter alt">N</div>
+          </div>
+          <h4>Sensing vs iNtuition</h4>
+          <p>Does the candidate focus on concrete facts and present reality (S) or on patterns, possibilities, and big-picture thinking (N)?</p>
+        </div>
+
+        <div class="type-card">
+          <div class="type-pair">
+            <div class="type-letter">T</div>
+            <div class="type-vs">VS</div>
+            <div class="type-letter alt">F</div>
+          </div>
+          <h4>Thinking vs Feeling</h4>
+          <p>Does the candidate prioritise objective logic and data (T) or team harmony, values, and the human impact of decisions (F)?</p>
+        </div>
+
+        <div class="type-card">
+          <div class="type-pair">
+            <div class="type-letter">J</div>
+            <div class="type-vs">VS</div>
+            <div class="type-letter alt">P</div>
+          </div>
+          <h4>Judging vs Perceiving</h4>
+          <p>Does the candidate prefer structure, schedules, and closure (J) or flexibility, adaptability, and keeping options open (P)?</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Sample Result -->
+  <section class="section" style="background:#fff; padding-top:60px; padding-bottom:60px;">
+    <div class="container">
+      <div class="section-header">
+        <div class="tag">Sample Output</div>
+        <h3>What a candidate result looks like</h3>
+        <p>The result is shown instantly to the candidate — and simultaneously written to Odoo.</p>
+      </div>
+
+      <div class="result-sample">
+        <div class="rs-label">DISC Work Style + Personality Type</div>
+        <div class="rs-badges">
+          <span class="rs-badge primary">D — Dominance</span>
+          <span class="rs-badge secondary">+ i Influence</span>
+          <span class="rs-badge type-code">ENTJ</span>
+        </div>
+
+        <div class="rs-bars">
+          <div class="rs-bar">
+            <div class="bar-letter">D</div>
+            <div class="bar-wrap"><div class="bar-fill" style="width:62%;background:#ef4444"></div></div>
+            <div class="bar-pct">62%</div>
+          </div>
+          <div class="rs-bar">
+            <div class="bar-letter">I</div>
+            <div class="bar-wrap"><div class="bar-fill" style="width:25%;background:#f97316"></div></div>
+            <div class="bar-pct">25%</div>
+          </div>
+          <div class="rs-bar">
+            <div class="bar-letter">S</div>
+            <div class="bar-wrap"><div class="bar-fill" style="width:6%;background:#22c55e"></div></div>
+            <div class="bar-pct">6%</div>
+          </div>
+          <div class="rs-bar">
+            <div class="bar-letter">C</div>
+            <div class="bar-wrap"><div class="bar-fill" style="width:19%;background:#3b82f6"></div></div>
+            <div class="bar-pct">19%</div>
+          </div>
+        </div>
+
+        <div class="rs-desc">
+          <strong>Di — The Driver-Influencer · ENTJ "The Commander"</strong><br>
+          Highly results-oriented with a natural gift for rallying others behind a vision. Pushes hard for outcomes, comfortable with risk, and energised by high-stakes situations. Pairs structure (J) with strategic instinct (N) to lead through ambiguity.
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Odoo Integration -->
+  <section class="odoo-section">
+    <div class="container">
+      <div class="section-header">
+        <div class="tag">Backend Integration</div>
+        <h3>Every result lands in Odoo — automatically</h3>
+        <p>No copy-paste, no spreadsheet, no delay. The moment a candidate submits, their profile is in your Odoo recruitment pipeline.</p>
+      </div>
+
+      <!-- Flow -->
+      <div class="odoo-flow">
+        <div class="odoo-flow-card">
+          <span class="icon">🧩</span>
+          <h4>Candidate completes profiler</h4>
+          <p>32 questions answered in the browser. Score computed client-side instantly.</p>
+          <span class="odoo-arrow">→</span>
+        </div>
+        <div class="odoo-flow-card">
+          <span class="icon">🗄️</span>
+          <h4>Submitted to Supabase + Odoo</h4>
+          <p>Result posted to <code>/api/submit-test</code>. Supabase is written first (source of truth). Odoo sync runs in parallel — bounded by a 3.5 s timeout so candidate UX is never affected.</p>
+          <span class="odoo-arrow">→</span>
+        </div>
+        <div class="odoo-flow-card">
+          <span class="icon">📋</span>
+          <h4>hr.applicant record updated in Odoo</h4>
+          <p>Applicant upserted by email. DISC scores, type code, and resume link appear in the chatter. Ready for recruiter review.</p>
+        </div>
+      </div>
+
+      <!-- Details -->
+      <div class="odoo-details">
+        <div class="odoo-detail-card">
+          <h4>📬 What gets written to Odoo</h4>
+          <ul>
+            <li>Candidate name, email, phone number</li>
+            <li>Job position (e.g. AI Engineer) linked automatically</li>
+            <li>DISC scores: D%, I%, S%, C% as structured fields</li>
+            <li>Primary + secondary DISC letter (e.g. "D", "i")</li>
+            <li>4-letter type code (e.g. "ENTJ")</li>
+            <li>LinkedIn profile URL</li>
+            <li>Resume attached directly to the applicant card</li>
+            <li>Supabase row ID for full audit trail</li>
+          </ul>
+        </div>
+
+        <div class="odoo-detail-card">
+          <h4>🛡️ How the sync is protected</h4>
+          <ul>
+            <li>Supabase write succeeds first — Odoo failure never blocks the candidate</li>
+            <li>Hard 3.5 s timeout prevents slow Odoo responses from affecting UX</li>
+            <li>Kill switch via environment variable (<code>ODOO_SYNC_ENABLED=false</code>)</li>
+            <li>Upsert by email — submitting twice updates the same applicant record</li>
+            <li>No PII logged — only email hash + event type in structured logs</li>
+            <li>API key with 1-year expiry, stored securely in Vercel environment</li>
+          </ul>
+        </div>
+      </div>
+
+      <!-- Chatter preview -->
+      <div class="chatter-preview">
+        <div class="cp-header">📝 Odoo Chatter Note — what HR sees on every submission</div>
+        <table>
+          <tr><td>Test</td><td>TechNext Profiler (DISC + Type) · 18 May 2026, 14:32 UTC</td></tr>
+          <tr><td>DISC</td><td>D 62% &nbsp; I 25% &nbsp; S 6% &nbsp; C 19%</td></tr>
+          <tr><td>Primary</td><td>D / i</td></tr>
+          <tr><td>4-letter type</td><td>ENTJ</td></tr>
+          <tr><td>Role applied</td><td>AI Engineer</td></tr>
+          <tr><td>LinkedIn</td><td>linkedin.com/in/candidate</td></tr>
+          <tr><td>Resume</td><td>Download / view ↗</td></tr>
+          <tr><td>Supabase ID</td><td>uuid-xxxxxxxx</td></tr>
+        </table>
+        <div class="cp-note">This note is appended to the applicant's chatter for every test completed — company quiz, profiler, technical assessment, and interview booking all appear as separate timestamped entries on the same record.</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Why It Matters -->
+  <section class="section">
+    <div class="container">
+      <div class="section-header">
+        <div class="tag">Why It Matters</div>
+        <h3>From gut feeling to structured data</h3>
+        <p>The profiler turns a subjective interview impression into an objective, comparable data point — at scale.</p>
+      </div>
+
+      <div class="why-grid">
+        <div class="why-card">
+          <div class="why-icon">⚡</div>
+          <h4>Zero admin overhead</h4>
+          <p>Profiles flow directly into Odoo. Recruiters open the applicant card and the DISC breakdown is already there — no manual input, no switching tabs.</p>
+        </div>
+        <div class="why-card">
+          <div class="why-icon">🎯</div>
+          <h4>Better role-fit conversations</h4>
+          <p>A high-S candidate in a fast-paced D-culture role is a risk worth discussing early. The profiler surfaces that before the first interview, not after a three-month probation.</p>
+        </div>
+        <div class="why-card">
+          <div class="why-icon">🤝</div>
+          <h4>Team composition planning</h4>
+          <p>When you have DISC data across the whole pipeline, you can see whether you're hiring too many drivers and not enough conscientious types — or vice versa.</p>
+        </div>
+        <div class="why-card">
+          <div class="why-icon">📊</div>
+          <h4>Consistent across all roles</h4>
+          <p>Every candidate — AI Engineer, Odoo Developer, Functional Consultant, Cyber Security — completes the same profiler, making cross-role comparisons meaningful.</p>
+        </div>
+        <div class="why-card">
+          <div class="why-icon">🔒</div>
+          <h4>Candidate-friendly experience</h4>
+          <p>The assessment is framed neutrally — there are no "wrong" answers. Candidates are told upfront that this measures work style, not intelligence. Completion rates are high.</p>
+        </div>
+        <div class="why-card">
+          <div class="why-icon">🔄</div>
+          <h4>Always in sync with Odoo</h4>
+          <p>Odoo is the single source of truth for recruitment. Profiler data lives alongside CV, technical scores, and booking — no separate spreadsheets to reconcile.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- CTA -->
+  <section class="cta">
+    <h3>Ready to run your first profiler?</h3>
+    <p>Share the assessment link with any candidate — results will be in Odoo within seconds.</p>
+    <a href="/technext/ai-engineer" class="cta-btn">Start a candidate assessment →</a>
+  </section>
+
+  <footer>
+    <p>© 2026 TechNext Singapore · Assessment platform powered by Vercel + Supabase · Integrated with Odoo Recruitment</p>
+  </footer>
+
+</body>
+</html>
