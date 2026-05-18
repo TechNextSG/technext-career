@@ -5,6 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Admin Dashboard — TechNext</title>
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 <style>
 *{box-sizing:border-box;margin:0;padding:0}
 body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;background:#f0f2f5;color:#0f3a52;min-height:100vh}
@@ -214,7 +215,10 @@ tr:hover td{background:#fafafa}
     <div class="table-wrap">
       <div class="table-header">
         <h2 id="table-title">All TechNext Candidates</h2>
-        <button class="btn btn-gold btn-sm" onclick="exportCSV()">⬇ Export CSV</button>
+        <div style="display:flex;gap:8px;flex-wrap:wrap">
+          <button class="btn btn-outline btn-sm" onclick="downloadSummaryPDF()">⬇ PDF Report</button>
+          <button class="btn btn-gold btn-sm" onclick="exportCSV()">⬇ Export CSV</button>
+        </div>
       </div>
       <div id="table-area">
         <div class="empty-state"><div class="icon">⏳</div><p>Loading…</p></div>
@@ -413,6 +417,7 @@ function renderTable() {
 
 function viewCandidate(idx) {
   const r = filtered[idx];
+  window._pdfRec = r;
   const secScores = r.section_scores ? Object.entries(r.section_scores) : [];
   document.getElementById('modal-body').innerHTML = `
     <div class="modal-head">
@@ -436,6 +441,7 @@ function viewCandidate(idx) {
       <div class="detail-row"><span class="d-lbl">Completed</span><span class="d-val">${fmtDateFull(r.end_time)}</span></div>
     </div>
     <div style="margin-top:14px;display:flex;gap:10px;flex-wrap:wrap">
+      <button class="btn btn-primary btn-sm" onclick="downloadTestPDF(window._pdfRec)">⬇ Download PDF</button>
       ${r.candidate_email?`<button class="btn btn-gold btn-sm" onclick="emailAddress('${esc(r.candidate_email)}','${esc(r.candidate_name||'')}')">📧 Email</button>`:''}
       <button class="btn btn-outline btn-sm" onclick="closeModal()">Close</button>
     </div>`;
@@ -464,6 +470,7 @@ function viewCandidate(idx) {
 
 function viewByEmail(email) {
   if (!email) return;
+  window._pdfEmail = email;
   const records = allData.filter(r => (r.candidate_email||'').toLowerCase() === email.toLowerCase())
     .sort((a,b) => (a.created_at||'').localeCompare(b.created_at||''));
   if (!records.length) { showToast('No tests for that email.'); return; }
@@ -506,6 +513,7 @@ function viewByEmail(email) {
         </div>`).join('')}
     </div>
     <div style="margin-top:14px;display:flex;gap:10px;flex-wrap:wrap">
+      <button class="btn btn-primary btn-sm" onclick="downloadCandidatePDF(window._pdfEmail)">⬇ Download PDF</button>
       <button class="btn btn-gold btn-sm" onclick="emailAddress('${esc(email)}','${esc(name)}')">📧 Email Candidate</button>
       <button class="btn btn-outline btn-sm" onclick="closeModal()">Close</button>
     </div>`;
@@ -572,6 +580,351 @@ function showToast(msg) { const t=document.getElementById('toast'); t.textConten
 window.addEventListener('load', () => {
   if (sessionStorage.getItem('tn_admin_ok') === '1') { showScreen('screen-dash'); loadData(); }
 });
+
+/* ═══════════════════════════════════════════════════════════════
+   PDF GENERATION  (jsPDF 2.5 — loaded via CDN)
+   Three reports:
+     downloadTestPDF(rec)         — single test result
+     downloadCandidatePDF(email)  — full candidate profile
+     downloadSummaryPDF()         — dashboard summary
+═══════════════════════════════════════════════════════════════ */
+
+function _pdfReady() {
+  if (window.jspdf && window.jspdf.jsPDF) return true;
+  showToast('⏳ PDF library still loading — try again in a moment.');
+  return false;
+}
+
+/* ── Shared drawing helpers ───────────────────────────────────── */
+function _pdfHeader(doc, subtitle) {
+  doc.setFillColor(15, 58, 82);
+  doc.rect(0, 0, 210, 20, 'F');
+  // Teal logo box
+  doc.setFillColor(25, 194, 166);
+  doc.roundedRect(14, 5, 10, 10, 2, 2, 'F');
+  doc.setFont('helvetica', 'bold');
+  doc.setFontSize(8);
+  doc.setTextColor(15, 58, 82);
+  doc.text('T', 19, 12, { align: 'center' });
+  // Brand
+  doc.setFont('helvetica', 'bold');
+  doc.setFontSize(10);
+  doc.setTextColor(255, 255, 255);
+  doc.text('TECHNEXT SINGAPORE', 27, 10);
+  doc.setFont('helvetica', 'normal');
+  doc.setFontSize(8);
+  doc.setTextColor(180, 220, 215);
+  doc.text(subtitle, 27, 16);
+  // Date
+  doc.setFontSize(8);
+  doc.setTextColor(180, 220, 215);
+  doc.text(new Date().toLocaleDateString('en-GB', { day:'2-digit', month:'short', year:'numeric' }), 196, 13, { align: 'right' });
+}
+
+function _pdfFooter(doc) {
+  const n = doc.internal.getNumberOfPages();
+  for (let i = 1; i <= n; i++) {
+    doc.setPage(i);
+    doc.setFillColor(240, 244, 248);
+    doc.rect(0, 285, 210, 12, 'F');
+    doc.setFont('helvetica', 'normal');
+    doc.setFontSize(7.5);
+    doc.setTextColor(107, 122, 141);
+    doc.text('TechNext Singapore — Candidate Assessment Report', 15, 292);
+    doc.text(`Page ${i} of ${n}`, 196, 292, { align: 'right' });
+  }
+}
+
+function _pdfSection(doc, label, y) {
+  doc.setFont('helvetica', 'bold');
+  doc.setFontSize(7.5);
+  doc.setTextColor(107, 122, 141);
+  doc.text(label.toUpperCase(), 15, y);
+  doc.setDrawColor(220, 227, 234);
+  doc.line(15, y + 1.5, 195, y + 1.5);
+}
+
+function _pdfRow(doc, label, value, y) {
+  doc.setFont('helvetica', 'normal');
+  doc.setFontSize(9.5);
+  doc.setTextColor(107, 122, 141);
+  doc.text(String(label), 15, y);
+  doc.setFont('helvetica', 'bold');
+  doc.setTextColor(15, 58, 82);
+  const val = String(value || '—');
+  doc.text(val, 196, y, { align: 'right', maxWidth: 110 });
+  doc.setDrawColor(243, 244, 246);
+  doc.line(15, y + 2, 195, y + 2);
+}
+
+function _pdfCard(doc, x, y, w, label, value) {
+  doc.setFillColor(240, 249, 246);
+  doc.roundedRect(x, y, w, 22, 3, 3, 'F');
+  doc.setFont('helvetica', 'bold');
+  doc.setFontSize(7);
+  doc.setTextColor(107, 122, 141);
+  doc.text(String(label), x + w / 2, y + 7, { align: 'center' });
+  doc.setFont('helvetica', 'bold');
+  doc.setFontSize(13);
+  doc.setTextColor(15, 58, 82);
+  doc.text(String(value || '—'), x + w / 2, y + 17, { align: 'center' });
+}
+
+function _chartImg(canvasId) {
+  try {
+    const c = document.getElementById(canvasId);
+    return c ? c.toDataURL('image/png') : null;
+  } catch (e) { return null; }
+}
+
+/* ── 1. Single test result PDF ────────────────────────────────── */
+function downloadTestPDF(rec) {
+  if (!_pdfReady()) return;
+  const { jsPDF } = window.jspdf;
+  const doc = new jsPDF('p', 'mm', 'a4');
+  const M = 15, cw = 180;
+
+  _pdfHeader(doc, 'Candidate Test Report');
+  let y = 28;
+
+  // Name + test label
+  doc.setFont('helvetica', 'bold'); doc.setFontSize(17); doc.setTextColor(15, 58, 82);
+  doc.text(rec.candidate_name || '—', M, y); y += 7;
+  doc.setFont('helvetica', 'normal'); doc.setFontSize(9.5); doc.setTextColor(107, 122, 141);
+  doc.text(`${TYPE_LABEL[rec.test_type] || rec.test_type}  ·  ${fmtDateFull(rec.end_time || rec.created_at)}`, M, y); y += 12;
+
+  // Score cards
+  const cw4 = (cw - 9) / 4;
+  _pdfCard(doc, M,                y, cw4, 'SCORE',  rec.score_pct != null ? rec.score_pct + '%' : '—');
+  _pdfCard(doc, M + cw4 + 3,     y, cw4, 'RAW',    rec.score_raw != null ? `${rec.score_raw} / ${rec.score_max || '—'}` : '—');
+  _pdfCard(doc, M + 2*(cw4+3),   y, cw4, 'RESULT', rec.result_label || '—');
+  _pdfCard(doc, M + 3*(cw4+3),   y, cw4, 'TIME',   fmtDuration(rec.time_taken_seconds));
+  y += 30;
+
+  // Section breakdown chart
+  const img1 = _chartImg('cand-chart');
+  if (img1 && rec.section_scores && Object.keys(rec.section_scores).length) {
+    _pdfSection(doc, 'Section Breakdown', y); y += 6;
+    doc.addImage(img1, 'PNG', M, y, cw, 65); y += 72;
+  }
+
+  // DISC-specific block
+  if (rec.test_type === 'tn_profiler' && rec.section_scores) {
+    _pdfSection(doc, 'DISC Profile', y); y += 9;
+    const s = rec.section_scores;
+    const disc = [['D — Dominance', s.D], ['I — Influence', s.I], ['S — Steadiness', s.S], ['C — Conscientiousness', s.C]];
+    for (const [lbl, val] of disc) {
+      if (val == null) continue;
+      _pdfRow(doc, lbl, val + '%', y); y += 9;
+    }
+    const flags = rec.flags || {};
+    if (flags.primary)   { _pdfRow(doc, 'Primary style',   flags.primary,   y); y += 9; }
+    if (flags.secondary) { _pdfRow(doc, 'Secondary style', flags.secondary, y); y += 9; }
+    if (flags.type)      { _pdfRow(doc, '4-letter type',   flags.type,      y); y += 9; }
+    y += 4;
+  }
+
+  // Candidate info
+  _pdfSection(doc, 'Candidate Information', y); y += 9;
+  const info = [
+    ['Email',        rec.candidate_email],
+    ['Handphone',    rec.candidate_phone],
+    ['Role applied', ROLE_LABEL[rec.candidate_role] || rec.candidate_role],
+    ['LinkedIn',     rec.candidate_linkedin],
+    ['Resume URL',   rec.candidate_resume_url],
+    ['Started',      fmtDateFull(rec.start_time)],
+    ['Completed',    fmtDateFull(rec.end_time)],
+    ['Duration',     fmtDuration(rec.time_taken_seconds)],
+  ];
+  for (const [lbl, val] of info) {
+    if (!val || val === '—') continue;
+    if (y > 272) { doc.addPage(); _pdfHeader(doc, 'Candidate Test Report'); y = 28; }
+    _pdfRow(doc, lbl, val, y); y += 9;
+  }
+
+  _pdfFooter(doc);
+  doc.save(`TechNext_${(rec.candidate_name || 'candidate').replace(/[^a-zA-Z0-9]/g, '_')}_${rec.test_type}.pdf`);
+  showToast('✅ Test report PDF downloaded');
+}
+
+/* ── 2. Full candidate profile PDF ────────────────────────────── */
+function downloadCandidatePDF(email) {
+  if (!_pdfReady() || !email) return;
+  const { jsPDF } = window.jspdf;
+  const records = allData
+    .filter(r => (r.candidate_email || '').toLowerCase() === email.toLowerCase())
+    .sort((a, b) => (a.created_at || '').localeCompare(b.created_at || ''));
+  if (!records.length) { showToast('No records for that candidate.'); return; }
+
+  const doc  = new jsPDF('p', 'mm', 'a4');
+  const M = 15, cw = 180;
+
+  const name     = records.find(r => r.candidate_name)?.candidate_name || '—';
+  const phone    = records.find(r => r.candidate_phone)?.candidate_phone || '';
+  const role     = records.find(r => r.candidate_role)?.candidate_role || '';
+  const linkedin = records.find(r => r.candidate_linkedin)?.candidate_linkedin || '';
+  const resume   = records.find(r => r.candidate_resume_url)?.candidate_resume_url || '';
+  const totalSec = records.reduce((s, r) => s + (r.time_taken_seconds || 0), 0);
+  const scored   = records.filter(r => r.score_pct != null);
+  const avgScore = scored.length ? Math.round(scored.reduce((s, r) => s + r.score_pct, 0) / scored.length) : 0;
+
+  _pdfHeader(doc, 'Candidate Profile Report');
+  let y = 28;
+
+  doc.setFont('helvetica', 'bold'); doc.setFontSize(17); doc.setTextColor(15, 58, 82);
+  doc.text(name, M, y); y += 7;
+  doc.setFont('helvetica', 'normal'); doc.setFontSize(9.5); doc.setTextColor(107, 122, 141);
+  doc.text([email, phone, ROLE_LABEL[role] || role].filter(Boolean).join('  ·  '), M, y); y += 12;
+
+  // Summary cards
+  const cw4 = (cw - 9) / 4;
+  _pdfCard(doc, M,              y, cw4, 'TESTS TAKEN',  records.length);
+  _pdfCard(doc, M + cw4 + 3,   y, cw4, 'AVG SCORE',    avgScore + '%');
+  _pdfCard(doc, M + 2*(cw4+3), y, cw4, 'TOTAL TIME',   fmtDuration(totalSec));
+  _pdfCard(doc, M + 3*(cw4+3), y, cw4, 'FIRST TEST',   fmtDateShort(records[0]?.created_at));
+  y += 30;
+
+  // Score bar chart from modal canvas
+  const img = _chartImg('email-chart');
+  if (img) {
+    _pdfSection(doc, 'Score Profile Across Tests', y); y += 6;
+    doc.addImage(img, 'PNG', M, y, cw, 62); y += 69;
+  }
+
+  // Profile links
+  if (linkedin || resume) {
+    _pdfSection(doc, 'Profile Links', y); y += 9;
+    if (linkedin) { _pdfRow(doc, 'LinkedIn', linkedin, y); y += 9; }
+    if (resume)   { _pdfRow(doc, 'Resume',   resume,   y); y += 9; }
+    y += 4;
+  }
+
+  // All tests table
+  _pdfSection(doc, 'All Test Results', y); y += 8;
+  // Table header
+  doc.setFillColor(248, 249, 251);
+  doc.rect(M, y - 4, cw, 9, 'F');
+  doc.setFont('helvetica', 'bold'); doc.setFontSize(7.5); doc.setTextColor(107, 122, 141);
+  doc.text('TEST',  M + 2,  y + 1);
+  doc.text('DATE',  M + 82, y + 1);
+  doc.text('SCORE', M + 122, y + 1);
+  doc.text('RESULT', M + 148, y + 1);
+  doc.text('TIME',  M + 172, y + 1);
+  y += 7;
+
+  for (const r of records) {
+    if (y > 272) { doc.addPage(); _pdfHeader(doc, 'Candidate Profile Report'); y = 28; }
+    doc.setDrawColor(243, 244, 246);
+    doc.line(M, y, M + cw, y);
+    doc.setFont('helvetica', 'bold'); doc.setFontSize(9); doc.setTextColor(15, 58, 82);
+    doc.text(TYPE_LABEL[r.test_type] || r.test_type, M + 2, y + 6);
+    doc.setFont('helvetica', 'normal'); doc.setFontSize(8.5); doc.setTextColor(107, 122, 141);
+    doc.text(fmtDateShort(r.end_time || r.created_at), M + 82, y + 6);
+    doc.setFont('helvetica', 'bold'); doc.setTextColor(15, 58, 82);
+    doc.text(r.score_pct != null ? r.score_pct + '%' : '—', M + 122, y + 6);
+    doc.setFont('helvetica', 'normal'); doc.setFontSize(8);
+    doc.text((r.result_label || '—').slice(0, 22), M + 148, y + 6);
+    doc.text(fmtDuration(r.time_taken_seconds), M + 172, y + 6);
+    y += 10;
+  }
+
+  _pdfFooter(doc);
+  doc.save(`TechNext_Profile_${name.replace(/[^a-zA-Z0-9]/g, '_')}.pdf`);
+  showToast('✅ Candidate profile PDF downloaded');
+}
+
+/* ── 3. Dashboard summary PDF ─────────────────────────────────── */
+function downloadSummaryPDF() {
+  if (!_pdfReady()) return;
+  const { jsPDF } = window.jspdf;
+  const doc = new jsPDF('p', 'mm', 'a4');
+  const M = 15, cw = 180;
+
+  /* — Page 1: title + stats + chart-types + chart-scores — */
+  _pdfHeader(doc, 'Assessment Summary Report');
+  let y = 28;
+
+  doc.setFont('helvetica', 'bold'); doc.setFontSize(16); doc.setTextColor(15, 58, 82);
+  doc.text('TechNext Assessment Summary', M, y); y += 7;
+  doc.setFont('helvetica', 'normal'); doc.setFontSize(9.5); doc.setTextColor(107, 122, 141);
+  const dateStr = new Date().toLocaleDateString('en-GB', { weekday:'long', day:'2-digit', month:'long', year:'numeric' });
+  doc.text(`${dateStr}  ·  ${allData.length} total submissions`, M, y); y += 12;
+
+  // Top stat cards
+  const scored  = allData.filter(r => r.score_pct != null);
+  const avgAll  = scored.length ? Math.round(scored.reduce((s, r) => s + r.score_pct, 0) / scored.length) : 0;
+  const uniqPpl = new Set(allData.map(r => (r.candidate_email || '').toLowerCase())).size;
+  const week    = allData.filter(r => (Date.now() - new Date(r.created_at || 0)) < 7 * 864e5).length;
+  const cw4 = (cw - 9) / 4;
+  _pdfCard(doc, M,              y, cw4, 'TOTAL SUBMISSIONS', allData.length);
+  _pdfCard(doc, M + cw4 + 3,   y, cw4, 'UNIQUE CANDIDATES', uniqPpl);
+  _pdfCard(doc, M + 2*(cw4+3), y, cw4, 'AVG SCORE (ALL)',   avgAll + '%');
+  _pdfCard(doc, M + 3*(cw4+3), y, cw4, 'LAST 7 DAYS',       week);
+  y += 30;
+
+  // Submissions by test type
+  const imgTypes = _chartImg('chart-types');
+  if (imgTypes) {
+    _pdfSection(doc, 'Submissions by Test Type', y); y += 6;
+    doc.addImage(imgTypes, 'PNG', M, y, cw, 70); y += 77;
+  }
+
+  // Score distribution
+  const imgScores = _chartImg('chart-scores');
+  if (imgScores) {
+    _pdfSection(doc, 'Score Distribution — All Tests', y); y += 6;
+    doc.addImage(imgScores, 'PNG', M, y, cw, 68);
+  }
+
+  /* — Page 2: time chart + avg chart + per-test table — */
+  doc.addPage();
+  _pdfHeader(doc, 'Assessment Summary Report');
+  y = 28;
+
+  const imgTime = _chartImg('chart-time');
+  if (imgTime) {
+    _pdfSection(doc, 'Submissions Over Time — Last 30 Days', y); y += 6;
+    doc.addImage(imgTime, 'PNG', M, y, cw, 65); y += 72;
+  }
+
+  const imgAvg = _chartImg('chart-avg');
+  if (imgAvg) {
+    _pdfSection(doc, 'Average Score by Test', y); y += 6;
+    doc.addImage(imgAvg, 'PNG', M, y, cw, 65); y += 72;
+  }
+
+  // Per-test summary table
+  _pdfSection(doc, 'Test-by-Test Summary', y); y += 8;
+  doc.setFillColor(248, 249, 251);
+  doc.rect(M, y - 4, cw, 9, 'F');
+  doc.setFont('helvetica', 'bold'); doc.setFontSize(7.5); doc.setTextColor(107, 122, 141);
+  doc.text('TEST',         M + 2,   y + 1);
+  doc.text('SUBMISSIONS',  M + 95,  y + 1);
+  doc.text('AVG SCORE',    M + 128, y + 1);
+  doc.text('HIGHEST',      M + 158, y + 1);
+  y += 7;
+
+  for (const t of TN_TYPES) {
+    if (y > 272) { doc.addPage(); _pdfHeader(doc, 'Assessment Summary Report'); y = 28; }
+    const items = allData.filter(r => r.test_type === t);
+    const sc    = items.filter(r => r.score_pct != null);
+    const avg   = sc.length ? Math.round(sc.reduce((s, r) => s + r.score_pct, 0) / sc.length) : null;
+    const max   = sc.length ? Math.max(...sc.map(r => r.score_pct)) : null;
+    doc.setDrawColor(243, 244, 246);
+    doc.line(M, y, M + cw, y);
+    doc.setFont('helvetica', 'bold'); doc.setFontSize(9); doc.setTextColor(15, 58, 82);
+    doc.text(TYPE_LABEL[t] || t, M + 2, y + 6);
+    doc.setFont('helvetica', 'normal'); doc.setFontSize(9); doc.setTextColor(107, 122, 141);
+    doc.text(String(items.length),             M + 95,  y + 6);
+    doc.text(avg != null ? avg + '%' : '—',   M + 128, y + 6);
+    doc.text(max != null ? max + '%' : '—',   M + 158, y + 6);
+    y += 10;
+  }
+
+  _pdfFooter(doc);
+  doc.save(`TechNext_Summary_${new Date().toISOString().slice(0, 10)}.pdf`);
+  showToast('✅ Summary PDF downloaded');
+}
 </script>
 </body>
 </html>
