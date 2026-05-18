@@ -584,10 +584,52 @@ window.addEventListener('load', () => {
 /* ═══════════════════════════════════════════════════════════════
    PDF GENERATION  (jsPDF 2.5 — loaded via CDN)
    Three reports:
-     downloadTestPDF(rec)         — single test result
-     downloadCandidatePDF(email)  — full candidate profile
+     downloadTestPDF(rec)         — single test result with full analysis
+     downloadCandidatePDF(email)  — full candidate profile, all tests
      downloadSummaryPDF()         — dashboard summary
 ═══════════════════════════════════════════════════════════════ */
+
+/* ── DISC descriptions (verbatim from profiler.html) ───────────── */
+const DISC_DESC = {
+  D: { name: 'Driver', tag: 'Dominance', color: [239, 68, 68],
+       text: "You're wired for results — direct, decisive, comfortable taking charge. You move fast and prefer clear ownership. Watch for impatience with slower or more cautious colleagues." },
+  I: { name: 'Influencer', tag: 'Influence', color: [249, 115, 22],
+       text: "You're energised by people — outgoing, persuasive, optimistic. You inspire teams and bring momentum. Watch for over-promising or losing focus on detail." },
+  S: { name: 'Stabiliser', tag: 'Steadiness', color: [34, 197, 94],
+       text: "You're patient, supportive, and reliable. You keep teams calm under pressure and excel in steady collaboration. Watch for avoiding necessary conflict or change." },
+  C: { name: 'Conscientious', tag: 'Conscientiousness', color: [59, 130, 246],
+       text: "You're analytical, careful, and precise. You raise the bar on quality and accuracy. Watch for over-thinking or perfection-blocking shipping." }
+};
+
+/* ── MBTI / 4-letter Type descriptions ─────────────────────────── */
+const MBTI_DESC = {
+  ISTJ: { name: 'The Inspector',    text: 'Practical, dependable, organised. Loves structure and follow-through.' },
+  ISFJ: { name: 'The Protector',    text: "Quietly supportive, loyal, attentive to people's needs." },
+  INFJ: { name: 'The Counsellor',   text: 'Insightful, principled, values-driven.' },
+  INTJ: { name: 'The Strategist',   text: 'Independent, big-picture, drives long-term plans.' },
+  ISTP: { name: 'The Craftsperson', text: 'Hands-on, calm, problem-solver in the moment.' },
+  ISFP: { name: 'The Composer',     text: 'Gentle, observant, brings quiet creativity.' },
+  INFP: { name: 'The Idealist',     text: 'Thoughtful, values-led, looks for meaning.' },
+  INTP: { name: 'The Architect',    text: 'Curious, analytical, loves first-principles thinking.' },
+  ESTP: { name: 'The Doer',         text: 'Energetic, pragmatic, thrives on action and feedback.' },
+  ESFP: { name: 'The Performer',    text: 'Playful, present, brings energy and connection.' },
+  ENFP: { name: 'The Champion',     text: 'Enthusiastic, future-focused, inspires people.' },
+  ENTP: { name: 'The Visionary',    text: 'Inventive, debating, generator of new ideas.' },
+  ESTJ: { name: 'The Supervisor',   text: 'Organised, decisive, runs things efficiently.' },
+  ESFJ: { name: 'The Provider',     text: 'Warm, organised, builds team harmony.' },
+  ENFJ: { name: 'The Teacher',      text: 'Charismatic, growth-focused, develops others.' },
+  ENTJ: { name: 'The Commander',    text: 'Strategic, decisive, leads from the front.' }
+};
+
+/* ── Score-tier interpretation (for color + recommendation) ─── */
+function _scoreTier(pct) {
+  if (pct == null) return { label: '—', color: [156, 163, 175], rec: 'No score recorded.' };
+  if (pct >= 80) return { label: 'Strong',     color: [22, 163, 74],  rec: 'Excellent performance. Top-tier candidate — recommend fast-track to next round.' };
+  if (pct >= 65) return { label: 'Proficient', color: [29, 78, 216],  rec: 'Above-average grasp. Strong shortlist candidate, advance to interview.' };
+  if (pct >= 50) return { label: 'Capable',    color: [217, 119, 6],  rec: 'Working knowledge. Suitable for further evaluation depending on role seniority.' };
+  if (pct >= 35) return { label: 'Borderline', color: [202, 138, 4],  rec: 'Partial grasp. May need training; review alongside other test results.' };
+  return            { label: 'Basic',      color: [220, 38, 38],   rec: 'Limited demonstrated knowledge. Recommend additional screening.' };
+}
 
 function _pdfReady() {
   if (window.jspdf && window.jspdf.jsPDF) return true;
@@ -677,23 +719,191 @@ function _chartImg(canvasId) {
   } catch (e) { return null; }
 }
 
-/* ── 1. Single test result PDF ────────────────────────────────── */
+/* Draws a horizontal score progress bar with color-coded fill */
+function _pdfProgressBar(doc, x, y, w, pct, colorRGB) {
+  pct = Math.max(0, Math.min(100, pct || 0));
+  const h = 6;
+  // Track
+  doc.setFillColor(232, 236, 243);
+  doc.roundedRect(x, y, w, h, 2, 2, 'F');
+  // Fill
+  doc.setFillColor(colorRGB[0], colorRGB[1], colorRGB[2]);
+  doc.roundedRect(x, y, (w * pct) / 100, h, 2, 2, 'F');
+}
+
+/* Draws the DISC profile as 4 horizontal bars natively in jsPDF */
+function _pdfDiscChart(doc, x, y, w, scores) {
+  const order = ['D', 'I', 'S', 'C'];
+  const barH = 9;
+  const gap = 6;
+  const labelW = 60;
+  const barW = w - labelW - 22;
+  let cy = y;
+  for (const k of order) {
+    const v = Math.max(0, Math.min(100, Number(scores[k]) || 0));
+    const d = DISC_DESC[k];
+    // Label
+    doc.setFont('helvetica', 'bold');
+    doc.setFontSize(10);
+    doc.setTextColor(15, 58, 82);
+    doc.text(`${k}  ${d.name}`, x, cy + 6);
+    // Bar track
+    doc.setFillColor(232, 236, 243);
+    doc.roundedRect(x + labelW, cy + 2, barW, barH, 2, 2, 'F');
+    // Bar fill
+    doc.setFillColor(d.color[0], d.color[1], d.color[2]);
+    doc.roundedRect(x + labelW, cy + 2, (barW * v) / 100, barH, 2, 2, 'F');
+    // Percentage
+    doc.setFont('helvetica', 'bold');
+    doc.setFontSize(10);
+    doc.setTextColor(15, 58, 82);
+    doc.text(`${v}%`, x + w - 2, cy + 8, { align: 'right' });
+    cy += barH + gap;
+  }
+  return cy;
+}
+
+/* Wrapped paragraph — returns new y after text */
+function _pdfPara(doc, text, x, y, w, opts) {
+  opts = opts || {};
+  doc.setFont('helvetica', opts.bold ? 'bold' : 'normal');
+  doc.setFontSize(opts.size || 9.5);
+  doc.setTextColor(opts.color ? opts.color[0] : 55, opts.color ? opts.color[1] : 65, opts.color ? opts.color[2] : 81);
+  const lines = doc.splitTextToSize(String(text || ''), w);
+  doc.text(lines, x, y);
+  const lh = (opts.size || 9.5) * 0.45;
+  return y + lines.length * lh + 1;
+}
+
+/* Coloured pill badge */
+function _pdfPill(doc, x, y, text, colorRGB) {
+  doc.setFont('helvetica', 'bold');
+  doc.setFontSize(8);
+  const w = doc.getTextWidth(String(text)) + 8;
+  doc.setFillColor(colorRGB[0], colorRGB[1], colorRGB[2]);
+  doc.roundedRect(x, y - 4, w, 6, 1.5, 1.5, 'F');
+  doc.setTextColor(255, 255, 255);
+  doc.text(String(text), x + 4, y);
+  return x + w + 3;
+}
+
+/* Page-break helper */
+function _pdfNeed(doc, y, need, subtitle) {
+  if (y + need > 278) {
+    doc.addPage();
+    _pdfHeader(doc, subtitle || '');
+    return 28;
+  }
+  return y;
+}
+
+/* Renders one test in detail — used for the candidate profile PDF */
+function _pdfRenderTestBlock(doc, rec, y, subtitle) {
+  const M = 15, cw = 180;
+  y = _pdfNeed(doc, y, 50, subtitle);
+
+  // Title bar
+  doc.setFillColor(248, 249, 251);
+  doc.rect(M, y, cw, 10, 'F');
+  doc.setFont('helvetica', 'bold'); doc.setFontSize(11); doc.setTextColor(15, 58, 82);
+  doc.text(TYPE_LABEL[rec.test_type] || rec.test_type, M + 3, y + 7);
+  doc.setFont('helvetica', 'normal'); doc.setFontSize(8.5); doc.setTextColor(107, 122, 141);
+  doc.text(fmtDateShort(rec.end_time || rec.created_at), M + cw - 3, y + 7, { align: 'right' });
+  y += 13;
+
+  // Profiler — show DISC + MBTI in detail
+  if (rec.test_type === 'tn_profiler' && rec.section_scores) {
+    const s = rec.section_scores;
+    const flags = rec.flags || {};
+    const primary = flags.primary || _topDisc(s, 0);
+    const secondary = flags.secondary || _topDisc(s, 1);
+    const mbti = flags.type || s.MBTI;
+
+    // Badges
+    let bx = M;
+    if (primary && DISC_DESC[primary])   bx = _pdfPill(doc, bx, y, `Primary: ${primary} ${DISC_DESC[primary].name}`, DISC_DESC[primary].color);
+    if (secondary && DISC_DESC[secondary]) bx = _pdfPill(doc, bx, y, `Secondary: ${secondary}`, DISC_DESC[secondary].color);
+    if (mbti) bx = _pdfPill(doc, bx, y, `Type: ${mbti}`, [15, 58, 82]);
+    y += 6;
+
+    // DISC chart (native)
+    y = _pdfDiscChart(doc, M, y, cw, s) + 4;
+
+    // Primary description
+    y = _pdfNeed(doc, y, 24, subtitle);
+    if (primary && DISC_DESC[primary]) {
+      doc.setFont('helvetica', 'bold'); doc.setFontSize(9.5); doc.setTextColor(15, 58, 82);
+      doc.text(`Primary work style: ${primary} — ${DISC_DESC[primary].name}`, M, y); y += 4.5;
+      y = _pdfPara(doc, DISC_DESC[primary].text, M, y, cw, { size: 9 }) + 3;
+    }
+    // Secondary description
+    if (secondary && DISC_DESC[secondary] && secondary !== primary) {
+      y = _pdfNeed(doc, y, 22, subtitle);
+      doc.setFont('helvetica', 'bold'); doc.setFontSize(9.5); doc.setTextColor(15, 58, 82);
+      doc.text(`Secondary: ${secondary} — ${DISC_DESC[secondary].name}`, M, y); y += 4.5;
+      y = _pdfPara(doc, DISC_DESC[secondary].text, M, y, cw, { size: 9 }) + 3;
+    }
+    // MBTI description
+    if (mbti && MBTI_DESC[mbti]) {
+      y = _pdfNeed(doc, y, 22, subtitle);
+      doc.setFont('helvetica', 'bold'); doc.setFontSize(9.5); doc.setTextColor(15, 58, 82);
+      doc.text(`4-letter Type: ${mbti} — ${MBTI_DESC[mbti].name}`, M, y); y += 4.5;
+      y = _pdfPara(doc, MBTI_DESC[mbti].text, M, y, cw, { size: 9 }) + 4;
+    }
+  } else {
+    // Scored test — show score, progress bar, interpretation
+    const pct = rec.score_pct;
+    const tier = _scoreTier(pct);
+    // Score row
+    doc.setFont('helvetica', 'bold'); doc.setFontSize(22); doc.setTextColor(tier.color[0], tier.color[1], tier.color[2]);
+    doc.text(pct != null ? pct + '%' : '—', M, y + 8);
+    doc.setFont('helvetica', 'normal'); doc.setFontSize(9.5); doc.setTextColor(107, 122, 141);
+    doc.text(rec.score_raw != null ? `${rec.score_raw} of ${rec.score_max || '—'} correct` : '', M + 30, y + 4);
+    doc.text(`Duration: ${fmtDuration(rec.time_taken_seconds)}`, M + 30, y + 9);
+    // Result badge
+    if (rec.result_label) {
+      _pdfPill(doc, M + cw - 50, y + 5, rec.result_label, tier.color);
+    }
+    y += 14;
+    // Progress bar
+    if (pct != null) {
+      _pdfProgressBar(doc, M, y, cw, pct, tier.color);
+      y += 10;
+    }
+    // Recommendation
+    y = _pdfPara(doc, 'Assessment: ' + tier.rec, M, y, cw, { size: 9 });
+    y += 4;
+  }
+
+  return y + 4;
+}
+
+/* Best-effort: derive primary/secondary letter from DISC scores */
+function _topDisc(s, idx) {
+  const arr = ['D','I','S','C']
+    .map(k => ({ k, v: Number(s[k]) || 0 }))
+    .sort((a,b) => b.v - a.v);
+  return arr[idx] ? arr[idx].k : null;
+}
+
+/* ── 1. Single test result PDF — rich, test-type aware ───────── */
 function downloadTestPDF(rec) {
   if (!_pdfReady()) return;
   const { jsPDF } = window.jspdf;
   const doc = new jsPDF('p', 'mm', 'a4');
   const M = 15, cw = 180;
+  const SUB = 'Candidate Test Report';
 
-  _pdfHeader(doc, 'Candidate Test Report');
+  _pdfHeader(doc, SUB);
   let y = 28;
 
   // Name + test label
-  doc.setFont('helvetica', 'bold'); doc.setFontSize(17); doc.setTextColor(15, 58, 82);
+  doc.setFont('helvetica', 'bold'); doc.setFontSize(18); doc.setTextColor(15, 58, 82);
   doc.text(rec.candidate_name || '—', M, y); y += 7;
-  doc.setFont('helvetica', 'normal'); doc.setFontSize(9.5); doc.setTextColor(107, 122, 141);
+  doc.setFont('helvetica', 'normal'); doc.setFontSize(10); doc.setTextColor(107, 122, 141);
   doc.text(`${TYPE_LABEL[rec.test_type] || rec.test_type}  ·  ${fmtDateFull(rec.end_time || rec.created_at)}`, M, y); y += 12;
 
-  // Score cards
+  // Score cards (always)
   const cw4 = (cw - 9) / 4;
   _pdfCard(doc, M,                y, cw4, 'SCORE',  rec.score_pct != null ? rec.score_pct + '%' : '—');
   _pdfCard(doc, M + cw4 + 3,     y, cw4, 'RAW',    rec.score_raw != null ? `${rec.score_raw} / ${rec.score_max || '—'}` : '—');
@@ -701,44 +911,123 @@ function downloadTestPDF(rec) {
   _pdfCard(doc, M + 3*(cw4+3),   y, cw4, 'TIME',   fmtDuration(rec.time_taken_seconds));
   y += 30;
 
-  // Section breakdown chart
-  const img1 = _chartImg('cand-chart');
-  if (img1 && rec.section_scores && Object.keys(rec.section_scores).length) {
-    _pdfSection(doc, 'Section Breakdown', y); y += 6;
-    doc.addImage(img1, 'PNG', M, y, cw, 65); y += 72;
-  }
-
-  // DISC-specific block
+  /* ───── Profiler — full DISC + MBTI personality profile ───── */
   if (rec.test_type === 'tn_profiler' && rec.section_scores) {
-    _pdfSection(doc, 'DISC Profile', y); y += 9;
     const s = rec.section_scores;
-    const disc = [['D — Dominance', s.D], ['I — Influence', s.I], ['S — Steadiness', s.S], ['C — Conscientiousness', s.C]];
-    for (const [lbl, val] of disc) {
-      if (val == null) continue;
-      _pdfRow(doc, lbl, val + '%', y); y += 9;
-    }
     const flags = rec.flags || {};
-    if (flags.primary)   { _pdfRow(doc, 'Primary style',   flags.primary,   y); y += 9; }
-    if (flags.secondary) { _pdfRow(doc, 'Secondary style', flags.secondary, y); y += 9; }
-    if (flags.type)      { _pdfRow(doc, '4-letter type',   flags.type,      y); y += 9; }
+    const primary = flags.primary || _topDisc(s, 0);
+    const secondary = flags.secondary || _topDisc(s, 1);
+    const mbti = flags.type || s.MBTI;
+
+    // Badges row
+    _pdfSection(doc, 'Personality Profile', y); y += 7;
+    let bx = M;
+    if (primary && DISC_DESC[primary])     bx = _pdfPill(doc, bx, y, `Primary: ${primary} ${DISC_DESC[primary].name}`, DISC_DESC[primary].color);
+    if (secondary && DISC_DESC[secondary]) bx = _pdfPill(doc, bx, y, `Secondary: ${secondary} ${DISC_DESC[secondary].name}`, DISC_DESC[secondary].color);
+    if (mbti && MBTI_DESC[mbti])           bx = _pdfPill(doc, bx, y, `${mbti} — ${MBTI_DESC[mbti].name}`, [15, 58, 82]);
+    y += 8;
+
+    // DISC bar chart (native)
+    _pdfSection(doc, 'DISC Work-Style Breakdown', y); y += 7;
+    y = _pdfDiscChart(doc, M, y, cw, s) + 4;
+
+    // Primary description
+    y = _pdfNeed(doc, y, 26, SUB);
+    doc.setFont('helvetica', 'bold'); doc.setFontSize(10.5); doc.setTextColor(15, 58, 82);
+    doc.text(`Primary: ${primary} — ${DISC_DESC[primary].name}`, M, y); y += 5;
+    y = _pdfPara(doc, DISC_DESC[primary].text, M, y, cw, { size: 9.5 }) + 4;
+
+    // Secondary description
+    if (secondary && secondary !== primary && DISC_DESC[secondary]) {
+      y = _pdfNeed(doc, y, 24, SUB);
+      doc.setFont('helvetica', 'bold'); doc.setFontSize(10.5); doc.setTextColor(15, 58, 82);
+      doc.text(`Secondary: ${secondary} — ${DISC_DESC[secondary].name}`, M, y); y += 5;
+      y = _pdfPara(doc, DISC_DESC[secondary].text, M, y, cw, { size: 9.5 }) + 4;
+    }
+
+    // 4-letter type description
+    if (mbti && MBTI_DESC[mbti]) {
+      y = _pdfNeed(doc, y, 24, SUB);
+      doc.setFont('helvetica', 'bold'); doc.setFontSize(10.5); doc.setTextColor(15, 58, 82);
+      doc.text(`Cognitive Type: ${mbti} — ${MBTI_DESC[mbti].name}`, M, y); y += 5;
+      y = _pdfPara(doc, MBTI_DESC[mbti].text, M, y, cw, { size: 9.5 }) + 6;
+    }
+  }
+  /* ───── Scored tests — progress bar + interpretation ────────── */
+  else if (rec.score_pct != null) {
+    const tier = _scoreTier(rec.score_pct);
+    _pdfSection(doc, 'Performance Analysis', y); y += 8;
+
+    // Large progress bar
+    doc.setFont('helvetica', 'bold'); doc.setFontSize(10); doc.setTextColor(15, 58, 82);
+    doc.text('Score', M, y);
+    doc.text(rec.score_pct + '%', M + cw, y, { align: 'right' });
+    y += 3;
+    _pdfProgressBar(doc, M, y, cw, rec.score_pct, tier.color);
+    y += 14;
+
+    // Tier label
+    doc.setFont('helvetica', 'bold'); doc.setFontSize(11); doc.setTextColor(tier.color[0], tier.color[1], tier.color[2]);
+    doc.text(`Tier: ${tier.label}${rec.result_label ? ' — ' + rec.result_label : ''}`, M, y); y += 6;
+
+    // Recommendation
+    y = _pdfPara(doc, tier.rec, M, y, cw, { size: 9.5 }) + 6;
+
+    // Score band reference table
+    y = _pdfNeed(doc, y, 36, SUB);
+    _pdfSection(doc, 'Score Band Reference', y); y += 7;
+    const bands = [
+      [80, 100, 'Strong',     [22, 163, 74]],
+      [65,  79, 'Proficient', [29, 78, 216]],
+      [50,  64, 'Capable',    [217, 119, 6]],
+      [35,  49, 'Borderline', [202, 138, 4]],
+      [ 0,  34, 'Basic',      [220, 38, 38]],
+    ];
+    for (const [lo, hi, lbl, col] of bands) {
+      const isThis = rec.score_pct >= lo && rec.score_pct <= hi;
+      if (isThis) {
+        doc.setFillColor(col[0], col[1], col[2], 0.08);
+        doc.rect(M - 2, y - 4, cw + 4, 7, 'F');
+      }
+      doc.setFont('helvetica', 'bold'); doc.setFontSize(9); doc.setTextColor(col[0], col[1], col[2]);
+      doc.text(`${lo}–${hi}%`, M, y);
+      doc.setFont('helvetica', isThis ? 'bold' : 'normal');
+      doc.setTextColor(15, 58, 82);
+      doc.text(lbl, M + 22, y);
+      doc.setFont('helvetica', 'normal'); doc.setTextColor(107, 122, 141);
+      doc.text(isThis ? '◄ this candidate' : '', M + cw - 2, y, { align: 'right' });
+      y += 7;
+    }
     y += 4;
   }
 
-  // Candidate info
+  /* ───── Booking-specific block ─────────────────────────────── */
+  if (rec.test_type === 'tn_booking') {
+    y = _pdfNeed(doc, y, 30, SUB);
+    _pdfSection(doc, 'Interview Booking Details', y); y += 9;
+    const ans = rec.answers || {};
+    if (rec.start_time) { _pdfRow(doc, 'Requested slot', fmtDateFull(rec.start_time), y); y += 9; }
+    if (ans.interviewer) { _pdfRow(doc, 'Interviewer', ans.interviewer, y); y += 9; }
+    _pdfRow(doc, 'Duration', '45 minutes', y); y += 9;
+    _pdfRow(doc, 'Status',   'Expression of interest — awaiting confirmation', y); y += 9;
+  }
+
+  /* ───── Candidate info — always last ───────────────────────── */
+  y = _pdfNeed(doc, y, 30, SUB);
   _pdfSection(doc, 'Candidate Information', y); y += 9;
   const info = [
     ['Email',        rec.candidate_email],
     ['Handphone',    rec.candidate_phone],
     ['Role applied', ROLE_LABEL[rec.candidate_role] || rec.candidate_role],
     ['LinkedIn',     rec.candidate_linkedin],
-    ['Resume URL',   rec.candidate_resume_url],
+    ['Resume',       rec.candidate_resume_url],
     ['Started',      fmtDateFull(rec.start_time)],
     ['Completed',    fmtDateFull(rec.end_time)],
     ['Duration',     fmtDuration(rec.time_taken_seconds)],
   ];
   for (const [lbl, val] of info) {
     if (!val || val === '—') continue;
-    if (y > 272) { doc.addPage(); _pdfHeader(doc, 'Candidate Test Report'); y = 28; }
+    y = _pdfNeed(doc, y, 12, SUB);
     _pdfRow(doc, lbl, val, y); y += 9;
   }
 
@@ -747,7 +1036,7 @@ function downloadTestPDF(rec) {
   showToast('✅ Test report PDF downloaded');
 }
 
-/* ── 2. Full candidate profile PDF ────────────────────────────── */
+/* ── 2. Full candidate profile PDF — comprehensive ────────────── */
 function downloadCandidatePDF(email) {
   if (!_pdfReady() || !email) return;
   const { jsPDF } = window.jspdf;
@@ -758,6 +1047,7 @@ function downloadCandidatePDF(email) {
 
   const doc  = new jsPDF('p', 'mm', 'a4');
   const M = 15, cw = 180;
+  const SUB = 'Candidate Profile Report';
 
   const name     = records.find(r => r.candidate_name)?.candidate_name || '—';
   const phone    = records.find(r => r.candidate_phone)?.candidate_phone || '';
@@ -767,29 +1057,25 @@ function downloadCandidatePDF(email) {
   const totalSec = records.reduce((s, r) => s + (r.time_taken_seconds || 0), 0);
   const scored   = records.filter(r => r.score_pct != null);
   const avgScore = scored.length ? Math.round(scored.reduce((s, r) => s + r.score_pct, 0) / scored.length) : 0;
+  const profilerRec = records.find(r => r.test_type === 'tn_profiler');
 
-  _pdfHeader(doc, 'Candidate Profile Report');
+  /* ──── PAGE 1: Cover + summary + DISC profile (if exists) ──── */
+  _pdfHeader(doc, SUB);
   let y = 28;
 
-  doc.setFont('helvetica', 'bold'); doc.setFontSize(17); doc.setTextColor(15, 58, 82);
-  doc.text(name, M, y); y += 7;
-  doc.setFont('helvetica', 'normal'); doc.setFontSize(9.5); doc.setTextColor(107, 122, 141);
+  // Name + subtitle
+  doc.setFont('helvetica', 'bold'); doc.setFontSize(20); doc.setTextColor(15, 58, 82);
+  doc.text(name, M, y); y += 8;
+  doc.setFont('helvetica', 'normal'); doc.setFontSize(10); doc.setTextColor(107, 122, 141);
   doc.text([email, phone, ROLE_LABEL[role] || role].filter(Boolean).join('  ·  '), M, y); y += 12;
 
   // Summary cards
   const cw4 = (cw - 9) / 4;
-  _pdfCard(doc, M,              y, cw4, 'TESTS TAKEN',  records.length);
-  _pdfCard(doc, M + cw4 + 3,   y, cw4, 'AVG SCORE',    avgScore + '%');
-  _pdfCard(doc, M + 2*(cw4+3), y, cw4, 'TOTAL TIME',   fmtDuration(totalSec));
-  _pdfCard(doc, M + 3*(cw4+3), y, cw4, 'FIRST TEST',   fmtDateShort(records[0]?.created_at));
+  _pdfCard(doc, M,              y, cw4, 'TESTS TAKEN', records.length);
+  _pdfCard(doc, M + cw4 + 3,   y, cw4, 'AVG SCORE',   avgScore + '%');
+  _pdfCard(doc, M + 2*(cw4+3), y, cw4, 'TOTAL TIME',  fmtDuration(totalSec));
+  _pdfCard(doc, M + 3*(cw4+3), y, cw4, 'FIRST TEST',  fmtDateShort(records[0]?.created_at));
   y += 30;
-
-  // Score bar chart from modal canvas
-  const img = _chartImg('email-chart');
-  if (img) {
-    _pdfSection(doc, 'Score Profile Across Tests', y); y += 6;
-    doc.addImage(img, 'PNG', M, y, cw, 62); y += 69;
-  }
 
   // Profile links
   if (linkedin || resume) {
@@ -799,33 +1085,84 @@ function downloadCandidatePDF(email) {
     y += 4;
   }
 
-  // All tests table
-  _pdfSection(doc, 'All Test Results', y); y += 8;
-  // Table header
-  doc.setFillColor(248, 249, 251);
-  doc.rect(M, y - 4, cw, 9, 'F');
-  doc.setFont('helvetica', 'bold'); doc.setFontSize(7.5); doc.setTextColor(107, 122, 141);
-  doc.text('TEST',  M + 2,  y + 1);
-  doc.text('DATE',  M + 82, y + 1);
-  doc.text('SCORE', M + 122, y + 1);
-  doc.text('RESULT', M + 148, y + 1);
-  doc.text('TIME',  M + 172, y + 1);
-  y += 7;
+  // Scores-at-a-glance bar list (native, not chart)
+  const usedTypes = TN_TYPES.filter(t => records.some(r => r.test_type === t && r.score_pct != null));
+  if (usedTypes.length) {
+    y = _pdfNeed(doc, y, 15 + usedTypes.length * 12, SUB);
+    _pdfSection(doc, 'Score Profile Across Tests', y); y += 8;
+    for (const t of usedTypes) {
+      const items = records.filter(r => r.test_type === t && r.score_pct != null);
+      const avg = Math.round(items.reduce((s, r) => s + r.score_pct, 0) / items.length);
+      const tier = _scoreTier(avg);
+      doc.setFont('helvetica', 'bold'); doc.setFontSize(9.5); doc.setTextColor(15, 58, 82);
+      doc.text(TYPE_LABEL[t], M, y);
+      doc.setFont('helvetica', 'bold'); doc.setTextColor(tier.color[0], tier.color[1], tier.color[2]);
+      doc.text(avg + '%', M + cw, y, { align: 'right' });
+      y += 2;
+      _pdfProgressBar(doc, M, y, cw, avg, tier.color);
+      y += 10;
+    }
+    y += 4;
+  }
 
-  for (const r of records) {
-    if (y > 272) { doc.addPage(); _pdfHeader(doc, 'Candidate Profile Report'); y = 28; }
-    doc.setDrawColor(243, 244, 246);
-    doc.line(M, y, M + cw, y);
-    doc.setFont('helvetica', 'bold'); doc.setFontSize(9); doc.setTextColor(15, 58, 82);
-    doc.text(TYPE_LABEL[r.test_type] || r.test_type, M + 2, y + 6);
-    doc.setFont('helvetica', 'normal'); doc.setFontSize(8.5); doc.setTextColor(107, 122, 141);
-    doc.text(fmtDateShort(r.end_time || r.created_at), M + 82, y + 6);
-    doc.setFont('helvetica', 'bold'); doc.setTextColor(15, 58, 82);
-    doc.text(r.score_pct != null ? r.score_pct + '%' : '—', M + 122, y + 6);
-    doc.setFont('helvetica', 'normal'); doc.setFontSize(8);
-    doc.text((r.result_label || '—').slice(0, 22), M + 148, y + 6);
-    doc.text(fmtDuration(r.time_taken_seconds), M + 172, y + 6);
+  /* ──── PAGE 2+: Personality Profile (if profiler exists) ──── */
+  if (profilerRec && profilerRec.section_scores) {
+    doc.addPage();
+    _pdfHeader(doc, SUB);
+    y = 28;
+
+    doc.setFont('helvetica', 'bold'); doc.setFontSize(16); doc.setTextColor(15, 58, 82);
+    doc.text('Personality Profile', M, y); y += 6;
+    doc.setFont('helvetica', 'normal'); doc.setFontSize(9.5); doc.setTextColor(107, 122, 141);
+    doc.text(`Based on TechNext Profiler — ${fmtDateShort(profilerRec.end_time || profilerRec.created_at)}`, M, y); y += 10;
+
+    const s = profilerRec.section_scores;
+    const flags = profilerRec.flags || {};
+    const primary = flags.primary || _topDisc(s, 0);
+    const secondary = flags.secondary || _topDisc(s, 1);
+    const mbti = flags.type || s.MBTI;
+
+    // Headline pills
+    let bx = M;
+    if (primary && DISC_DESC[primary])     bx = _pdfPill(doc, bx, y, `Primary: ${primary} ${DISC_DESC[primary].name}`, DISC_DESC[primary].color);
+    if (secondary && DISC_DESC[secondary]) bx = _pdfPill(doc, bx, y, `Secondary: ${secondary} ${DISC_DESC[secondary].name}`, DISC_DESC[secondary].color);
+    if (mbti && MBTI_DESC[mbti])           bx = _pdfPill(doc, bx, y, `${mbti} — ${MBTI_DESC[mbti].name}`, [15, 58, 82]);
     y += 10;
+
+    // DISC chart native
+    _pdfSection(doc, 'DISC Work-Style Breakdown', y); y += 7;
+    y = _pdfDiscChart(doc, M, y, cw, s) + 6;
+
+    // Detailed text blocks
+    if (primary && DISC_DESC[primary]) {
+      _pdfSection(doc, `Primary work style — ${primary} (${DISC_DESC[primary].name})`, y); y += 7;
+      y = _pdfPara(doc, DISC_DESC[primary].text, M, y, cw, { size: 10 }) + 5;
+    }
+    if (secondary && secondary !== primary && DISC_DESC[secondary]) {
+      y = _pdfNeed(doc, y, 28, SUB);
+      _pdfSection(doc, `Secondary work style — ${secondary} (${DISC_DESC[secondary].name})`, y); y += 7;
+      y = _pdfPara(doc, DISC_DESC[secondary].text, M, y, cw, { size: 10 }) + 5;
+    }
+    if (mbti && MBTI_DESC[mbti]) {
+      y = _pdfNeed(doc, y, 28, SUB);
+      _pdfSection(doc, `Cognitive type — ${mbti} (${MBTI_DESC[mbti].name})`, y); y += 7;
+      y = _pdfPara(doc, MBTI_DESC[mbti].text, M, y, cw, { size: 10 }) + 6;
+    }
+  }
+
+  /* ──── PAGE 3+: Detailed per-test breakdown ──── */
+  doc.addPage();
+  _pdfHeader(doc, SUB);
+  y = 28;
+
+  doc.setFont('helvetica', 'bold'); doc.setFontSize(16); doc.setTextColor(15, 58, 82);
+  doc.text('Detailed Test Results', M, y); y += 6;
+  doc.setFont('helvetica', 'normal'); doc.setFontSize(9.5); doc.setTextColor(107, 122, 141);
+  doc.text(`${records.length} submission${records.length === 1 ? '' : 's'} — sorted chronologically`, M, y); y += 10;
+
+  // Render each test in full detail
+  for (const rec of records) {
+    y = _pdfRenderTestBlock(doc, rec, y, SUB);
   }
 
   _pdfFooter(doc);
