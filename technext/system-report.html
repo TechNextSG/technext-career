@@ -1,0 +1,1011 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>TechNext Career — System Operations Report</title>
+<meta name="robots" content="noindex,nofollow">
+<style>
+*,*::before,*::after { box-sizing:border-box; margin:0; padding:0; }
+html { scroll-behavior:smooth; }
+
+:root {
+  --navy:#0f3a52;
+  --navy2:#082a3a;
+  --teal:#19c2a6;
+  --teal2:#149a83;
+  --bg:#f0f4f8;
+  --text:#1e2d3d;
+  --muted:#6b7a8d;
+  --border:#dce3ea;
+  --radius:14px;
+  --shadow:0 4px 24px rgba(15,58,82,.10);
+  --code-bg:#0c1e2a;
+}
+
+body {
+  font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',system-ui,sans-serif;
+  font-size:16px; line-height:1.6;
+  background:var(--bg); color:var(--text);
+}
+
+/* ── Header ───────────────────────────────────────────── */
+.tn-header {
+  position:sticky; top:0; z-index:50;
+  background:var(--navy); padding:0 24px;
+  height:64px; display:flex; align-items:center; gap:14px;
+  box-shadow:0 2px 12px rgba(0,0,0,.25);
+}
+.tn-logo {
+  width:36px; height:36px; background:var(--teal);
+  border-radius:9px; display:flex; align-items:center; justify-content:center;
+  font-size:18px; font-weight:900; color:var(--navy); flex-shrink:0;
+}
+.tn-brand h1 { font-size:16px; font-weight:800; color:#fff; line-height:1.2; }
+.tn-brand p  { font-size:11.5px; color:rgba(255,255,255,.7); }
+.tn-header-right { margin-left:auto; font-size:12.5px; color:rgba(255,255,255,.55); }
+@media(max-width:600px) { .tn-header-right{display:none} }
+
+/* ── Hero ─────────────────────────────────────────────── */
+.hero {
+  background:linear-gradient(135deg,var(--navy) 0%,var(--navy2) 60%,#0a3347 100%);
+  color:#fff; padding:64px 24px 72px; text-align:center;
+  position:relative; overflow:hidden;
+}
+.hero::before {
+  content:''; position:absolute; inset:0;
+  background:radial-gradient(ellipse 80% 60% at 50% 110%, rgba(25,194,166,.18) 0%, transparent 70%);
+}
+.hero-badge {
+  display:inline-flex; align-items:center; gap:8px;
+  background:rgba(25,194,166,.18); border:1px solid rgba(25,194,166,.35);
+  border-radius:100px; padding:6px 16px;
+  font-size:12.5px; font-weight:600; color:var(--teal); letter-spacing:.04em;
+  margin-bottom:20px;
+}
+.hero h2 { font-size:clamp(28px,5vw,42px); font-weight:900; line-height:1.15; margin-bottom:16px; }
+.hero h2 span { color:var(--teal); }
+.hero p { font-size:15.5px; color:rgba(255,255,255,.75); max-width:660px; margin:0 auto 28px; }
+.hero-meta { display:flex; justify-content:center; gap:28px; flex-wrap:wrap; font-size:13px; color:rgba(255,255,255,.6); }
+.hero-meta b { color:var(--teal); }
+
+/* ── Layout ───────────────────────────────────────────── */
+.wrap { max-width:1080px; margin:0 auto; padding:0 24px; }
+@media(max-width:520px) { .wrap{padding:0 16px} }
+
+/* TOC */
+.toc {
+  background:#fff; border-radius:var(--radius); border:1px solid var(--border);
+  box-shadow:var(--shadow); margin:32px auto; padding:24px;
+}
+.toc h3 { font-size:12px; font-weight:700; color:var(--muted); letter-spacing:.06em; text-transform:uppercase; margin-bottom:12px; }
+.toc-grid { display:grid; grid-template-columns:repeat(2,1fr); gap:8px 18px; }
+@media(max-width:600px) { .toc-grid{grid-template-columns:1fr} }
+.toc a {
+  font-size:13.5px; color:var(--navy); text-decoration:none;
+  padding:6px 0; display:flex; align-items:center; gap:8px;
+  border-bottom:1px solid #f3f4f6;
+}
+.toc a:hover { color:var(--teal2); }
+.toc a::before { content:'›'; color:var(--teal); font-weight:900; }
+
+/* Section */
+.section { padding:48px 0; }
+.section-tag {
+  display:inline-block; background:rgba(25,194,166,.12); color:var(--teal2);
+  border-radius:100px; padding:4px 14px;
+  font-size:11.5px; font-weight:700; letter-spacing:.06em; text-transform:uppercase;
+  margin-bottom:10px;
+}
+.section h2 { font-size:clamp(20px,3vw,28px); font-weight:800; color:var(--navy); margin-bottom:12px; letter-spacing:-.01em; }
+.section .lead { color:var(--muted); font-size:15px; max-width:760px; margin-bottom:24px; }
+.section h3 { font-size:17px; font-weight:700; color:var(--navy); margin-top:24px; margin-bottom:10px; }
+.section p { margin-bottom:12px; color:var(--text); }
+.section ul, .section ol { margin:0 0 14px 22px; }
+.section li { margin-bottom:6px; }
+
+/* Card */
+.card {
+  background:#fff; border-radius:var(--radius); border:1px solid var(--border);
+  box-shadow:var(--shadow); padding:24px; margin-bottom:18px;
+}
+.card.warn  { background:#fffbeb; border-left:4px solid #f59e0b; }
+.card.danger{ background:#fef2f2; border-left:4px solid #dc2626; }
+.card.ok    { background:#f0fdf4; border-left:4px solid #16a34a; }
+.card.info  { background:#eff6ff; border-left:4px solid #3b82f6; }
+.card h4 { font-size:14px; font-weight:700; color:var(--navy); margin-bottom:8px; display:flex; align-items:center; gap:6px; }
+
+/* Code */
+code, .mono {
+  font-family:'SF Mono','Consolas','Monaco',monospace; font-size:13px;
+  background:#eef3f8; color:#0f3a52; padding:2px 6px; border-radius:4px;
+}
+pre {
+  background:var(--code-bg); color:#dbeafe;
+  border-radius:10px; padding:16px 18px;
+  font-family:'SF Mono','Consolas','Monaco',monospace; font-size:12.5px;
+  line-height:1.55; overflow-x:auto; margin:12px 0 16px;
+}
+pre code { background:transparent; color:inherit; padding:0; }
+pre .key  { color:#7dd3fc; }
+pre .val  { color:#a7f3d0; }
+pre .com  { color:#64748b; font-style:italic; }
+pre .kw   { color:#f9a8d4; }
+
+/* Table */
+.tbl-wrap { overflow-x:auto; margin:8px 0 16px; }
+table { width:100%; border-collapse:collapse; font-size:13.5px; min-width:540px; }
+th {
+  background:#f8fafc; color:var(--muted); text-align:left;
+  padding:9px 12px; font-size:11.5px; font-weight:700;
+  text-transform:uppercase; letter-spacing:.04em;
+  border-bottom:1px solid var(--border);
+}
+td { padding:9px 12px; border-bottom:1px solid #f3f4f6; vertical-align:top; }
+td code { font-size:12px; }
+tr:last-child td { border-bottom:none; }
+
+/* Pill */
+.pill {
+  display:inline-block; padding:2px 9px; border-radius:100px;
+  font-size:11px; font-weight:700; letter-spacing:.03em;
+}
+.pill-green { background:#dcfce7; color:#15803d; }
+.pill-blue  { background:#dbeafe; color:#1d4ed8; }
+.pill-amber { background:#fef3c7; color:#92400e; }
+.pill-red   { background:#fee2e2; color:#991b1b; }
+.pill-navy  { background:#e8ecf3; color:#0f3a52; }
+.pill-teal  { background:rgba(25,194,166,.18); color:var(--teal2); }
+
+/* Step */
+.steps { display:flex; flex-direction:column; gap:14px; }
+.step {
+  background:#fff; border-radius:var(--radius); border:1px solid var(--border);
+  box-shadow:var(--shadow); padding:20px 24px;
+  display:flex; align-items:flex-start; gap:18px;
+}
+.step-num {
+  flex-shrink:0; width:34px; height:34px; border-radius:50%;
+  background:var(--navy); color:#fff;
+  display:flex; align-items:center; justify-content:center;
+  font-size:14px; font-weight:800;
+}
+.step-body h4 { font-size:14.5px; font-weight:700; color:var(--navy); margin-bottom:4px; }
+.step-body p  { font-size:13.5px; color:var(--muted); }
+
+/* Grid */
+.grid-2 { display:grid; grid-template-columns:repeat(2,1fr); gap:18px; }
+.grid-3 { display:grid; grid-template-columns:repeat(3,1fr); gap:18px; }
+@media(max-width:720px) { .grid-2,.grid-3 { grid-template-columns:1fr; } }
+
+/* DISC mini */
+.disc-grid { display:grid; grid-template-columns:repeat(2,1fr); gap:14px; }
+@media(max-width:600px) { .disc-grid{grid-template-columns:1fr} }
+.disc-mini { padding:18px; border-radius:12px; border-left:4px solid transparent; }
+.disc-mini.d { background:#fef2f2; border-color:#ef4444; }
+.disc-mini.i { background:#fff7ed; border-color:#f97316; }
+.disc-mini.s { background:#f0fdf4; border-color:#22c55e; }
+.disc-mini.c { background:#eff6ff; border-color:#3b82f6; }
+.disc-letter { font-size:28px; font-weight:900; line-height:1; }
+.disc-mini.d .disc-letter{color:#ef4444}
+.disc-mini.i .disc-letter{color:#f97316}
+.disc-mini.s .disc-letter{color:#22c55e}
+.disc-mini.c .disc-letter{color:#3b82f6}
+.disc-mini h5 { font-size:13.5px; font-weight:700; color:var(--navy); margin:4px 0; }
+.disc-mini p  { font-size:12.5px; color:#475569; }
+
+/* Architecture diagram */
+.arch {
+  background:var(--navy); border-radius:var(--radius); padding:28px 22px; margin:14px 0;
+  color:#fff;
+}
+.arch-row { display:flex; justify-content:center; align-items:center; gap:16px; flex-wrap:wrap; margin:10px 0; }
+.arch-node {
+  background:rgba(255,255,255,.08); border:1px solid rgba(255,255,255,.15);
+  border-radius:10px; padding:12px 18px; min-width:140px;
+  text-align:center; font-size:13px;
+}
+.arch-node b { color:var(--teal); display:block; margin-bottom:2px; font-size:12.5px; letter-spacing:.04em; }
+.arch-arrow { color:var(--teal); font-size:18px; font-weight:900; }
+@media(max-width:600px) { .arch-arrow{transform:rotate(90deg)} }
+
+/* Footer */
+footer {
+  background:var(--navy2); color:rgba(255,255,255,.5);
+  text-align:center; padding:32px 24px; font-size:12.5px; margin-top:60px;
+}
+footer a { color:var(--teal); }
+
+/* Anchor offset for sticky header */
+:target { scroll-margin-top:80px; }
+
+/* Card hover */
+.card { transition:transform .2s, box-shadow .2s; }
+.card:hover { transform:translateY(-2px); box-shadow:0 8px 32px rgba(15,58,82,.14); }
+.step { transition:transform .2s, box-shadow .2s; }
+.step:hover { transform:translateY(-2px); box-shadow:0 8px 32px rgba(15,58,82,.14); }
+
+/* Tablet — 768px */
+@media (max-width: 768px) {
+  .hero { padding:52px 20px 60px; }
+  .section { padding:40px 0; }
+  .toc { padding:18px; margin:24px auto; }
+  .toc-grid { grid-template-columns:1fr; }
+  .toc a { padding:10px 0; min-height:44px; font-size:14px; }
+  .grid-2, .grid-3 { grid-template-columns:1fr; }
+  .disc-grid { grid-template-columns:1fr; }
+  pre { font-size:11.5px; padding:14px; }
+}
+
+/* Phone — 480px */
+@media (max-width: 480px) {
+  .tn-header { padding:0 14px; height:58px; }
+  .tn-brand h1 { font-size:14px; }
+  .tn-brand p  { font-size:11px; }
+  .hero { padding:40px 16px 48px; }
+  .hero h2 { font-size:24px; }
+  .hero p  { font-size:14px; }
+  .hero-meta { gap:14px; font-size:12px; }
+  .hero-badge { font-size:11.5px; padding:5px 12px; }
+  .section { padding:32px 0; }
+  .section h2 { font-size:20px; }
+  .section h3 { font-size:15.5px; }
+  .card { padding:18px; }
+  .step { padding:16px 18px; gap:12px; flex-direction:column; }
+  .step-num { width:32px; height:32px; font-size:13px; }
+  .arch { padding:20px 14px; }
+  .arch-node { min-width:120px; padding:10px 14px; font-size:12.5px; }
+  .disc-mini { padding:14px; }
+  .disc-letter { font-size:24px; }
+  pre { font-size:11px; padding:12px; border-radius:6px; }
+  table { font-size:12.5px; }
+  th, td { padding:7px 10px; }
+}
+</style>
+</head>
+<body>
+
+<!-- Header -->
+<header class="tn-header">
+  <div class="tn-logo">T</div>
+  <div class="tn-brand">
+    <h1>TechNext Singapore</h1>
+    <p>System Operations Report</p>
+  </div>
+  <div class="tn-header-right">Internal — confidential</div>
+</header>
+
+<!-- Hero -->
+<section class="hero">
+  <div class="hero-badge">📘 Operations Documentation</div>
+  <h2>The Complete <span>TechNext Career</span> Platform Report</h2>
+  <p>Everything an operator needs to understand, run, secure, and extend the TechNext candidate assessment platform — from architecture and APIs to credentials, databases, and user management.</p>
+  <div class="hero-meta">
+    <span>Generated <b>May 2026</b></span>
+    <span>Production · <b>technext-career.vercel.app</b></span>
+    <span>Version <b>1.0</b></span>
+  </div>
+</section>
+
+<div class="wrap">
+
+  <!-- TOC -->
+  <nav class="toc">
+    <h3>Table of contents</h3>
+    <div class="toc-grid">
+      <a href="#overview">1. System Overview</a>
+      <a href="#architecture">2. Architecture</a>
+      <a href="#vercel">3. Vercel — Hosting & Deployment</a>
+      <a href="#supabase">4. Supabase — Database & Storage</a>
+      <a href="#odoo">5. Odoo — Recruitment Backend</a>
+      <a href="#github">6. GitHub Repositories</a>
+      <a href="#auth">7. Authentication & Security</a>
+      <a href="#apis">8. API Endpoints</a>
+      <a href="#admin">9. Admin Dashboard</a>
+      <a href="#tests">10. Assessment Tests</a>
+      <a href="#profiler">11. Profiler — DISC + MBTI</a>
+      <a href="#users">12. Managing Users</a>
+      <a href="#anthony">13. Anthony's Super-Admin Access</a>
+      <a href="#secrets">14. Credentials Reference</a>
+      <a href="#rotation">15. Security Rotations</a>
+      <a href="#runbook">16. Operations Runbook</a>
+    </div>
+  </nav>
+
+  <!-- 1. Overview -->
+  <section class="section" id="overview">
+    <span class="section-tag">Section 1</span>
+    <h2>System Overview</h2>
+    <p class="lead">TechNext Career is a candidate assessment portal: prospective hires take a sequence of psychometric and technical tests, results flow into Supabase, and a live mirror lands in Odoo Recruitment as <code>hr.applicant</code> records with chatter notes.</p>
+
+    <div class="grid-3">
+      <div class="card">
+        <h4>📝 What candidates do</h4>
+        <p style="font-size:13.5px;color:var(--muted)">Visit a role-specific URL, fill candidate info, optionally upload a CV, complete 1–4 short tests, and submit. Results appear instantly.</p>
+      </div>
+      <div class="card">
+        <h4>📊 What recruiters see</h4>
+        <p style="font-size:13.5px;color:var(--muted)">Open the admin dashboard or jump straight to Odoo Recruitment. Every applicant has DISC scores, technical-test scores, and chatter notes.</p>
+      </div>
+      <div class="card">
+        <h4>⚙️ How it stays running</h4>
+        <p style="font-size:13.5px;color:var(--muted)">Vercel serverless functions, Supabase Postgres + Storage, Odoo SaaS. Zero npm dependencies in serverless handlers — pure Node.</p>
+      </div>
+    </div>
+
+    <h3>The eight test types</h3>
+    <div class="tbl-wrap"><table>
+      <thead><tr><th>Test type</th><th>Label</th><th>Where it appears</th></tr></thead>
+      <tbody>
+        <tr><td><code>tn_company_quiz</code></td><td>About TechNext (quiz)</td><td>Every candidate, first step</td></tr>
+        <tr><td><code>tn_profiler</code></td><td>TechNext Profiler — DISC + Type</td><td>Optional, all roles</td></tr>
+        <tr><td><code>tn_iq</code></td><td>Reasoning Test</td><td>FC + Odoo Developer roles</td></tr>
+        <tr><td><code>tn_ai_technical</code></td><td>AI Engineer — Technical</td><td>AI Engineer role</td></tr>
+        <tr><td><code>tn_fc_technical</code></td><td>FC / BA — Technical</td><td>Functional Consultant role</td></tr>
+        <tr><td><code>tn_odoo_technical</code></td><td>Odoo Developer — Technical</td><td>Odoo Developer role</td></tr>
+        <tr><td><code>tn_cyber_technical</code></td><td>Cyber Security — Technical</td><td>Cyber Security role</td></tr>
+        <tr><td><code>tn_booking</code></td><td>Interview Booking</td><td>Post-test, optional</td></tr>
+      </tbody>
+    </table></div>
+  </section>
+
+  <!-- 2. Architecture -->
+  <section class="section" id="architecture">
+    <span class="section-tag">Section 2</span>
+    <h2>Architecture</h2>
+    <p class="lead">A three-tier flow: the candidate's browser talks to Vercel serverless APIs, which write to Supabase (source of truth) and best-effort mirror to Odoo.</p>
+
+    <div class="arch">
+      <div class="arch-row">
+        <div class="arch-node"><b>BROWSER</b>Candidate web app</div>
+        <span class="arch-arrow">→</span>
+        <div class="arch-node"><b>VERCEL</b>/api/submit-test<br>/api/upload-resume<br>/api/get-results</div>
+        <span class="arch-arrow">→</span>
+        <div class="arch-node"><b>SUPABASE</b>Postgres<br>Storage (resumes)</div>
+      </div>
+      <div class="arch-row" style="margin-top:18px">
+        <div class="arch-node" style="opacity:.6">candidate_results</div>
+        <span class="arch-arrow">↓</span>
+        <div class="arch-node"><b>ODOO SAAS</b>hr.applicant<br>chatter + attachments</div>
+      </div>
+    </div>
+
+    <p style="font-size:13.5px;color:var(--muted);text-align:center;margin-top:8px">
+      Supabase is the <strong>source of truth</strong>. Odoo sync is best-effort with a 3.5 s hard timeout — Odoo failures never block the candidate.
+    </p>
+  </section>
+
+  <!-- 3. Vercel -->
+  <section class="section" id="vercel">
+    <span class="section-tag">Section 3</span>
+    <h2>Vercel — Hosting & Deployment</h2>
+    <p class="lead">Production runs on Vercel as a single project. Static assets are served from <code>/technext/*</code>; serverless handlers from <code>/api/*</code>.</p>
+
+    <h3>Project facts</h3>
+    <div class="tbl-wrap"><table>
+      <tbody>
+        <tr><td><b>Project</b></td><td><code>sky-3677s-projects/technext-career</code></td></tr>
+        <tr><td><b>Production URL</b></td><td><a href="https://technext-career.vercel.app" target="_blank">technext-career.vercel.app</a></td></tr>
+        <tr><td><b>Region</b></td><td>iad1 (US East)</td></tr>
+        <tr><td><b>Build</b></td><td>Static + serverless functions — no build step beyond Node runtime</td></tr>
+        <tr><td><b>Auto-deploy</b></td><td>Pushes to <code>master</code> branch trigger production deploys (when GitHub integration is connected)</td></tr>
+      </tbody>
+    </table></div>
+
+    <h3>Routing (vercel.json)</h3>
+    <p>URL rewrites mirror the legacy Netlify paths plus clean role URLs:</p>
+    <pre><span class="key">/</span>                                  → <span class="val">/technext/index</span>
+<span class="key">/technext/ai-engineer</span>              → <span class="val">/technext/role?role=ai-engineer</span>
+<span class="key">/technext/functional-consultant</span>    → <span class="val">/technext/role?role=functional-consultant</span>
+<span class="key">/technext/odoo-developer</span>           → <span class="val">/technext/role?role=odoo-developer</span>
+<span class="key">/technext/cyber-security</span>           → <span class="val">/technext/role?role=cyber-security</span>
+<span class="key">/.netlify/functions/submit-test</span>    → <span class="val">/api/submit-test</span>     <span class="com">// legacy</span>
+<span class="key">/.netlify/functions/get-results</span>    → <span class="val">/api/get-results</span>     <span class="com">// legacy</span></pre>
+
+    <h3>Deploying</h3>
+    <pre><span class="com"># manual deploy from local checkout</span>
+vercel --prod
+
+<span class="com"># view deployment logs</span>
+vercel logs &lt;deployment-id&gt;
+
+<span class="com"># list environment variables</span>
+vercel env ls production
+
+<span class="com"># add or remove a variable, then redeploy</span>
+echo -n "new-value" | vercel env add MY_VAR production
+vercel env rm MY_VAR production</pre>
+
+    <h3>Environment variables (production)</h3>
+    <div class="tbl-wrap"><table>
+      <thead><tr><th>Variable</th><th>Purpose</th><th>Status</th></tr></thead>
+      <tbody>
+        <tr><td><code>SUPABASE_URL</code></td><td>Supabase project URL</td><td><span class="pill pill-green">set</span></td></tr>
+        <tr><td><code>SUPABASE_SERVICE_ROLE_KEY</code></td><td>Server-only Supabase JWT (bypasses RLS)</td><td><span class="pill pill-green">set</span></td></tr>
+        <tr><td><code>ADMIN_PASSWORD</code></td><td>The password operators type at the admin login</td><td><span class="pill pill-green">set</span></td></tr>
+        <tr><td><code>ADMIN_SESSION_SECRET</code></td><td>HMAC secret used to sign admin session tokens</td><td><span class="pill pill-green">set</span></td></tr>
+        <tr><td><code>ADMIN_SESSION_TTL_HOURS</code></td><td>Token lifetime (default 12)</td><td><span class="pill pill-amber">optional</span></td></tr>
+        <tr><td><code>ODOO_URL</code></td><td>https://&lt;company&gt;.odoo.com</td><td><span class="pill pill-green">set</span></td></tr>
+        <tr><td><code>ODOO_DB</code></td><td>Odoo database name</td><td><span class="pill pill-green">set</span></td></tr>
+        <tr><td><code>ODOO_USER</code></td><td>Odoo login email for the integration account</td><td><span class="pill pill-green">set</span></td></tr>
+        <tr><td><code>ODOO_API_KEY</code></td><td>Odoo API key — currently 1-year expiry</td><td><span class="pill pill-green">set</span></td></tr>
+        <tr><td><code>ODOO_JOB_AI_ENGINEER_ID</code></td><td>Odoo job position ID for AI Engineer applicants</td><td><span class="pill pill-green">set</span></td></tr>
+        <tr><td><code>ODOO_JOB_FUNCTIONAL_CONSULTANT_ID</code></td><td>FC/BA position ID</td><td><span class="pill pill-amber">optional</span></td></tr>
+        <tr><td><code>ODOO_JOB_ODOO_DEVELOPER_ID</code></td><td>Odoo Dev position ID</td><td><span class="pill pill-amber">optional</span></td></tr>
+        <tr><td><code>ODOO_JOB_CYBER_SECURITY_ID</code></td><td>Cyber Security position ID</td><td><span class="pill pill-amber">optional</span></td></tr>
+        <tr><td><code>ODOO_SYNC_ENABLED</code></td><td>Kill switch — set to <code>false</code> to skip Odoo entirely</td><td><span class="pill pill-amber">optional</span></td></tr>
+        <tr><td><code>ODOO_SYNC_TIMEOUT_MS</code></td><td>Hard timeout, default 3500 ms</td><td><span class="pill pill-amber">optional</span></td></tr>
+      </tbody>
+    </table></div>
+  </section>
+
+  <!-- 4. Supabase -->
+  <section class="section" id="supabase">
+    <span class="section-tag">Section 4</span>
+    <h2>Supabase — Database & Storage</h2>
+    <p class="lead">All candidate submissions live in a single Postgres table; resumes live in Supabase Storage.</p>
+
+    <h3>Project facts</h3>
+    <div class="tbl-wrap"><table>
+      <tbody>
+        <tr><td><b>Project ref</b></td><td><code>ndaydueegykjvliblbly</code></td></tr>
+        <tr><td><b>Project URL</b></td><td><code>https://ndaydueegykjvliblbly.supabase.co</code></td></tr>
+        <tr><td><b>Dashboard</b></td><td><a href="https://supabase.com/dashboard/project/ndaydueegykjvliblbly" target="_blank">supabase.com/dashboard/project/ndaydueegykjvliblbly</a></td></tr>
+      </tbody>
+    </table></div>
+
+    <h3>Table: <code>candidate_results</code></h3>
+    <p>One row per test submission. The same candidate can produce many rows (one per test taken).</p>
+    <div class="tbl-wrap"><table>
+      <thead><tr><th>Column</th><th>Type</th><th>Notes</th></tr></thead>
+      <tbody>
+        <tr><td><code>id</code></td><td>uuid (PK)</td><td>auto-generated</td></tr>
+        <tr><td><code>created_at</code></td><td>timestamptz</td><td>set by Postgres</td></tr>
+        <tr><td><code>test_type</code></td><td>text</td><td>one of the 8 enumerated test codes</td></tr>
+        <tr><td><code>candidate_name</code></td><td>text</td><td>required</td></tr>
+        <tr><td><code>candidate_email</code></td><td>text</td><td>used as the upsert key on the Odoo side</td></tr>
+        <tr><td><code>candidate_phone</code></td><td>text</td><td>optional</td></tr>
+        <tr><td><code>candidate_role</code></td><td>text</td><td>ai-engineer / functional-consultant / odoo-developer / cyber-security</td></tr>
+        <tr><td><code>candidate_position</code></td><td>text</td><td>candidate-supplied job title (free text)</td></tr>
+        <tr><td><code>candidate_linkedin</code></td><td>text</td><td>optional URL</td></tr>
+        <tr><td><code>candidate_resume_url</code></td><td>text</td><td>points to Supabase Storage</td></tr>
+        <tr><td><code>start_time</code></td><td>timestamptz</td><td>when the candidate started the test</td></tr>
+        <tr><td><code>end_time</code></td><td>timestamptz</td><td>submission time</td></tr>
+        <tr><td><code>time_taken_seconds</code></td><td>integer</td><td>bounded 0…86400 by API</td></tr>
+        <tr><td><code>score_raw</code></td><td>integer</td><td>correct answers</td></tr>
+        <tr><td><code>score_max</code></td><td>integer</td><td>total questions</td></tr>
+        <tr><td><code>score_pct</code></td><td>numeric</td><td>0–100</td></tr>
+        <tr><td><code>result_label</code></td><td>text</td><td>"Solid grasp", "Proficient", etc.</td></tr>
+        <tr><td><code>section_scores</code></td><td>jsonb</td><td>e.g. <code>{D:42,I:18,S:23,C:17,MBTI:"ENTJ"}</code></td></tr>
+        <tr><td><code>flags</code></td><td>jsonb</td><td>profiler primary/secondary/type + per-test flags</td></tr>
+        <tr><td><code>answers</code></td><td>jsonb</td><td>full answer set (raw)</td></tr>
+        <tr><td><code>interview_slot_iso</code></td><td>timestamptz</td><td>filled for <code>tn_booking</code> only</td></tr>
+      </tbody>
+    </table></div>
+
+    <h3>Storage bucket: <code>resumes</code></h3>
+    <ul>
+      <li>Public read; writes only via the server-side <code>SUPABASE_SERVICE_ROLE_KEY</code>.</li>
+      <li>File-type allowlist (PDF, DOC, DOCX) enforced by <code>/api/upload-resume</code> — both extension and magic bytes.</li>
+      <li>Size cap: 4.5 MB.</li>
+      <li>Filenames are sanitised and prefixed with a random timestamp to avoid collisions.</li>
+    </ul>
+
+    <h3>Service-role key (server-only)</h3>
+    <div class="card warn">
+      <h4>⚠️ Never expose to the browser</h4>
+      <p style="font-size:13.5px">The <code>SUPABASE_SERVICE_ROLE_KEY</code> bypasses Row-Level Security. It must live only in Vercel environment variables and server-side code. If it ever appears in client-side JS, in a public repo, or in a screenshot, <strong>rotate it immediately</strong> (Supabase Dashboard → Settings → API → "Reset service_role secret").</p>
+    </div>
+  </section>
+
+  <!-- 5. Odoo -->
+  <section class="section" id="odoo">
+    <span class="section-tag">Section 5</span>
+    <h2>Odoo — Recruitment Backend</h2>
+    <p class="lead">Every test submission upserts to a single <code>hr.applicant</code> record per candidate (matched on email), with a structured chatter note per test and the resume attached on first sync.</p>
+
+    <h3>Project facts</h3>
+    <div class="tbl-wrap"><table>
+      <tbody>
+        <tr><td><b>Instance</b></td><td><code>https://technext.odoo.com</code></td></tr>
+        <tr><td><b>Database</b></td><td><code>technext</code></td></tr>
+        <tr><td><b>Integration user</b></td><td>sky@technext.asia (uid 2)</td></tr>
+        <tr><td><b>API key</b></td><td>"TechNext Vercel 1yr" — expires May 17, 2027</td></tr>
+        <tr><td><b>Smoke endpoint</b></td><td><a href="https://technext-career.vercel.app/api/odoo-ping" target="_blank">/api/odoo-ping</a></td></tr>
+      </tbody>
+    </table></div>
+
+    <h3>What gets written per submission</h3>
+    <ol>
+      <li><strong>Upsert</strong> <code>hr.applicant</code> by <code>email_from</code> (case-insensitive).</li>
+      <li><strong>Job link</strong> if <code>ODOO_JOB_*_ID</code> is set for the role.</li>
+      <li><strong>Custom fields</strong> on <code>x_tn_*</code> if the optional <code>tn_assessment</code> Odoo module is installed; pre-fetched per warm container and intersected before write.</li>
+      <li><strong>Chatter note</strong> (HTML body) on every submission — always. Universal fallback.</li>
+      <li><strong>Resume attachment</strong> on first sync only — 2 s fetch timeout, 10 MB cap.</li>
+    </ol>
+
+    <h3>Optional companion module</h3>
+    <p>An optional <code>tn_assessment</code> Odoo module adds <code>x_tn_*</code> custom fields and a "TechNext Assessment" page on the applicant form. Source lives in the repo under <code>odoo-module/tn_assessment/</code>. Without it, the integration still works — only the chatter note appears.</p>
+  </section>
+
+  <!-- 6. GitHub -->
+  <section class="section" id="github">
+    <span class="section-tag">Section 6</span>
+    <h2>GitHub Repositories</h2>
+    <p class="lead">The codebase lives in two mirrored Git remotes — one personal, one organisational.</p>
+
+    <div class="tbl-wrap"><table>
+      <thead><tr><th>Remote</th><th>URL</th><th>Branch</th></tr></thead>
+      <tbody>
+        <tr><td><code>origin</code></td><td><a href="https://github.com/skytechnext/cluadecodepsychometric" target="_blank">skytechnext/cluadecodepsychometric</a></td><td><code>master</code></td></tr>
+        <tr><td><code>technextsg</code></td><td><a href="https://github.com/TechNextSG/technext-career" target="_blank">TechNextSG/technext-career</a> <span class="pill pill-teal">canonical</span></td><td><code>main</code> (← <code>master</code>)</td></tr>
+      </tbody>
+    </table></div>
+
+    <h3>Workflow</h3>
+    <pre><span class="com"># normal work — commit then push to both</span>
+git add .
+git commit -m "..."
+git push origin master
+git push technextsg master:main
+
+<span class="com"># or push to both in one command (configure once)</span>
+git remote set-url --add --push origin https://github.com/TechNextSG/technext-career.git
+git remote set-url --add --push origin https://github.com/skytechnext/cluadecodepsychometric.git</pre>
+  </section>
+
+  <!-- 7. Auth -->
+  <section class="section" id="auth">
+    <span class="section-tag">Section 7</span>
+    <h2>Authentication & Security</h2>
+    <p class="lead">All admin endpoints are protected by an HMAC-signed session token. There is no password on the wire after login.</p>
+
+    <h3>Login flow</h3>
+    <div class="steps">
+      <div class="step">
+        <div class="step-num">1</div>
+        <div class="step-body">
+          <h4>Operator types password into the admin login form</h4>
+          <p>Client posts <code>{ password }</code> to <code>POST /api/admin-login</code>.</p>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num">2</div>
+        <div class="step-body">
+          <h4>Server validates with constant-time compare</h4>
+          <p><code>crypto.timingSafeEqual</code> against <code>ADMIN_PASSWORD</code> env var. Wrong password → 401. Too many fails from one IP → 429 (8 tries / 5 minutes per warm Lambda).</p>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num">3</div>
+        <div class="step-body">
+          <h4>Server issues a signed token</h4>
+          <p>Format: <code>base64url(payload).base64url(hmac-sha256(payload))</code>. Payload contains <code>exp</code> = unix seconds, default 12 h. Signed with <code>ADMIN_SESSION_SECRET</code>.</p>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num">4</div>
+        <div class="step-body">
+          <h4>Client stores token in sessionStorage</h4>
+          <p>Every subsequent admin request sends <code>Authorization: Bearer &lt;token&gt;</code>. The dashboard auto-logs-out when the stored expiry passes.</p>
+        </div>
+      </div>
+    </div>
+
+    <h3>HTTP security headers</h3>
+    <div class="tbl-wrap"><table>
+      <thead><tr><th>Header</th><th>Value</th><th>Scope</th></tr></thead>
+      <tbody>
+        <tr><td><code>Strict-Transport-Security</code></td><td>max-age=31536000; includeSubDomains</td><td>all routes</td></tr>
+        <tr><td><code>X-Content-Type-Options</code></td><td>nosniff</td><td>all routes</td></tr>
+        <tr><td><code>X-Frame-Options</code></td><td>SAMEORIGIN</td><td>all routes</td></tr>
+        <tr><td><code>Referrer-Policy</code></td><td>strict-origin-when-cross-origin</td><td>all routes</td></tr>
+        <tr><td><code>Permissions-Policy</code></td><td>camera=(), microphone=(), geolocation=()</td><td>all routes</td></tr>
+        <tr><td><code>X-Robots-Tag</code></td><td>noindex, nofollow</td><td>/technext/admin*</td></tr>
+        <tr><td><code>Cache-Control</code></td><td>no-store</td><td>/api/*, admin pages</td></tr>
+      </tbody>
+    </table></div>
+
+    <h3>Input validation</h3>
+    <ul>
+      <li><code>/api/submit-test</code>: enforces test_type whitelist, role whitelist, 256 KB payload cap, 500-char string truncation, bounded <code>time_taken_seconds</code>.</li>
+      <li><code>/api/upload-resume</code>: extension allowlist (PDF/DOC/DOCX) AND magic-byte detection — spoofed extensions cannot smuggle through scripts or images.</li>
+      <li><code>/api/get-results</code>: token required, query params bounded (limit ≤ 2000, ISO-date regex).</li>
+    </ul>
+
+    <h3>Server-side errors</h3>
+    <p>Responses never include <code>err.message</code>. Operational detail goes to <code>console.error</code> only (visible in Vercel function logs).</p>
+  </section>
+
+  <!-- 8. APIs -->
+  <section class="section" id="apis">
+    <span class="section-tag">Section 8</span>
+    <h2>API Endpoints</h2>
+    <p class="lead">All five endpoints live in <code>/api/*.js</code> and are deployed as Vercel serverless functions.</p>
+
+    <div class="tbl-wrap"><table>
+      <thead><tr><th>Endpoint</th><th>Method</th><th>Auth</th><th>Purpose</th></tr></thead>
+      <tbody>
+        <tr><td><code>/api/admin-login</code></td><td>POST</td><td>password (body)</td><td>Issue a 12 h session token</td></tr>
+        <tr><td><code>/api/get-results</code></td><td>GET</td><td>Bearer token</td><td>List candidate submissions (admin only)</td></tr>
+        <tr><td><code>/api/submit-test</code></td><td>POST</td><td>none</td><td>Receive a test submission; insert → Supabase → Odoo</td></tr>
+        <tr><td><code>/api/upload-resume</code></td><td>POST</td><td>none</td><td>Upload candidate CV to Supabase Storage</td></tr>
+        <tr><td><code>/api/odoo-ping</code></td><td>GET</td><td>none</td><td>Health-check Odoo creds + connectivity</td></tr>
+      </tbody>
+    </table></div>
+
+    <h3>Example calls</h3>
+    <pre><span class="com"># Sign in</span>
+curl -s -X POST -H "Content-Type: application/json" \
+  -d '{"password":"&lt;ADMIN_PASSWORD&gt;"}' \
+  https://technext-career.vercel.app/api/admin-login
+
+<span class="com"># Use the returned token</span>
+TOKEN="..."
+curl -s -H "Authorization: Bearer $TOKEN" \
+  "https://technext-career.vercel.app/api/get-results?limit=10"
+
+<span class="com"># Health check Odoo</span>
+curl -s https://technext-career.vercel.app/api/odoo-ping</pre>
+  </section>
+
+  <!-- 9. Admin Dashboard -->
+  <section class="section" id="admin">
+    <span class="section-tag">Section 9</span>
+    <h2>Admin Dashboard</h2>
+    <p class="lead">Live at <a href="https://technext-career.vercel.app/technext/admin" target="_blank">technext-career.vercel.app/technext/admin</a>. Single-page app, server-validated login, real-time filters, CSV export, and three PDF report types.</p>
+
+    <h3>What it shows</h3>
+    <ul>
+      <li><strong>Top stats:</strong> total submissions + count per test type.</li>
+      <li><strong>Four charts:</strong> submissions by test, score distribution, submissions over time (30 days), average score by test.</li>
+      <li><strong>Filter row:</strong> role, test type, date range, free-text search across name/email/phone.</li>
+      <li><strong>Candidate table:</strong> sortable, paginated, with a "Result" button per row that opens a full modal.</li>
+      <li><strong>Email mailto:</strong> one-click email composer pre-filled with the candidate's address.</li>
+    </ul>
+
+    <h3>PDF reports (jsPDF, client-side)</h3>
+    <div class="grid-3">
+      <div class="card">
+        <h4>📄 Individual test PDF</h4>
+        <p style="font-size:13px;color:var(--muted)">For profiler: 4 native DISC bars + primary/secondary descriptions + 4-letter type. For scored tests: progress bar, tier label, recommendation, score-band reference.</p>
+      </div>
+      <div class="card">
+        <h4>👤 Candidate profile PDF</h4>
+        <p style="font-size:13px;color:var(--muted)">3 pages. Cover with summary cards, dedicated Personality page if profiler taken, then every test rendered in full with its own chart and interpretation.</p>
+      </div>
+      <div class="card">
+        <h4>📊 Dashboard summary PDF</h4>
+        <p style="font-size:13px;color:var(--muted)">2 pages. All four dashboard charts captured + per-test stats table (submissions, avg score, highest).</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- 10. Tests -->
+  <section class="section" id="tests">
+    <span class="section-tag">Section 10</span>
+    <h2>Assessment Tests</h2>
+    <p class="lead">Eight test types, each with its own HTML file in <code>/technext/</code>, sharing the design system in <code>tn.css</code> and the submission helper in <code>tn.js</code>.</p>
+
+    <div class="tbl-wrap"><table>
+      <thead><tr><th>File</th><th>test_type</th><th>Questions</th><th>Duration</th></tr></thead>
+      <tbody>
+        <tr><td><code>quiz.html</code></td><td>tn_company_quiz</td><td>8</td><td>~3 min</td></tr>
+        <tr><td><code>profiler.html</code></td><td>tn_profiler</td><td>32 (16 DISC + 16 Type)</td><td>~6 min</td></tr>
+        <tr><td><code>iq_test.html</code></td><td>tn_iq</td><td>~20</td><td>~10 min</td></tr>
+        <tr><td><code>ai_technical.html</code></td><td>tn_ai_technical</td><td>~25</td><td>~15 min</td></tr>
+        <tr><td><code>fc_technical.html</code></td><td>tn_fc_technical</td><td>~20</td><td>~12 min</td></tr>
+        <tr><td><code>odoo_technical.html</code></td><td>tn_odoo_technical</td><td>~20</td><td>~12 min</td></tr>
+        <tr><td><code>cyber_technical.html</code></td><td>tn_cyber_technical</td><td>~25</td><td>~15 min</td></tr>
+        <tr><td><code>booking.html</code></td><td>tn_booking</td><td>n/a</td><td>n/a</td></tr>
+      </tbody>
+    </table></div>
+  </section>
+
+  <!-- 11. Profiler -->
+  <section class="section" id="profiler">
+    <span class="section-tag">Section 11</span>
+    <h2>Profiler — DISC + 4-letter Type</h2>
+    <p class="lead">The flagship behavioural assessment. 16 questions map DISC work style, 16 more map four cognitive dichotomies (ExtraversionIntroversion, SensingiNtuition, ThinkingFeeling, JudgingPerceiving) to produce a 4-letter type code.</p>
+
+    <h3>DISC quick reference</h3>
+    <div class="disc-grid">
+      <div class="disc-mini d">
+        <div class="disc-letter">D</div>
+        <h5>Dominance — The Driver</h5>
+        <p>Results-focused, decisive, direct. Watch for impatience with slower colleagues.</p>
+      </div>
+      <div class="disc-mini i">
+        <div class="disc-letter">I</div>
+        <h5>Influence — The Energiser</h5>
+        <p>Outgoing, enthusiastic, persuasive. Watch for over-promising or losing focus on detail.</p>
+      </div>
+      <div class="disc-mini s">
+        <div class="disc-letter">S</div>
+        <h5>Steadiness — The Stabiliser</h5>
+        <p>Patient, supportive, reliable. Watch for avoiding necessary conflict or change.</p>
+      </div>
+      <div class="disc-mini c">
+        <div class="disc-letter">C</div>
+        <h5>Conscientiousness — The Analyst</h5>
+        <p>Analytical, careful, precise. Watch for over-thinking or perfectionism.</p>
+      </div>
+    </div>
+
+    <h3>4-letter Type — all 16</h3>
+    <div class="tbl-wrap"><table>
+      <thead><tr><th>Code</th><th>Name</th><th>Code</th><th>Name</th></tr></thead>
+      <tbody>
+        <tr><td><code>ISTJ</code></td><td>The Inspector</td><td><code>ESTJ</code></td><td>The Supervisor</td></tr>
+        <tr><td><code>ISFJ</code></td><td>The Protector</td><td><code>ESFJ</code></td><td>The Provider</td></tr>
+        <tr><td><code>INFJ</code></td><td>The Counsellor</td><td><code>ENFJ</code></td><td>The Teacher</td></tr>
+        <tr><td><code>INTJ</code></td><td>The Strategist</td><td><code>ENTJ</code></td><td>The Commander</td></tr>
+        <tr><td><code>ISTP</code></td><td>The Craftsperson</td><td><code>ESTP</code></td><td>The Doer</td></tr>
+        <tr><td><code>ISFP</code></td><td>The Composer</td><td><code>ESFP</code></td><td>The Performer</td></tr>
+        <tr><td><code>INFP</code></td><td>The Idealist</td><td><code>ENFP</code></td><td>The Champion</td></tr>
+        <tr><td><code>INTP</code></td><td>The Architect</td><td><code>ENTP</code></td><td>The Visionary</td></tr>
+      </tbody>
+    </table></div>
+
+    <p>See <a href="/technext/profiler-about" target="_blank">/technext/profiler-about</a> for a candidate-facing explanation.</p>
+  </section>
+
+  <!-- 12. Users -->
+  <section class="section" id="users">
+    <span class="section-tag">Section 12</span>
+    <h2>Managing Users</h2>
+    <p class="lead">Adding a new operator requires touching three to four systems. Walk through each in order.</p>
+
+    <h3>1. Supabase project access</h3>
+    <p>Supabase has its own user accounts at the project / organisation level. Members can be granted varying roles.</p>
+    <div class="steps">
+      <div class="step">
+        <div class="step-num">1</div>
+        <div class="step-body">
+          <h4>Open the project's Team page</h4>
+          <p>Go to <a href="https://supabase.com/dashboard/project/ndaydueegykjvliblbly/settings/team" target="_blank">Dashboard → Settings → Team</a> (signed in as the current owner).</p>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num">2</div>
+        <div class="step-body">
+          <h4>Click "Invite"</h4>
+          <p>Enter the email address of the new operator.</p>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num">3</div>
+        <div class="step-body">
+          <h4>Choose a role</h4>
+          <p><strong>Owner</strong> — full control including billing. <strong>Administrator</strong> — manage project + members. <strong>Developer</strong> — read/write tables and SQL. <strong>Read-only</strong> — view-only dashboards. For super-admin, pick <strong>Owner</strong>.</p>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num">4</div>
+        <div class="step-body">
+          <h4>Send invite</h4>
+          <p>The user receives an email. Once they accept and create a Supabase account (free), they appear in the team list and can sign in at <a href="https://supabase.com" target="_blank">supabase.com</a>.</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="card info">
+      <h4>About Supabase roles</h4>
+      <p style="font-size:13.5px">Supabase auth is for the <em>application's</em> users (e.g. candidates would have their own auth if we used it). What we're managing here is <strong>project membership</strong> for the operators — that's a separate concept handled in the dashboard's team settings.</p>
+    </div>
+
+    <h3>2. Vercel project access</h3>
+    <div class="steps">
+      <div class="step">
+        <div class="step-num">1</div>
+        <div class="step-body">
+          <h4>Open Vercel → team → Members</h4>
+          <p><a href="https://vercel.com/sky-3677s-projects/~/settings/members" target="_blank">vercel.com/sky-3677s-projects/~/settings/members</a></p>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num">2</div>
+        <div class="step-body">
+          <h4>Invite by email</h4>
+          <p>Add their email, choose a role:</p>
+          <ul style="font-size:13.5px;color:var(--muted);margin-top:6px;margin-left:18px">
+            <li><strong>Owner</strong> — full control (deployments, env vars, billing)</li>
+            <li><strong>Member</strong> — deploy, edit env vars, manage projects</li>
+            <li><strong>Developer</strong> — deploy and view; cannot change env vars</li>
+            <li><strong>Viewer</strong> — read-only</li>
+          </ul>
+          <p style="font-size:13.5px;color:var(--muted);margin-top:8px">For super-admin: <strong>Owner</strong>.</p>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num">3</div>
+        <div class="step-body">
+          <h4>Sign-in</h4>
+          <p>They accept the email invite and sign in at <a href="https://vercel.com/login" target="_blank">vercel.com/login</a> using GitHub or email.</p>
+        </div>
+      </div>
+    </div>
+
+    <h3>3. GitHub repo access</h3>
+    <div class="steps">
+      <div class="step">
+        <div class="step-num">1</div>
+        <div class="step-body">
+          <h4>Confirm the user is in the TechNextSG org</h4>
+          <p>Org owner / admin visits <a href="https://github.com/orgs/TechNextSG/people" target="_blank">github.com/orgs/TechNextSG/people</a> and invites by email or GitHub username.</p>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num">2</div>
+        <div class="step-body">
+          <h4>Grant repo-level permission</h4>
+          <p>Open <a href="https://github.com/TechNextSG/technext-career/settings/access" target="_blank">technext-career → Settings → Collaborators and teams → Add people</a>. Choose <strong>Admin</strong> for full control, <strong>Maintain</strong> for code + merges, <strong>Write</strong> for push, <strong>Triage</strong> for issues, <strong>Read</strong> for view.</p>
+        </div>
+      </div>
+    </div>
+
+    <h3>4. Odoo user</h3>
+    <div class="steps">
+      <div class="step">
+        <div class="step-num">1</div>
+        <div class="step-body">
+          <h4>Settings → Users & Companies → Users</h4>
+          <p>In Odoo at <code>technext.odoo.com</code>, open the Users list and click "New".</p>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num">2</div>
+        <div class="step-body">
+          <h4>Fill name and email, set access rights</h4>
+          <p>For super-admin, enable <strong>Administration → Settings</strong> and <strong>Recruitment → Administrator</strong>. Save.</p>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num">3</div>
+        <div class="step-body">
+          <h4>Send an invitation</h4>
+          <p>Use the "Send Invitation Email" button. The user receives an email to set their password.</p>
+        </div>
+      </div>
+    </div>
+
+    <h3>5. Admin dashboard access</h3>
+    <p>The admin dashboard uses a shared <code>ADMIN_PASSWORD</code>. To onboard a new operator: share the current password securely (1Password / password manager). To revoke access: change <code>ADMIN_PASSWORD</code> in Vercel env vars and redeploy. All previously issued session tokens remain valid until they expire (default 12 h) but can be force-invalidated by changing <code>ADMIN_SESSION_SECRET</code>.</p>
+  </section>
+
+  <!-- 13. Anthony -->
+  <section class="section" id="anthony">
+    <span class="section-tag">Section 13</span>
+    <h2>Anthony's Super-Admin Access</h2>
+    <p class="lead">User <code>anthony@technext.asia</code> (GitHub: <code>anthony-technext</code>) — what's already been done and what remains for the current owner to action.</p>
+
+    <div class="tbl-wrap"><table>
+      <thead><tr><th>System</th><th>Status</th><th>Action taken</th></tr></thead>
+      <tbody>
+        <tr><td><strong>GitHub</strong> — TechNextSG/technext-career</td><td><span class="pill pill-green">done</span></td><td>Added as repo <strong>Admin</strong> via API; user already in org</td></tr>
+        <tr><td><strong>Admin dashboard</strong></td><td><span class="pill pill-blue">share password</span></td><td>Send Anthony the current <code>ADMIN_PASSWORD</code> via secure channel</td></tr>
+        <tr><td><strong>Supabase</strong> — project</td><td><span class="pill pill-amber">manual</span></td><td>Owner must invite via Dashboard → Settings → Team (role: Owner)</td></tr>
+        <tr><td><strong>Vercel</strong> — sky-3677s-projects</td><td><span class="pill pill-amber">manual</span></td><td>Owner must invite via Team → Settings → Members (role: Owner)</td></tr>
+        <tr><td><strong>Odoo</strong> — technext database</td><td><span class="pill pill-amber">manual</span></td><td>Create user via Settings → Users & Companies, grant Administration + Recruitment Administrator</td></tr>
+      </tbody>
+    </table></div>
+
+    <div class="card info">
+      <h4>📨 What to send Anthony</h4>
+      <p style="font-size:13.5px">A welcome email containing: the production URL (<a href="https://technext-career.vercel.app">technext-career.vercel.app</a>), the admin dashboard URL (<a href="https://technext-career.vercel.app/technext/admin">technext-career.vercel.app/technext/admin</a>), and the current admin password — shared via a password manager, not plain email.</p>
+    </div>
+  </section>
+
+  <!-- 14. Credentials -->
+  <section class="section" id="secrets">
+    <span class="section-tag">Section 14</span>
+    <h2>Credentials Reference</h2>
+    <p class="lead">Where every secret lives. None of these belong in source files — they live in Vercel env vars or external dashboards.</p>
+
+    <div class="tbl-wrap"><table>
+      <thead><tr><th>Credential</th><th>Type</th><th>Stored in</th><th>Used by</th></tr></thead>
+      <tbody>
+        <tr><td><code>ADMIN_PASSWORD</code></td><td>plain-text password</td><td>Vercel env</td><td>/api/admin-login</td></tr>
+        <tr><td><code>ADMIN_SESSION_SECRET</code></td><td>96-char hex (HMAC key)</td><td>Vercel env</td><td>/api/_auth (issue + verify tokens)</td></tr>
+        <tr><td><code>SUPABASE_SERVICE_ROLE_KEY</code></td><td>JWT</td><td>Vercel env + Supabase dashboard</td><td>all server-side Supabase calls</td></tr>
+        <tr><td><code>ODOO_API_KEY</code></td><td>40-char hex</td><td>Vercel env + Odoo user preferences</td><td>/api/_odoo (auth + execute_kw)</td></tr>
+        <tr><td>GitHub PAT</td><td>OAuth token</td><td>Local <code>.git/config</code></td><td>git push (must be rotated, see §15)</td></tr>
+      </tbody>
+    </table></div>
+
+    <div class="card danger">
+      <h4>🚨 What is NOT in code</h4>
+      <p style="font-size:13.5px">None of these values should ever appear in committed source files, browser-side JavaScript, screenshots, or chat logs. The current code has been audited and cleared of hardcoded fallbacks.</p>
+    </div>
+  </section>
+
+  <!-- 15. Rotations -->
+  <section class="section" id="rotation">
+    <span class="section-tag">Section 15</span>
+    <h2>Security Rotations</h2>
+    <p class="lead">Required immediately because these secrets were previously in source files committed to Git.</p>
+
+    <div class="card danger">
+      <h4>🔄 Required rotations</h4>
+      <ol style="margin-top:8px;margin-left:18px;font-size:13.5px">
+        <li><strong>Supabase service-role JWT</strong> — was hardcoded as a fallback in three API files. Reset at Supabase Dashboard → Settings → API → "Reset service_role secret". Then <code>vercel env rm SUPABASE_SERVICE_ROLE_KEY production</code> + <code>vercel env add</code> + redeploy.</li>
+        <li><strong>GitHub PAT</strong> — was in <code>.git/config</code> on the deployment machine. Revoke at <a href="https://github.com/settings/tokens" target="_blank">github.com/settings/tokens</a>. Generate a new fine-scoped PAT (just repo + workflow) and update local git remote URLs.</li>
+        <li><strong>ADMIN_PASSWORD</strong> — currently set to <code>Admin01!</code> for continuity. Change to something stronger (12+ chars, mixed): <code>vercel env rm ADMIN_PASSWORD production</code> then <code>vercel env add</code>, redeploy, distribute via password manager.</li>
+      </ol>
+    </div>
+
+    <h3>How to rotate cleanly (template)</h3>
+    <pre><span class="com"># 1. Generate or fetch the new secret from the source dashboard</span>
+NEW_VALUE="..."
+
+<span class="com"># 2. Remove the old value</span>
+vercel env rm SUPABASE_SERVICE_ROLE_KEY production
+
+<span class="com"># 3. Add the new value</span>
+echo -n "$NEW_VALUE" | vercel env add SUPABASE_SERVICE_ROLE_KEY production
+
+<span class="com"># 4. Redeploy so the new value is picked up</span>
+vercel --prod
+
+<span class="com"># 5. Smoke test</span>
+curl -s https://technext-career.vercel.app/api/odoo-ping</pre>
+  </section>
+
+  <!-- 16. Runbook -->
+  <section class="section" id="runbook">
+    <span class="section-tag">Section 16</span>
+    <h2>Operations Runbook</h2>
+    <p class="lead">Common tasks an operator may need to perform.</p>
+
+    <h3>"A candidate submitted but isn't in Odoo"</h3>
+    <ol>
+      <li>Open Vercel → project → Logs → filter for <code>evt:odoo_sync_fail</code>.</li>
+      <li>Hit <code>/api/odoo-ping</code> — confirm <code>"ok": true</code>.</li>
+      <li>If 503: check the Odoo API key in Vercel env hasn't expired; renew at Odoo → user → Preferences → Account Security.</li>
+      <li>If 200 but record still missing: the candidate's email may have a typo. Look up the row in Supabase admin and re-run a manual upsert.</li>
+    </ol>
+
+    <h3>"Resume isn't attaching in Odoo"</h3>
+    <ol>
+      <li>Confirm <code>candidate_resume_url</code> is set in the Supabase row.</li>
+      <li>Confirm the Supabase Storage bucket is public-readable.</li>
+      <li>The chatter note always contains a clickable resume URL even if the file attachment failed.</li>
+    </ol>
+
+    <h3>"Job position isn't linking automatically"</h3>
+    <p>Each role needs an <code>ODOO_JOB_*_ID</code> env var pointing to the corresponding Odoo job position. To find the ID: in Odoo, open Recruitment → Job Positions → the job → look at the URL (e.g. <code>/odoo/recruitment/1</code> → ID is 1). Set the env var, redeploy.</p>
+
+    <h3>"I need to lock everyone out immediately"</h3>
+    <p>Rotate <code>ADMIN_SESSION_SECRET</code> (any new value) and redeploy. All in-flight session tokens become invalid instantly.</p>
+    <pre><span class="com"># generate a new secret + apply</span>
+NEW=$(node -e "console.log(require('crypto').randomBytes(48).toString('hex'))")
+vercel env rm ADMIN_SESSION_SECRET production
+echo -n "$NEW" | vercel env add ADMIN_SESSION_SECRET production
+vercel --prod</pre>
+
+    <h3>"Production is down"</h3>
+    <ol>
+      <li>Vercel dashboard → project → Deployments. Is the latest deployment "Ready"?</li>
+      <li>Click into the deployment → Functions → check error rate per endpoint.</li>
+      <li>Roll back via "Promote to Production" on a previous green deployment.</li>
+    </ol>
+
+    <h3>"Add a new test type"</h3>
+    <ol>
+      <li>Create a new HTML file in <code>/technext/&lt;testname&gt;.html</code> following the pattern in <code>iq_test.html</code>.</li>
+      <li>Add the test_type code to <code>VALID_TEST_TYPES</code> in <code>api/submit-test.js</code>.</li>
+      <li>Add it to <code>TN_TYPES</code> + <code>TYPE_LABEL</code> + <code>TYPE_COLOR</code> in <code>admin.html</code>.</li>
+      <li>Optionally add a custom-field mapping in <code>api/_odoo.js</code> (<code>buildCustomFields</code>).</li>
+      <li>Commit + push + deploy.</li>
+    </ol>
+  </section>
+
+</div>
+
+<footer>
+  <p>TechNext Singapore · Internal Operations Document · Generated automatically</p>
+  <p style="margin-top:6px"><a href="https://technext-career.vercel.app">technext-career.vercel.app</a> · <a href="https://github.com/TechNextSG/technext-career">GitHub</a> · <a href="https://technext.odoo.com">Odoo</a></p>
+</footer>
+
+</body>
+</html>
